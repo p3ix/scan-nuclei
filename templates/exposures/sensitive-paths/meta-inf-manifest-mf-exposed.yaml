@@ -1,0 +1,33 @@
+id: meta-inf-manifest-mf-exposed
+
+info:
+  name: META-INF MANIFEST.MF Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects access to /META-INF/MANIFEST.MF, which may leak build metadata,
+    dependency versions, and implementation details useful for attack planning.
+  tags:
+    - exposure
+    - java
+    - manifest
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/META-INF/MANIFEST.MF"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: body
+        words:
+          - "Manifest-Version:"
+      - type: regex
+        part: body
+        regex:
+          - "(?im)^(Implementation-Version|Built-By|Build-Jdk|Created-By):"

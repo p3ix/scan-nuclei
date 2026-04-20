@@ -1,0 +1,50 @@
+id: wsdl-xsd-exposed
+
+info:
+  name: WSDL or XSD Files Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly accessible WSDL and XSD artifacts that reveal SOAP services,
+    operations, bindings, and XML schema structures.
+  tags:
+    - exposure
+    - wsdl
+    - xsd
+    - soap
+    - java
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?wsdl"
+      - "{{BaseURL}}/service?wsdl"
+      - "{{BaseURL}}/services?wsdl"
+      - "{{BaseURL}}/ws?wsdl"
+      - "{{BaseURL}}/api?wsdl"
+      - "{{BaseURL}}/application.wsdl"
+      - "{{BaseURL}}/service.wsdl"
+      - "{{BaseURL}}/services.wsdl"
+      - "{{BaseURL}}/wsdl/service.wsdl"
+      - "{{BaseURL}}/wsdl/services.wsdl"
+      - "{{BaseURL}}/schema.xsd"
+      - "{{BaseURL}}/xsd0.xsd"
+      - "{{BaseURL}}/application.xsd"
+      - "{{BaseURL}}/wsdl.xsd"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<(wsdl:)?definitions\\b"
+          - "(?is)<(xs:)?schema\\b"
+          - "(?is)<(wsdl:)?service\\b"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/xml|text/xml|application/wsdl\\+xml|application/xsd\\+xml|text/plain)"

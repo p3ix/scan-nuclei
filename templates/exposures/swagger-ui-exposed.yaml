@@ -1,0 +1,40 @@
+id: swagger-ui-exposed
+
+info:
+  name: Swagger UI Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Swagger UI endpoints that expose API documentation
+    and interactive exploration capabilities without explicit access controls.
+  tags:
+    - exposure
+    - swagger
+    - openapi
+    - java
+    - api
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/swagger-ui.html"
+      - "{{BaseURL}}/swagger-ui/index.html"
+      - "{{BaseURL}}/swagger-ui/"
+      - "{{BaseURL}}/swagger-api/"
+      - "{{BaseURL}}/swagger-api/index.html"
+      - "{{BaseURL}}/api-docs/"
+      - "{{BaseURL}}/docs/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - "(?i)(swagger ui|swagger-ui-bundle\\.js|swagger-ui-standalone-preset\\.js)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/html|application/javascript|text/javascript)"

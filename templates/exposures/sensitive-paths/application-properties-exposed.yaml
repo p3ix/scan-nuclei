@@ -1,0 +1,41 @@
+id: application-properties-exposed
+
+info:
+  name: Spring Application Properties Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects direct access to Spring application property files and common backup
+    variants, potentially exposing credentials and backend configuration.
+  tags:
+    - exposure
+    - spring
+    - config
+    - properties
+    - secrets
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/application.properties"
+      - "{{BaseURL}}/application.properties.bak"
+      - "{{BaseURL}}/application.properties.old"
+      - "{{BaseURL}}/application.properties~"
+      - "{{BaseURL}}/config/application.properties"
+      - "{{BaseURL}}/config/application.properties.bak"
+      - "{{BaseURL}}/config/application.properties.old"
+      - "{{BaseURL}}/config/application.properties~"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - "(?im)^(spring\\.|server\\.|management\\.|logging\\.|datasource\\.|db\\.)"
+      - type: regex
+        part: body
+        regex:
+          - "(?im)^(.*(password|passwd|secret|token|apikey|api_key).*=.*)$"

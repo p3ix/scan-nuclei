@@ -1,0 +1,42 @@
+id: swagger-assets-sourcemap-exposed
+
+info:
+  name: Swagger UI Assets or Source Maps Exposed
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects accessible Swagger UI JavaScript assets and source map files. While
+    often informational, these resources confirm public API documentation surface
+    and can disclose implementation details through source maps.
+  tags:
+    - exposure
+    - swagger
+    - sourcemap
+    - javascript
+    - api
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/swagger-ui.js"
+      - "{{BaseURL}}/swagger-ui-bundle.js"
+      - "{{BaseURL}}/swagger-ui-standalone-preset.js"
+      - "{{BaseURL}}/swagger-ui.js.map"
+      - "{{BaseURL}}/swagger-ui-bundle.js.map"
+      - "{{BaseURL}}/swagger-ui-standalone-preset.js.map"
+      - "{{BaseURL}}/swagger-ui/swagger-ui.js"
+      - "{{BaseURL}}/swagger-ui/swagger-ui-bundle.js.map"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - "(?i)(SwaggerUIBundle|swagger-ui|sourceMappingURL|\"version\"\\s*:)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/javascript|text/javascript|application/json|text/plain)"

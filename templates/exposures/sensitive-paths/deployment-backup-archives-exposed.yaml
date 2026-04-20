@@ -1,0 +1,47 @@
+id: deployment-backup-archives-exposed
+
+info:
+  name: Deployment Backup Archives Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed backup archives and packaged deployments (WAR/JAR/ZIP/TAR.GZ),
+    which can leak source code, configs, credentials, and internal assets.
+  tags:
+    - exposure
+    - backup
+    - archive
+    - java
+    - war
+    - jar
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/backup.zip"
+      - "{{BaseURL}}/backup.tar.gz"
+      - "{{BaseURL}}/site-backup.zip"
+      - "{{BaseURL}}/app-backup.zip"
+      - "{{BaseURL}}/application.war"
+      - "{{BaseURL}}/ROOT.war"
+      - "{{BaseURL}}/app.war"
+      - "{{BaseURL}}/application.jar"
+      - "{{BaseURL}}/app.jar"
+      - "{{BaseURL}}/build/libs/app.jar"
+      - "{{BaseURL}}/dist/app.war"
+      - "{{BaseURL}}/tmp/backup.zip"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: binary
+        binary:
+          - "504B0304"
+          - "1F8B08"
+        condition: or
+      - type: regex
+        part: header
+        regex:
+          - "(?i)(content-type:.*(application/zip|application/java-archive|application/octet-stream|application/x-gzip)|content-disposition:.*(\\.zip|\\.tar\\.gz|\\.war|\\.jar))"

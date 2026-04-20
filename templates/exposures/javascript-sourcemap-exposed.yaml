@@ -1,0 +1,49 @@
+id: javascript-sourcemap-exposed
+
+info:
+  name: JavaScript Source Map Exposed
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects exposed JavaScript source maps that may leak source paths, symbols,
+    and implementation details useful for reverse engineering.
+  tags:
+    - exposure
+    - sourcemap
+    - javascript
+    - frontend
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/app.js.map"
+      - "{{BaseURL}}/main.js.map"
+      - "{{BaseURL}}/bundle.js.map"
+      - "{{BaseURL}}/vendor.js.map"
+      - "{{BaseURL}}/runtime.js.map"
+      - "{{BaseURL}}/assets/app.js.map"
+      - "{{BaseURL}}/assets/main.js.map"
+      - "{{BaseURL}}/static/js/main.js.map"
+      - "{{BaseURL}}/static/js/bundle.js.map"
+      - "{{BaseURL}}/js/app.js.map"
+      - "{{BaseURL}}/js/main.js.map"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?is)"version"\s*:\s*[0-9]+\s*,'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?is)"sources"\s*:\s*\['
+          - '(?is)"mappings"\s*:\s*"[^"]+'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/json|application/octet-stream|text/plain)"

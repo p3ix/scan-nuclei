@@ -1,0 +1,41 @@
+id: openapi-yaml-exposed
+
+info:
+  name: OpenAPI YAML Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly exposed OpenAPI/Swagger YAML definition files, which can
+    reveal sensitive endpoint and schema metadata.
+  tags:
+    - exposure
+    - openapi
+    - swagger
+    - yaml
+    - api
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/openapi.yaml"
+      - "{{BaseURL}}/openapi.yml"
+      - "{{BaseURL}}/swagger.yaml"
+      - "{{BaseURL}}/swagger.yml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?mi)^(openapi|swagger)\s*:\s*["'']?[0-9]+(\.[0-9]+)*["'']?\s*$'
+      - type: regex
+        part: body
+        regex:
+          - "(?mi)^paths\\s*:\\s*$"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/yaml|application/x-yaml|text/yaml|text/plain)"

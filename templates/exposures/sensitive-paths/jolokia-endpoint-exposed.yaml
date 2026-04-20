@@ -1,0 +1,35 @@
+id: jolokia-endpoint-exposed
+
+info:
+  name: Jolokia Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Jolokia JMX-HTTP bridge endpoints that can disclose runtime
+    internals and potentially permit sensitive JMX interactions.
+  tags:
+    - exposure
+    - java
+    - jolokia
+    - jmx
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/jolokia"
+      - "{{BaseURL}}/jolokia/list"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"(request|value|status|timestamp)"'
+      - type: regex
+        part: body
+        regex:
+          - "(?i)(jolokia|mbean|javax\\.management)"

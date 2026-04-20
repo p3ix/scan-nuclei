@@ -1,0 +1,35 @@
+id: actuator-env-exposed
+
+info:
+  name: Spring Boot Actuator Env Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated access to Spring Boot Actuator env endpoint, which
+    can expose environment variables, configuration values, and secrets.
+  tags:
+    - exposure
+    - spring
+    - spring-boot
+    - actuator
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/env"
+      - "{{BaseURL}}/env"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"(activeProfiles|propertySources|systemEnvironment|systemProperties)"'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"

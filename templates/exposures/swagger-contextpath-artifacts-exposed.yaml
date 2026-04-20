@@ -1,0 +1,54 @@
+id: swagger-contextpath-artifacts-exposed
+
+info:
+  name: Swagger or WADL Artifacts Exposed on Java Context Paths
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly exposed Swagger/OpenAPI/WADL artifacts under common Java
+    application context paths (for example /vesismin-ws/swagger-ui.js).
+  tags:
+    - exposure
+    - swagger
+    - openapi
+    - wadl
+    - java
+    - contextpath
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/{{ctx}}/swagger-ui.js"
+      - "{{BaseURL}}/{{ctx}}/swagger-ui-bundle.js"
+      - "{{BaseURL}}/{{ctx}}/swagger-ui-bundle.js.map"
+      - "{{BaseURL}}/{{ctx}}/docs.json"
+      - "{{BaseURL}}/{{ctx}}/v3/api-docs"
+      - "{{BaseURL}}/{{ctx}}/v2/api-docs"
+
+    payloads:
+      ctx:
+        - vesismin-ws
+        - api
+        - app
+        - ws
+        - rest
+        - services
+        - service
+        - backend
+        - portal
+        - web
+        - gateway
+        - internal
+
+    stop-at-first-match: true
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 && (contains(body, \"SwaggerUIBundle\") || contains(body, \"swagger-ui\") || contains(body, \"sourceMappingURL\")) && (contains(to_lower(all_headers), \"application/javascript\") || contains(to_lower(all_headers), \"text/javascript\") || contains(to_lower(all_headers), \"application/json\") || contains(to_lower(all_headers), \"text/plain\"))"
+      - type: dsl
+        dsl:
+          - "status_code == 200 && (contains(body, \"\\\"openapi\\\"\") || contains(body, \"\\\"swagger\\\"\")) && contains(body, \"\\\"paths\\\"\") && (contains(to_lower(all_headers), \"application/json\") || contains(to_lower(all_headers), \"text/plain\"))"
+      - type: dsl
+        dsl:
+          - "status_code == 200 && (contains(body, \"http://wadl.dev.java.net/2009/02\") || contains(body, \"<resources\") || contains(body, \"<grammars\") || contains(body, \"<xs:schema\")) && (contains(to_lower(all_headers), \"application/xml\") || contains(to_lower(all_headers), \"text/xml\") || contains(to_lower(all_headers), \"application/xsd+xml\") || contains(to_lower(all_headers), \"text/plain\"))"

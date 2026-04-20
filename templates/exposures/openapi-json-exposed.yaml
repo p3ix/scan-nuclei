@@ -1,0 +1,45 @@
+id: openapi-json-exposed
+
+info:
+  name: OpenAPI JSON Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly accessible OpenAPI/Swagger JSON documents that disclose
+    endpoint inventory, schemas, and API metadata.
+  tags:
+    - exposure
+    - openapi
+    - swagger
+    - json
+    - api
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/v3/api-docs"
+      - "{{BaseURL}}/v2/api-docs"
+      - "{{BaseURL}}/openapi.json"
+      - "{{BaseURL}}/swagger.json"
+      - "{{BaseURL}}/docs.json"
+      - "{{BaseURL}}/api/docs.json"
+      - "{{BaseURL}}/swagger/docs/v1"
+      - "{{BaseURL}}/swagger/docs/v1.json"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"(openapi|swagger)"\s*:\s*"[^"]+"'
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"paths"\s*:\s*\{'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/json|application/vnd\\.oas\\.json|text/plain)"

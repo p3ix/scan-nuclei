@@ -1,0 +1,89 @@
+id: swagger-contextpath-artifacts-exposed-pro
+
+info:
+  name: Swagger or WADL Artifacts Exposed on Java Context Paths (Pro)
+  author: scan-nuclei
+  severity: medium
+  description: |
+    High-coverage variant focused on nested Java context path artifacts to reduce
+    overlaps with baseline templates and still detect hidden API documentation
+    surfaces in production deployments.
+  tags:
+    - exposure
+    - swagger
+    - openapi
+    - wadl
+    - sourcemap
+    - java
+    - contextpath
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/{{ctx}}/rest/application.wadl"
+      - "{{BaseURL}}/{{ctx}}/rest/application.wadl?detail=true"
+      - "{{BaseURL}}/{{ctx}}/rest/application.wadl/xsd0.xsd"
+      - "{{BaseURL}}/{{ctx}}/api/application.wadl"
+      - "{{BaseURL}}/{{ctx}}/api/application.wadl?detail=true"
+      - "{{BaseURL}}/{{ctx}}/api/application.wadl/xsd0.xsd"
+      - "{{BaseURL}}/{{ctx}}/services/application.wadl"
+      - "{{BaseURL}}/{{ctx}}/services/application.wadl?detail=true"
+      - "{{BaseURL}}/{{ctx}}/services/application.wadl/xsd0.xsd"
+      - "{{BaseURL}}/{{ctx}}/rest/docs.json"
+      - "{{BaseURL}}/{{ctx}}/api/docs.json"
+      - "{{BaseURL}}/{{ctx}}/services/docs.json"
+      - "{{BaseURL}}/{{ctx}}/rest/v3/api-docs"
+      - "{{BaseURL}}/{{ctx}}/api/v3/api-docs"
+      - "{{BaseURL}}/{{ctx}}/services/v3/api-docs"
+      - "{{BaseURL}}/{{ctx}}/rest/swagger-ui.js"
+      - "{{BaseURL}}/{{ctx}}/api/swagger-ui.js"
+      - "{{BaseURL}}/{{ctx}}/services/swagger-ui.js"
+      - "{{BaseURL}}/{{ctx}}/rest/swagger-ui-bundle.js.map"
+      - "{{BaseURL}}/{{ctx}}/api/swagger-ui-bundle.js.map"
+      - "{{BaseURL}}/{{ctx}}/services/swagger-ui-bundle.js.map"
+
+    payloads:
+      ctx:
+        - vesismin-ws
+        - api
+        - app
+        - apps
+        - ws
+        - rest
+        - service
+        - services
+        - backend
+        - backoffice
+        - portal
+        - web
+        - gateway
+        - internal
+        - integration
+        - platform
+        - core
+        - public
+        - private
+        - ext
+        - external
+        - client
+        - customers
+        - partner
+        - soap
+        - microservice
+        - microservices
+        - admin
+        - management
+        - api-gateway
+
+    stop-at-first-match: true
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 && (contains(body, \"SwaggerUIBundle\") || contains(body, \"swagger-ui\") || contains(body, \"sourceMappingURL\") || contains(body, \"Swagger UI\")) && (contains(to_lower(all_headers), \"application/javascript\") || contains(to_lower(all_headers), \"text/javascript\") || contains(to_lower(all_headers), \"application/json\") || contains(to_lower(all_headers), \"text/plain\"))"
+      - type: dsl
+        dsl:
+          - "status_code == 200 && (contains(body, \"\\\"openapi\\\"\") || contains(body, \"\\\"swagger\\\"\") || contains(body, \"openapi:\")) && (contains(body, \"\\\"paths\\\"\") || contains(body, \"paths:\")) && (contains(to_lower(all_headers), \"application/json\") || contains(to_lower(all_headers), \"application/yaml\") || contains(to_lower(all_headers), \"application/x-yaml\") || contains(to_lower(all_headers), \"text/yaml\") || contains(to_lower(all_headers), \"text/plain\"))"
+      - type: dsl
+        dsl:
+          - "status_code == 200 && (contains(body, \"http://wadl.dev.java.net/2009/02\") || contains(body, \"<resources\") || contains(body, \"<grammars\") || contains(body, \"<xs:schema\")) && (contains(to_lower(all_headers), \"application/xml\") || contains(to_lower(all_headers), \"text/xml\") || contains(to_lower(all_headers), \"application/xsd+xml\") || contains(to_lower(all_headers), \"text/plain\"))"

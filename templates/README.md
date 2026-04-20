@@ -1,28 +1,23 @@
-# Plantillas Nuclei (Java / Tomcat / Apache)
+# Templates internals
 
-## Criterio de clasificación
+Este README documenta el arbol interno de `templates/`.
+La documentacion principal para GitHub esta en el `README.md` de la raiz.
 
-| Directorio | Cuándo usarlo |
-|------------|----------------|
-| `cves/` | Comprobaciones ligadas a un **CVE** concreto (matchers alineados al advisory; evitar basarse solo en banner). |
-| `vulnerabilities/` | Clases de fallo o cadenas de explotación **sin un CVE único** (lógica de app, patrones genéricos). |
-| `misconfiguration/` | Configuración **insegura pero “válida”**: interfaces admin expuestas, verbos/módulos peligrosos, headers de debug, etc. |
-| `exposures/` | **Filtración o superficie sensible** vía HTTP: rutas (`/WEB-INF/`, backups), páginas de error ruidosas, probes de debug. |
-| `technologies/` | **Huella** (`severity: info`): detección de stack sin afirmar explotabilidad. |
-| `default-logins/` | Formularios o basic auth con **credenciales por defecto** conocidas. |
-| `workflows/` | Flujos **multi-request** (p. ej. fingerprint → chequeo acotado). |
-| `file/` | Plantillas `protocol: file` para artefactos en disco (CI, imágenes). |
-| `helpers/` | Payloads o datos reutilizables entre plantillas (si aplica). |
-
-## Nombres de fichero
-
-- CVEs: `CVE-YYYY-NNNNN-<producto>-<slug-corto>.yaml`.
-- Resto: `<producto>-<hallazgo>-<opcional-contexto>.yaml` en minúsculas y guiones.
-
-## Uso
+## Uso rapido
 
 ```bash
+nuclei -validate -t templates/
 nuclei -t templates/ -u https://objetivo
 ```
 
-Las carpetas vacías usan `.gitkeep` para mantener el árbol en Git.
+## Clasificacion
+
+- `cves/`: detecciones ligadas a CVEs concretos.
+- `vulnerabilities/`: fallos sin CVE unico.
+- `misconfiguration/`: configuraciones inseguras.
+- `exposures/`: endpoints o archivos sensibles expuestos.
+- `technologies/`: fingerprinting (`severity: info`).
+- `default-logins/`: credenciales por defecto.
+- `workflows/`: encadenado de templates.
+
+Las carpetas vacias mantienen `.gitkeep`.

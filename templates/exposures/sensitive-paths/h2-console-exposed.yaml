@@ -1,0 +1,36 @@
+id: h2-console-exposed
+
+info:
+  name: H2 Console Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed H2 database console interfaces, which can provide direct
+    database interaction if weak or default settings are in place.
+  tags:
+    - exposure
+    - h2
+    - database
+    - console
+    - java
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/h2-console"
+      - "{{BaseURL}}/h2-console/"
+      - "{{BaseURL}}/h2-console/login.jsp"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - "(?i)(h2 console|jdbc url|org\\.h2\\.Driver|login\\.do)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*text/html"
