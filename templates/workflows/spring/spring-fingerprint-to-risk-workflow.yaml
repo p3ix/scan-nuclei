@@ -11,10 +11,15 @@ workflows:
       - template: templates/misconfiguration/java-apps/spring-actuator-root-exposed.yaml
       - template: templates/misconfiguration/java-apps/spring-actuator-prometheus-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-debug-endpoints-exposed.yaml
+      - template: templates/misconfiguration/java-apps/java-missing-security-headers.yaml
       - template: templates/exposures/error-pages/java-tomcat-stacktrace-exposed.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-mappings-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-configprops-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-boot-env-sensitive-keys-exposed.yaml
       - template: templates/vulnerabilities/spring/spring-boot-trace-http-inclusion-exposed.yaml
       - template: templates/vulnerabilities/spring/spring-cors-wildcard-credentials-potential.yaml
+      - template: templates/vulnerabilities/spring/csp-unsafe-inline-unsafe-eval.yaml
+      - template: templates/vulnerabilities/spring/cors-overly-permissive-methods-or-exposed-headers.yaml
+      - template: templates/vulnerabilities/spring/jsessionid-samesite-none-without-secure.yaml
+      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml
       - template: templates/cves/java/CVE-2022-22965-spring4shell-potential.yaml

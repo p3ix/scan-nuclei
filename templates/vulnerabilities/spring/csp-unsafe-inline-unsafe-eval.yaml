@@ -1,0 +1,29 @@
+id: csp-unsafe-inline-unsafe-eval
+
+info:
+  name: CSP Contains Unsafe Inline or Eval
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Content-Security-Policy directives allowing unsafe-inline or unsafe-eval,
+    weakening script execution protections.
+  tags:
+    - vulnerability
+    - spring
+    - headers
+    - csp
+    - xss
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'content-security-policy:')"
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), \"'unsafe-inline'\") || contains(to_lower(all_headers), \"'unsafe-eval'\")"

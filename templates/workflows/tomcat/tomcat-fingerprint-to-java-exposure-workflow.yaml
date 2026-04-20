@@ -13,8 +13,15 @@ workflows:
       - template: templates/exposures/wadl-exposed.yaml
       - template: templates/exposures/wsdl-xsd-exposed.yaml
       - template: templates/exposures/error-pages/java-tomcat-stacktrace-exposed.yaml
+      - template: templates/misconfiguration/java-apps/java-missing-security-headers.yaml
       - template: templates/exposures/sensitive-paths/actuator-env-exposed.yaml
       - template: templates/exposures/sensitive-paths/actuator-heapdump-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-yaml-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
+      - template: templates/vulnerabilities/generic-servlets/hsts-weak-max-age-or-missing-subdomains.yaml
+      - template: templates/vulnerabilities/generic-servlets/x-frame-options-invalid-or-weak.yaml
+      - template: templates/vulnerabilities/generic-servlets/x-content-type-options-invalid.yaml
+      - template: templates/vulnerabilities/generic-servlets/cors-origin-reflection-with-credentials.yaml
+      - template: templates/vulnerabilities/generic-servlets/jsessionid-missing-secure-httponly.yaml
+      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml

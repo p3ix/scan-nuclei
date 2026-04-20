@@ -1,0 +1,32 @@
+id: x-powered-by-disclosure
+
+info:
+  name: X-Powered-By Technology Disclosure
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects X-Powered-By header disclosure, which can leak technology stack
+    and version hints useful for reconnaissance.
+  tags:
+    - tech
+    - headers
+    - disclosure
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    extractors:
+      - type: regex
+        name: powered_by_value
+        part: header
+        regex:
+          - "(?i)x-powered-by:\\s*([^\\r\\n]+)"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'x-powered-by:')"

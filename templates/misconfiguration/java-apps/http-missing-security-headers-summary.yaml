@@ -1,0 +1,45 @@
+id: http-missing-security-headers-summary
+
+info:
+  name: HTTP Missing Security Headers Summary
+  author: scan-nuclei
+  severity: low
+  description: |
+    Aggregated single finding for missing security headers. Designed to reduce
+    noise by emitting one result and exposing per-header missing flags.
+  tags:
+    - misconfig
+    - headers
+    - hardening
+    - summary
+    - java
+    - apache
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 301
+          - 302
+          - 401
+          - 403
+          - 404
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(all_headers), 'strict-transport-security:') || !contains(to_lower(all_headers), 'content-security-policy:') || !contains(to_lower(all_headers), 'x-frame-options:') || !contains(to_lower(all_headers), 'x-content-type-options:') || !contains(to_lower(all_headers), 'referrer-policy:') || !contains(to_lower(all_headers), 'permissions-policy:') || !contains(to_lower(all_headers), 'cross-origin-opener-policy:') || !contains(to_lower(all_headers), 'cross-origin-embedder-policy:') || !contains(to_lower(all_headers), 'cross-origin-resource-policy:')"
+
+    extractors:
+      - type: dsl
+        name: missing_headers
+        dsl:
+          - "trim_suffix((!contains(to_lower(all_headers), 'strict-transport-security:') ? 'strict-transport-security,' : '') + (!contains(to_lower(all_headers), 'content-security-policy:') ? 'content-security-policy,' : '') + (!contains(to_lower(all_headers), 'x-frame-options:') ? 'x-frame-options,' : '') + (!contains(to_lower(all_headers), 'x-content-type-options:') ? 'x-content-type-options,' : '') + (!contains(to_lower(all_headers), 'referrer-policy:') ? 'referrer-policy,' : '') + (!contains(to_lower(all_headers), 'permissions-policy:') ? 'permissions-policy,' : '') + (!contains(to_lower(all_headers), 'cross-origin-opener-policy:') ? 'cross-origin-opener-policy,' : '') + (!contains(to_lower(all_headers), 'cross-origin-embedder-policy:') ? 'cross-origin-embedder-policy,' : '') + (!contains(to_lower(all_headers), 'cross-origin-resource-policy:') ? 'cross-origin-resource-policy,' : ''), ',')"
+      - type: dsl
+        name: missing_count
+        dsl:
+          - "(!contains(to_lower(all_headers), 'strict-transport-security:') ? 1 : 0) + (!contains(to_lower(all_headers), 'content-security-policy:') ? 1 : 0) + (!contains(to_lower(all_headers), 'x-frame-options:') ? 1 : 0) + (!contains(to_lower(all_headers), 'x-content-type-options:') ? 1 : 0) + (!contains(to_lower(all_headers), 'referrer-policy:') ? 1 : 0) + (!contains(to_lower(all_headers), 'permissions-policy:') ? 1 : 0) + (!contains(to_lower(all_headers), 'cross-origin-opener-policy:') ? 1 : 0) + (!contains(to_lower(all_headers), 'cross-origin-embedder-policy:') ? 1 : 0) + (!contains(to_lower(all_headers), 'cross-origin-resource-policy:') ? 1 : 0)"

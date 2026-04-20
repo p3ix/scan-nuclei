@@ -1,0 +1,28 @@
+id: x-frame-options-invalid-or-weak
+
+info:
+  name: X-Frame-Options Invalid or Weak
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects invalid or weak X-Frame-Options values that may not correctly
+    protect against framing/clickjacking.
+  tags:
+    - vulnerability
+    - headers
+    - x-frame-options
+    - clickjacking
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'x-frame-options:')"
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'x-frame-options: allow-from http://') || contains(to_lower(all_headers), 'x-frame-options: allowall') || contains(to_lower(all_headers), 'x-frame-options: none') || contains(to_lower(all_headers), 'x-frame-options: sameorigin,')"

@@ -1,0 +1,29 @@
+id: apache-missing-security-headers-extended
+
+info:
+  name: Apache Missing Extended Security Headers
+  author: scan-nuclei
+  severity: low
+  description: |
+    Detects Apache responses missing extended browser security headers used for
+    hardening and clickjacking/content-sniffing risk reduction.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - headers
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'server: apache')"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(all_headers), 'strict-transport-security:') || !contains(to_lower(all_headers), 'referrer-policy:') || !contains(to_lower(all_headers), 'permissions-policy:')"

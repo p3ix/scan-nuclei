@@ -1,0 +1,36 @@
+id: cors-overly-permissive-methods-or-exposed-headers
+
+info:
+  name: CORS Overly Permissive Methods or Exposed Headers
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects CORS responses that allow sensitive method sets or expose sensitive
+    response headers to cross-origin callers.
+  tags:
+    - vulnerability
+    - spring
+    - cors
+    - headers
+    - api
+
+http:
+  - method: OPTIONS
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/api/"
+      - "{{BaseURL}}/v1/"
+
+    headers:
+      Origin: https://evil-origin.example
+      Access-Control-Request-Method: PUT
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 204
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'access-control-allow-methods:') && (contains(to_lower(all_headers), 'put') || contains(to_lower(all_headers), 'delete') || contains(to_lower(all_headers), 'patch')) || (contains(to_lower(all_headers), 'access-control-expose-headers:') && (contains(to_lower(all_headers), 'authorization') || contains(to_lower(all_headers), 'set-cookie') || contains(to_lower(all_headers), 'x-api-key')))"

@@ -69,6 +69,17 @@ nuclei -t templates/ -u https://objetivo
 - Si aparece por input malformado (`?f=[`, comillas, expresiones):
   - revisar validacion/sanitizacion de parametros y respuestas de excepcion globales.
 
+## Triage de cabeceras
+
+- `low`:
+  - cabeceras de hardening ausentes (postura), sin evidencia directa de explotacion.
+- `medium`:
+  - cabeceras presentes pero debiles (`unsafe-inline`, HSTS flojo, XFO/XCTO invalidos),
+  - cookies de sesion sin flags recomendados.
+- `high`:
+  - combinaciones CORS peligrosas (`Allow-Credentials: true` + Origin reflejado arbitrario).
+- En disclosure (`Server`, `X-Powered-By`, version headers), tratar como `info` para priorizacion de superficie.
+
 ## Baseline de calidad antes de commit
 
 - Parse YAML correcto de todas las plantillas.

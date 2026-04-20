@@ -16,6 +16,10 @@ workflows:
       - template: templates/misconfiguration/apache/apache-cgi-bin-exposed.yaml
       - template: templates/misconfiguration/apache/apache-open-proxy-potential.yaml
       - template: templates/misconfiguration/apache/apache-missing-security-headers.yaml
+      - template: templates/misconfiguration/apache/apache-missing-security-headers-extended.yaml
+      - template: templates/misconfiguration/apache/apache-unsafe-http-methods-enabled.yaml
+      - template: templates/technologies/apache/apache-server-version-disclosure.yaml
+      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml
 
   - template: templates/technologies/apache/apache-default-page-fingerprint.yaml
     subtemplates:

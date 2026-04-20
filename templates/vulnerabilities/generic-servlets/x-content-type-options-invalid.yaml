@@ -1,0 +1,25 @@
+id: x-content-type-options-invalid
+
+info:
+  name: X-Content-Type-Options Invalid
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects invalid X-Content-Type-Options values. The only valid secure value
+    is nosniff.
+  tags:
+    - vulnerability
+    - headers
+    - x-content-type-options
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'x-content-type-options:') && !contains(to_lower(all_headers), 'x-content-type-options: nosniff')"

@@ -1,0 +1,29 @@
+id: jsessionid-missing-secure-httponly
+
+info:
+  name: JSESSIONID Missing Secure or HttpOnly
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects JSESSIONID cookies missing Secure and/or HttpOnly flags.
+  tags:
+    - vulnerability
+    - java
+    - servlet
+    - cookie
+    - headers
+    - session
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'set-cookie: jsessionid=')"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(all_headers), 'httponly') || !contains(to_lower(all_headers), 'secure')"

@@ -1,0 +1,35 @@
+id: java-missing-security-headers
+
+info:
+  name: Java App Missing Security Headers
+  author: scan-nuclei
+  severity: low
+  description: |
+    Detects Java web applications missing baseline browser security headers.
+    Posture-focused check for servlet and Spring-based stacks.
+  tags:
+    - java
+    - spring
+    - servlet
+    - misconfig
+    - headers
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Set-Cookie:\\s*JSESSIONID="
+          - "(?i)org\\.springframework\\."
+          - "(?i)Whitelabel Error Page"
+          - "(?i)Apache Tomcat"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(all_headers), 'content-security-policy:') || !contains(to_lower(all_headers), 'x-frame-options:') || !contains(to_lower(all_headers), 'x-content-type-options:')"

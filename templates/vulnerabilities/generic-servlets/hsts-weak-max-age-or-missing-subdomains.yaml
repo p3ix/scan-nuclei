@@ -1,0 +1,33 @@
+id: hsts-weak-max-age-or-missing-subdomains
+
+info:
+  name: HSTS Weak Max-Age or Missing SubDomains
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects weak HSTS policy where max-age is too low or includeSubDomains is
+    missing on HTTPS responses.
+  tags:
+    - vulnerability
+    - headers
+    - hsts
+    - hardening
+    - servlet
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "starts_with(host, 'https://')"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^strict-transport-security:\\s*max-age=([0-9]{1,5});?"
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'strict-transport-security:') && !contains(to_lower(all_headers), 'includesubdomains')"

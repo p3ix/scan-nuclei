@@ -1,0 +1,32 @@
+id: apache-server-version-disclosure
+
+info:
+  name: Apache Server Version Disclosure Header
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects explicit Apache version disclosure in the Server header.
+  tags:
+    - tech
+    - apache
+    - headers
+    - disclosure
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    extractors:
+      - type: regex
+        name: apache_server_version
+        part: header
+        regex:
+          - "(?i)server:\\s*(apache/[0-9.]+[^\\r\\n]*)"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'server: apache/')"

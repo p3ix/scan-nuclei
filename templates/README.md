@@ -32,5 +32,9 @@ nuclei -t templates/ -u https://objetivo
 - Para stacktraces:
   - si hay paquetes/clases internas y lineas de codigo, priorizar remediacion;
   - si solo hay error generico, tratar como hardening de manejo de errores.
+- Para cabeceras:
+  - `misconfiguration/*headers*`: postura/hardening (`low`).
+  - `vulnerabilities/*headers*` y `cors-*`: riesgo de impacto en navegador/API (`medium`/`high`).
+  - `technologies/*disclosure*`: contexto de reconocimiento (`info`).
 
 Las carpetas vacias mantienen `.gitkeep`.

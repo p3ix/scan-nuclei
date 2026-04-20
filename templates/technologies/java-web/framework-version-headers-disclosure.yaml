@@ -1,0 +1,32 @@
+id: framework-version-headers-disclosure
+
+info:
+  name: Framework Version Headers Disclosure
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects framework/version disclosure headers such as X-AspNet-Version and
+    similar metadata-bearing headers.
+  tags:
+    - tech
+    - headers
+    - disclosure
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    extractors:
+      - type: regex
+        name: framework_header
+        part: header
+        regex:
+          - "(?i)(x-aspnet-version|x-aspnetmvc-version|x-runtime|x-generator):\\s*([^\\r\\n]+)"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'x-aspnet-version:') || contains(to_lower(all_headers), 'x-aspnetmvc-version:') || contains(to_lower(all_headers), 'x-runtime:') || contains(to_lower(all_headers), 'x-generator:')"
