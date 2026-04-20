@@ -1,0 +1,43 @@
+id: tomcat-manager-text-endpoints-exposed
+
+info:
+  name: Tomcat Manager Text Endpoints Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat Manager text endpoints associated with scripting and
+    deployment automation surface.
+  tags:
+    - tomcat
+    - exposure
+    - manager
+    - text
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/text"
+      - "{{BaseURL}}/manager/text/list"
+      - "{{BaseURL}}/manager/text/serverinfo"
+      - "{{BaseURL}}/manager/text/resources"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?m)^OK - Listed applications for virtual host"
+          - "(?m)^OK - Server info"
+          - "(?m)^OK - Listed global JNDI resources"
+          - "(?i)Tomcat Manager Application"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

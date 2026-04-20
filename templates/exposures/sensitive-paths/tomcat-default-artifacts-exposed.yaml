@@ -1,0 +1,46 @@
+id: tomcat-default-artifacts-exposed
+
+info:
+  name: Tomcat Default Application Artifacts Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects files commonly exposed by default or sample Tomcat applications,
+    including documentation assets, JSP examples, and static application
+    resources that indicate undeleted sample content.
+  tags:
+    - tomcat
+    - exposure
+    - examples
+    - docs
+    - artifacts
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/docs/changelog.html"
+      - "{{BaseURL}}/docs/config/ajp.html"
+      - "{{BaseURL}}/examples/jsp/index.html"
+      - "{{BaseURL}}/examples/servlets/index.html"
+      - "{{BaseURL}}/examples/websocket/index.xhtml"
+      - "{{BaseURL}}/favicon.ico"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Apache Tomcat"
+          - "(?i)Servlet and JSP Examples"
+          - "(?i)WebSocket Examples"
+          - "(?i)AJP Connector"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

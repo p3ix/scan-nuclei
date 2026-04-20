@@ -12,13 +12,26 @@ workflows:
       - template: templates/misconfiguration/tomcat/tomcat-host-manager-html-exposed.yaml
       - template: templates/misconfiguration/tomcat/tomcat-manager-script-endpoint-exposed.yaml
       - template: templates/misconfiguration/tomcat/tomcat-manager-jmxproxy-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-manager-help-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-manager-text-endpoints-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-host-manager-text-endpoints-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-manager-status-endpoint-exposed.yaml
       - template: templates/default-logins/tomcat-manager/tomcat-manager-default-credentials.yaml
       - template: templates/default-logins/apache-tomcat/apache-tomcat-admin-default-credentials.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-default-root-page-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-examples-docs-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-default-artifacts-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-host-manager-help-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-directory-listing-common-paths-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-deployed-artifacts-listing-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-users-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-context-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-server-xml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-web-xml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-catalina-policy-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-logging-properties-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-root-context-xml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-config-backups-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-catalina-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-webapps-root-listing-exposed.yaml
       - template: templates/exposures/sensitive-paths/web-inf-web-xml-exposed.yaml

@@ -1,0 +1,37 @@
+id: tomcat-web-xml-exposed
+
+info:
+  name: Tomcat Global Web XML Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat global `web.xml` configuration, which may reveal
+    default servlet mappings, security constraints, MIME mappings, and session
+    configuration.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - config
+    - webxml
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/web.xml"
+      - "{{BaseURL}}/web.xml"
+      - "{{BaseURL}}/conf/web.xml.default"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<web-app\\b"
+          - "(?is)<servlet\\b"
+          - "(?is)<security-constraint\\b"
+          - "(?is)<session-config\\b"

@@ -1,0 +1,50 @@
+id: tomcat-directory-listing-common-paths-exposed
+
+info:
+  name: Tomcat Directory Listing on Common Paths
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects directory listing exposure on Tomcat-specific common paths such as
+    docs, examples, ROOT, WEB-INF, META-INF, and webapps.
+  tags:
+    - tomcat
+    - exposure
+    - directory-listing
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/docs/"
+      - "{{BaseURL}}/examples/"
+      - "{{BaseURL}}/ROOT/"
+      - "{{BaseURL}}/WEB-INF/"
+      - "{{BaseURL}}/META-INF/"
+      - "{{BaseURL}}/webapps/"
+      - "{{BaseURL}}/webapps/ROOT/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Index of /"
+          - "(?i)<h1>Index of /"
+          - "(?i)Parent Directory"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(WEB-INF|META-INF|examples|docs|ROOT)/"
+          - "(?i)\\.(war|jar|class|xml|properties|yml|yaml|bak|old|log)\\b"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

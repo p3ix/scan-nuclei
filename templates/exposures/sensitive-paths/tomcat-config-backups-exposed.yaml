@@ -1,0 +1,63 @@
+id: tomcat-config-backups-exposed
+
+info:
+  name: Tomcat Config Backups Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed backup or editor-temp copies of sensitive Tomcat
+    configuration files such as `server.xml`, `context.xml`, `tomcat-users.xml`
+    and related descriptors.
+  tags:
+    - tomcat
+    - exposure
+    - backup
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/server.xml.bak"
+      - "{{BaseURL}}/conf/server.xml.old"
+      - "{{BaseURL}}/conf/server.xml~"
+      - "{{BaseURL}}/server.xml.bak"
+      - "{{BaseURL}}/conf/context.xml.bak"
+      - "{{BaseURL}}/conf/context.xml.old"
+      - "{{BaseURL}}/conf/context.xml~"
+      - "{{BaseURL}}/context.xml.bak"
+      - "{{BaseURL}}/conf/tomcat-users.xml.bak"
+      - "{{BaseURL}}/conf/tomcat-users.xml.old"
+      - "{{BaseURL}}/conf/tomcat-users.xml~"
+      - "{{BaseURL}}/tomcat-users.xml.bak"
+      - "{{BaseURL}}/conf/web.xml.bak"
+      - "{{BaseURL}}/conf/web.xml.old"
+      - "{{BaseURL}}/conf/web.xml~"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.old"
+      - "{{BaseURL}}/conf/logging.properties.bak"
+      - "{{BaseURL}}/conf/logging.properties.old"
+      - "{{BaseURL}}/conf/catalina.policy.bak"
+      - "{{BaseURL}}/conf/catalina.policy.old"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Server\\b"
+          - "(?is)<Context\\b"
+          - "(?is)<tomcat-users\\b"
+          - "(?is)<web-app\\b"
+          - "(?im)^handlers\\s*="
+          - "(?im)^grant\\s+codeBase"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,48 @@
+id: tomcat-deployed-artifacts-listing-exposed
+
+info:
+  name: Tomcat Deployed Artifacts Listing Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects directory listings exposing deployed Tomcat application artifacts
+    such as WARs, exploded apps, XML descriptors, and backups.
+  tags:
+    - tomcat
+    - exposure
+    - listing
+    - artifacts
+    - deployment
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/webapps/"
+      - "{{BaseURL}}/webapps/dist/"
+      - "{{BaseURL}}/deploy/"
+      - "{{BaseURL}}/apps/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Index of /"
+          - "(?i)<h1>Index of /"
+          - "(?i)Parent Directory"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)\\.(war|jar|xml|bak|old)\\b"
+          - "(?i)(ROOT|examples|docs|manager|host-manager)/"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

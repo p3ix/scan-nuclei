@@ -49,6 +49,28 @@ nuclei -w templates/workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml
 nuclei -w templates/workflows/wildfly/jboss-legacy-migration-debt-workflow.yaml -u https://objetivo
 ```
 
+Para objetivos Tomcat, separa el uso segun el tipo de revision:
+
+- `templates/workflows/tomcat/tomcat-version-priority-workflow.yaml`
+  - para superficie admin, archivos sensibles, defaults y CVEs `potential`.
+- `templates/workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflow.yaml`
+  - para exposiciones Java tipicas desplegadas sobre Tomcat.
+- `templates/workflows/tomcat/tomcat-hardening-workflow.yaml`
+  - para revisar hardening, headers, cookies, TRACE, errores verbosos y surface admin.
+
+Ejemplos:
+
+```bash
+# Tomcat admin surface + ficheros sensibles + CVEs potenciales
+nuclei -w templates/workflows/tomcat/tomcat-version-priority-workflow.yaml -u https://objetivo
+
+# Tomcat + exposiciones Java
+nuclei -w templates/workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflow.yaml -u https://objetivo
+
+# Tomcat hardening
+nuclei -w templates/workflows/tomcat/tomcat-hardening-workflow.yaml -u https://objetivo
+```
+
 ## Cobertura WildFly moderna
 
 La linea de `WildFly` moderno esta pensada principalmente para:
@@ -93,6 +115,7 @@ Triage rapido recomendado para estos hallazgos:
   - Swagger assets/source maps (`swagger-ui*.js`, `*.map`)
   - Fingerprints de tecnologia (`technologies/*`)
   - management reads de WildFly (`wildfly-*-management-unauth`) cuando varias plantillas devuelven la misma causa raiz de exposicion
+  - manager/help/text/status de Tomcat cuando varias rutas describen la misma superficie administrativa
 - Priorizar para remediacion en este orden:
   1) `default-logins`, `misconfiguration` de admin panels
   2) `exposures` de secretos/configuracion
@@ -126,5 +149,6 @@ Triage rapido recomendado para estos hallazgos:
 - Campos obligatorios presentes (`id`, `info`, `http/requests`, `matchers-condition`, `matchers`).
 - Revisar solapamientos de paths para reducir hallazgos duplicados.
 - En workflows WildFly, mantener separadas las familias `modern-admin-surface` y `legacy-migration-debt`.
+- En workflows Tomcat, separar `version-priority`, `java-exposure` y `hardening` segun el objetivo del scan.
 
 Para detalle de clasificacion, ver `templates/README.md`.

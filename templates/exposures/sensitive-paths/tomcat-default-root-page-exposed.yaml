@@ -1,0 +1,38 @@
+id: tomcat-default-root-page-exposed
+
+info:
+  name: Tomcat Default ROOT Page Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects the default Apache Tomcat ROOT landing page, which usually
+    indicates an uncustomized or weakly hardened deployment.
+  tags:
+    - tomcat
+    - exposure
+    - default-page
+    - root
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/index.jsp"
+      - "{{BaseURL}}/index.html"
+
+    stop-at-first-match: true
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)If you're seeing this, you've successfully installed Tomcat"
+          - "(?i)Apache Tomcat/[0-9.]+"
+          - "(?i)It works !"
+          - "(?i)Tomcat home page"

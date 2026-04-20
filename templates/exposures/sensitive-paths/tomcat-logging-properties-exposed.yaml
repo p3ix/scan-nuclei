@@ -1,0 +1,34 @@
+id: tomcat-logging-properties-exposed
+
+info:
+  name: Tomcat Logging Properties Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Tomcat `logging.properties`, which may leak handler
+    configuration, log file locations, and internal logger categories.
+  tags:
+    - tomcat
+    - exposure
+    - logging
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/logging.properties"
+      - "{{BaseURL}}/logging.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^handlers\\s*="
+          - "(?im)\\.org\\.apache\\.juli\\."
+          - "(?im)^java\\.util\\.logging\\."
+          - "(?im)^\\d*catalina\\.org\\.apache\\.juli\\."

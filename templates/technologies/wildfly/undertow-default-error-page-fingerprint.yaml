@@ -30,6 +30,6 @@ http:
         condition: or
         regex:
           - "(?i)UT[0-9]{6}:"
-          - "(?i)undertow"
-          - "(?i)<title>.*404.*</title>"
+          - "(?i)io\\.undertow\\."
+          - "(?i)server:\\s*undertow/?[0-9.]*"
           - "(?i)WFLYUT[0-9]{4}:"

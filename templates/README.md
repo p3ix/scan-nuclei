@@ -45,4 +45,13 @@ nuclei -t templates/ -u https://objetivo
 - `workflows/wildfly/jboss-legacy-migration-debt-workflow.yaml`:
   - orientado a deuda de migracion y superficies legacy de JBoss.
 
+## Nota de workflows Tomcat
+
+- `workflows/tomcat/tomcat-version-priority-workflow.yaml`:
+  - orientado a superficie admin, defaults, archivos sensibles y CVEs `potential`.
+- `workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflow.yaml`:
+  - orientado a exposiciones Java tipicas sobre aplicaciones servidas por Tomcat.
+- `workflows/tomcat/tomcat-hardening-workflow.yaml`:
+  - orientado a posture review, headers, cookies, TRACE, errores verbosos y surface admin.
+
 Las carpetas vacias mantienen `.gitkeep`.

@@ -1,0 +1,37 @@
+id: tomcat-root-context-xml-exposed
+
+info:
+  name: Tomcat ROOT Context XML Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed ROOT context descriptor files used by Tomcat per-app
+    configuration, which may reveal JNDI resources, valves, and deployment
+    internals for the default webapp.
+  tags:
+    - tomcat
+    - exposure
+    - context
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml"
+      - "{{BaseURL}}/Catalina/localhost/ROOT.xml"
+      - "{{BaseURL}}/ROOT.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Context\\b"
+          - "(?is)<Resource\\b"
+          - "(?is)<Valve\\b"
+          - "(?i)(docBase|path|reloadable|crossContext)="

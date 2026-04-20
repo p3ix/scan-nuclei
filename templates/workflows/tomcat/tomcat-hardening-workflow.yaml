@@ -1,0 +1,35 @@
+id: tomcat-hardening-workflow
+
+info:
+  name: Tomcat Hardening Workflow
+  author: scan-nuclei
+  description: Runs Tomcat posture and hardening checks after Tomcat technology is detected, without focusing on CVEs or deep file exposure.
+
+workflows:
+  - template: templates/technologies/tomcat/tomcat-version-hint-fingerprint.yaml
+    subtemplates:
+      - template: templates/exposures/sensitive-paths/tomcat-default-root-page-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-examples-docs-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-default-artifacts-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-directory-listing-common-paths-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-deployed-artifacts-listing-exposed.yaml
+      - template: templates/misconfiguration/tomcat/tomcat-manager-html-exposed.yaml
+      - template: templates/misconfiguration/tomcat/tomcat-host-manager-html-exposed.yaml
+      - template: templates/misconfiguration/tomcat/tomcat-manager-script-endpoint-exposed.yaml
+      - template: templates/misconfiguration/tomcat/tomcat-manager-jmxproxy-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-manager-help-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-manager-text-endpoints-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-host-manager-help-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-host-manager-text-endpoints-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-manager-status-endpoint-exposed.yaml
+      - template: templates/misconfiguration/java-apps/http-missing-security-headers-summary.yaml
+      - template: templates/vulnerabilities/generic-servlets/java-servlet-trace-echo-enabled.yaml
+      - template: templates/vulnerabilities/generic-servlets/java-servlet-verbose-error-disclosure.yaml
+      - template: templates/vulnerabilities/generic-servlets/hsts-weak-max-age-or-missing-subdomains.yaml
+      - template: templates/vulnerabilities/generic-servlets/x-frame-options-invalid-or-weak.yaml
+      - template: templates/vulnerabilities/generic-servlets/x-content-type-options-invalid.yaml
+      - template: templates/vulnerabilities/generic-servlets/cors-origin-reflection-with-credentials.yaml
+      - template: templates/vulnerabilities/generic-servlets/jsessionid-missing-secure-httponly.yaml
+      - template: templates/exposures/error-pages/java-tomcat-stacktrace-exposed.yaml
+      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml
+      - template: templates/technologies/java-web/framework-version-headers-disclosure.yaml

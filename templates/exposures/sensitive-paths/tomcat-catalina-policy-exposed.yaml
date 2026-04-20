@@ -1,0 +1,35 @@
+id: tomcat-catalina-policy-exposed
+
+info:
+  name: Tomcat Catalina Policy Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed `catalina.policy`, which may reveal Java security policy
+    grants, codebase paths, and runtime trust assumptions.
+  tags:
+    - tomcat
+    - exposure
+    - config
+    - policy
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/catalina.policy"
+      - "{{BaseURL}}/catalina.policy"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^grant\\s+codeBase"
+          - "(?im)^grant\\s*\\{"
+          - "(?im)permission\\s+java\\."
+          - "(?im)\\$\\{catalina\\.(home|base)\\}"

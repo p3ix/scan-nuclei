@@ -1,0 +1,42 @@
+id: tomcat-host-manager-help-exposed
+
+info:
+  name: Tomcat Host Manager Help or UI Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Host Manager help or UI pages that reveal administrative
+    capabilities and per-host management surface.
+  tags:
+    - tomcat
+    - exposure
+    - host-manager
+    - admin
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/host-manager/"
+      - "{{BaseURL}}/host-manager/html"
+      - "{{BaseURL}}/host-manager/html/list"
+      - "{{BaseURL}}/host-manager/html/help"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Tomcat Virtual Host Manager"
+          - "(?i)Host Manager"
+          - "(?i)www-authenticate:\\s*basic\\s+realm=\"Tomcat Host Manager Application\""
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

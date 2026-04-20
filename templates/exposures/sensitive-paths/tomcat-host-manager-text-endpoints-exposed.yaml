@@ -1,0 +1,42 @@
+id: tomcat-host-manager-text-endpoints-exposed
+
+info:
+  name: Tomcat Host Manager Text Endpoints Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Host Manager text endpoints that reveal virtual-host
+    management surface and administrative capabilities.
+  tags:
+    - tomcat
+    - exposure
+    - host-manager
+    - text
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/host-manager/text"
+      - "{{BaseURL}}/host-manager/text/list"
+      - "{{BaseURL}}/host-manager/text/serverinfo"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Tomcat Host Manager Application"
+          - "(?m)^OK -"
+          - "(?i)Virtual Hosts"
+          - "(?i)www-authenticate:\\s*basic\\s+realm=\"Tomcat Host Manager Application\""
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

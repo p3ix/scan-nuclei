@@ -49,11 +49,16 @@ http:
         part: body
         condition: or
         regex:
+          - "(?i)io\\.undertow\\."
+          - "(?i)org\\.wildfly\\."
+          - "(?i)WFLYUT[0-9]{4}:"
+          - "(?i)org\\.jboss\\.as\\."
+      - type: regex
+        part: body
+        condition: or
+        regex:
           - "(?m)^\\s*at\\s+[a-zA-Z0-9_$.]+\\([A-Za-z0-9_.]+:[0-9]+\\)"
           - "(?m)^\\s*at\\s+[a-zA-Z0-9_$.]+\\([A-Za-z0-9_$.]+\\.java:[0-9]+\\)"
           - "(?i)java\\.lang\\.[A-Za-z0-9_$.]*Exception"
           - "(?i)(javax|jakarta)\\.[a-z0-9_$.]+\\.[A-Za-z0-9_$.]*Exception"
           - "(?im)^Caused by:\\s+[a-zA-Z0-9_$.]+"
-          - "(?i)io\\.undertow\\."
-          - "(?i)org\\.wildfly\\."
-          - "(?i)WFLYUT[0-9]{4}:"
