@@ -1,0 +1,39 @@
+id: spring-cloud-bootstrap-yml-exposed
+
+info:
+  name: Spring Cloud Bootstrap YML Exposed
+  author: scan-nuclei
+  severity: high
+  description: Detects exposed bootstrap.yml/bootstrap.yaml files with Spring Cloud config hints.
+  tags:
+    - exposure
+    - spring
+    - spring-cloud
+    - config
+    - secrets
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/bootstrap.yml"
+      - "{{BaseURL}}/bootstrap.yaml"
+      - "{{BaseURL}}/config/bootstrap.yml"
+      - "{{BaseURL}}/config/bootstrap.yaml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^spring:\\s*$"
+          - "(?im)^\\s*cloud:\\s*$"
+          - "(?im)^\\s*config:\\s*$"
+          - "(?im)^\\s*uri:\\s*https?://"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

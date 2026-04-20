@@ -10,7 +10,9 @@ workflows:
     subtemplates:
       - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-status-auto-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-status-json-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-info-module-signature-exposed.yaml
       - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml
       - template: templates/misconfiguration/apache/apache-directory-listing-exposed.yaml
       - template: templates/misconfiguration/apache/apache-ht-files-exposed.yaml
@@ -26,5 +28,7 @@ workflows:
     subtemplates:
       - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-status-auto-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-status-json-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-info-module-signature-exposed.yaml
       - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml

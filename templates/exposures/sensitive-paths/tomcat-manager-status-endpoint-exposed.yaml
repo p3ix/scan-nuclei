@@ -1,0 +1,36 @@
+id: tomcat-manager-status-endpoint-exposed
+
+info:
+  name: Tomcat Manager Status Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: Detects exposed Tomcat manager status endpoint.
+  tags:
+    - exposure
+    - tomcat
+    - manager
+    - status
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/status"
+      - "{{BaseURL}}/manager/status/all"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Server Status"
+          - "(?i)Tomcat Manager Application"
+          - "(?i)JVM"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

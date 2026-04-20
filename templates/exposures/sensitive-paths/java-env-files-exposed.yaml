@@ -1,0 +1,41 @@
+id: java-env-files-exposed
+
+info:
+  name: Java Environment Files Exposed
+  author: scan-nuclei
+  severity: high
+  description: Detects exposed Java runtime environment/config files.
+  tags:
+    - exposure
+    - java
+    - environment
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.env"
+      - "{{BaseURL}}/.java-version"
+      - "{{BaseURL}}/.sdkmanrc"
+      - "{{BaseURL}}/setenv.sh"
+      - "{{BaseURL}}/setenv.bat"
+      - "{{BaseURL}}/catalina.sh"
+      - "{{BaseURL}}/catalina.bat"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^JAVA_(HOME|OPTS|TOOL_OPTIONS)="
+          - "(?im)^CATALINA_(HOME|BASE|OPTS)="
+          - "(?im)^export\\s+JAVA_HOME="
+          - "(?im)^set\\s+JAVA_HOME="
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

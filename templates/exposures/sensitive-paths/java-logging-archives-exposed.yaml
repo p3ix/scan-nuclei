@@ -1,0 +1,41 @@
+id: java-logging-archives-exposed
+
+info:
+  name: Java Logging Archives Exposed
+  author: scan-nuclei
+  severity: medium
+  description: Detects exposed compressed logging/config archives.
+  tags:
+    - exposure
+    - java
+    - logging
+    - archive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/logs.zip"
+      - "{{BaseURL}}/logs.tar.gz"
+      - "{{BaseURL}}/logback.xml.zip"
+      - "{{BaseURL}}/log4j2.xml.zip"
+      - "{{BaseURL}}/config/logback.xml.zip"
+      - "{{BaseURL}}/config/log4j2.xml.zip"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)content-type:\\s*application/(zip|x-gzip|gzip|octet-stream)"
+          - "(?i)content-disposition:\\s*attachment"
+      - type: dsl
+        dsl:
+          - "content_length > 100"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

@@ -1,0 +1,35 @@
+id: tomcat-webapps-root-listing-exposed
+
+info:
+  name: Tomcat Webapps Root Listing Exposed
+  author: scan-nuclei
+  severity: medium
+  description: Detects directory listing exposure on common Tomcat webapps roots.
+  tags:
+    - exposure
+    - tomcat
+    - directory-listing
+    - webapps
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/webapps/"
+      - "{{BaseURL}}/webapps/ROOT/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Index of /webapps"
+          - "(?i)Parent Directory"
+          - "(?i)WEB-INF/"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

@@ -17,7 +17,18 @@ workflows:
       - template: templates/exposures/sensitive-paths/actuator-logfile-exposed.yaml
       - template: templates/exposures/sensitive-paths/actuator-startup-exposed.yaml
       - template: templates/exposures/sensitive-paths/bootstrap-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/spring-cloud-bootstrap-yml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/spring-cloud-bootstrap-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/spring-profile-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/application-local-profile-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/application-staging-profile-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/application-uat-profile-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/application-secret-files-exposed.yaml
+      - template: templates/exposures/sensitive-paths/git-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/spring-actuator-caches-unauth.yaml
+      - template: templates/exposures/sensitive-paths/spring-actuator-integrationgraph-unauth.yaml
+      - template: templates/exposures/sensitive-paths/java-env-files-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-logging-archives-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-backups-exposed.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-beans-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-conditions-unauth.yaml

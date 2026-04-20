@@ -1,0 +1,39 @@
+id: application-staging-profile-config-exposed
+
+info:
+  name: Spring Staging Profile Config Exposed
+  author: scan-nuclei
+  severity: high
+  description: Detects exposed staging profile application config files.
+  tags:
+    - exposure
+    - spring
+    - config
+    - profile
+    - staging
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/application-staging.yml"
+      - "{{BaseURL}}/application-staging.yaml"
+      - "{{BaseURL}}/application-staging.properties"
+      - "{{BaseURL}}/config/application-staging.yml"
+      - "{{BaseURL}}/config/application-staging.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^(spring\\.|datasource\\.|security\\.|management\\.)"
+          - "(?im)^(spring|datasource|security|management)\\s*:"
+          - "(?im)(password|token|secret|api[-_]?key)\\s*[:=]"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

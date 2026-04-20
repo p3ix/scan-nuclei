@@ -1,0 +1,39 @@
+id: application-uat-profile-config-exposed
+
+info:
+  name: Spring UAT Profile Config Exposed
+  author: scan-nuclei
+  severity: high
+  description: Detects exposed UAT profile application config files.
+  tags:
+    - exposure
+    - spring
+    - config
+    - profile
+    - uat
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/application-uat.yml"
+      - "{{BaseURL}}/application-uat.yaml"
+      - "{{BaseURL}}/application-uat.properties"
+      - "{{BaseURL}}/config/application-uat.yml"
+      - "{{BaseURL}}/config/application-uat.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^(spring\\.|datasource\\.|security\\.|management\\.)"
+          - "(?im)^(spring|datasource|security|management)\\s*:"
+          - "(?im)(password|token|secret|api[-_]?key)\\s*[:=]"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

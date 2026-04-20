@@ -1,0 +1,35 @@
+id: apache-status-json-exposed
+
+info:
+  name: Apache Server Status JSON Exposed
+  author: scan-nuclei
+  severity: medium
+  description: Detects exposed machine-readable Apache status in JSON format.
+  tags:
+    - apache
+    - misconfiguration
+    - mod-status
+    - json
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-status?json"
+      - "{{BaseURL}}/server-status/?json"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"ServerVersion"\\s*:'
+          - '(?i)"BusyWorkers"\\s*:'
+          - '(?i)"IdleWorkers"\\s*:'
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

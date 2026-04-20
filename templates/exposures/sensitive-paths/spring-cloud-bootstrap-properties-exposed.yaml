@@ -1,0 +1,39 @@
+id: spring-cloud-bootstrap-properties-exposed
+
+info:
+  name: Spring Cloud Bootstrap Properties Exposed
+  author: scan-nuclei
+  severity: high
+  description: Detects exposed bootstrap.properties files with Spring Cloud config settings.
+  tags:
+    - exposure
+    - spring
+    - spring-cloud
+    - config
+    - properties
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/bootstrap.properties"
+      - "{{BaseURL}}/config/bootstrap.properties"
+      - "{{BaseURL}}/bootstrap.properties.bak"
+      - "{{BaseURL}}/bootstrap.properties.old"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^spring\\.application\\.name\\s*="
+          - "(?im)^spring\\.cloud\\.config\\.uri\\s*="
+          - "(?im)^spring\\.cloud\\.config\\.username\\s*="
+          - "(?im)^encrypt\\.key\\s*="
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

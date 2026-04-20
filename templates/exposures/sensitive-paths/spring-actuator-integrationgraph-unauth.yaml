@@ -1,0 +1,39 @@
+id: spring-actuator-integrationgraph-unauth
+
+info:
+  name: Spring Actuator IntegrationGraph Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: Detects unauthenticated access to Spring Integration graph endpoint.
+  tags:
+    - exposure
+    - spring
+    - actuator
+    - integration
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/integrationgraph"
+      - "{{BaseURL}}/integrationgraph"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"nodes"\\s*:'
+          - '(?i)"links"\\s*:'
+          - '(?i)"integration"'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

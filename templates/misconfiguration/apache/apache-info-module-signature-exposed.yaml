@@ -1,0 +1,36 @@
+id: apache-info-module-signature-exposed
+
+info:
+  name: Apache Server Info Module Signature Exposed
+  author: scan-nuclei
+  severity: medium
+  description: Detects Apache mod_info details that disclose loaded modules and build config.
+  tags:
+    - apache
+    - misconfiguration
+    - mod-info
+    - disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-info?config"
+      - "{{BaseURL}}/server-info?list"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Loaded Modules"
+          - "(?i)Server Built"
+          - "(?i)Server MPM"
+          - "(?i)Apache Module Information"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

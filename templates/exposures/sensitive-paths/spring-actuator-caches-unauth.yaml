@@ -1,0 +1,39 @@
+id: spring-actuator-caches-unauth
+
+info:
+  name: Spring Actuator Caches Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: Detects unauthenticated access to Spring Actuator caches endpoint.
+  tags:
+    - exposure
+    - spring
+    - actuator
+    - caches
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/caches"
+      - "{{BaseURL}}/caches"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"cacheManagers"\\s*:'
+          - '(?i)"target"\\s*:'
+          - '(?i)"name"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

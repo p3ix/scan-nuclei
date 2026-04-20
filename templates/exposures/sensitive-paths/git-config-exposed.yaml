@@ -1,0 +1,39 @@
+id: git-config-exposed
+
+info:
+  name: Git Metadata Exposed
+  author: scan-nuclei
+  severity: high
+  description: Detects exposed Git metadata/config files that can leak repository details.
+  tags:
+    - exposure
+    - git
+    - sensitive
+    - source-code
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.git/config"
+      - "{{BaseURL}}/.git/HEAD"
+      - "{{BaseURL}}/.git/index"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^\\[core\\]"
+          - "(?im)^\\s*repositoryformatversion\\s*=\\s*\\d+"
+          - "(?im)^ref:\\s+refs/"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(all_headers), 'text/html')"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path

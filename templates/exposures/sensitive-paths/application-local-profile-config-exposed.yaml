@@ -1,0 +1,37 @@
+id: application-local-profile-config-exposed
+
+info:
+  name: Spring Local Profile Config Exposed
+  author: scan-nuclei
+  severity: medium
+  description: Detects exposed local profile application config files.
+  tags:
+    - exposure
+    - spring
+    - config
+    - profile
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/application-local.yml"
+      - "{{BaseURL}}/application-local.yaml"
+      - "{{BaseURL}}/application-local.properties"
+      - "{{BaseURL}}/config/application-local.yml"
+      - "{{BaseURL}}/config/application-local.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: [200]
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^(spring\\.|server\\.|management\\.|logging\\.)"
+          - "(?im)^(spring|server|management|logging)\\s*:"
+
+    extractors:
+      - type: dsl
+        dsl: [path]
+        name: exposed_path
