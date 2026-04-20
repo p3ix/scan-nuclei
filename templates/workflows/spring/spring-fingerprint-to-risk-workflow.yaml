@@ -11,6 +11,7 @@ workflows:
       - template: templates/misconfiguration/java-apps/spring-actuator-root-exposed.yaml
       - template: templates/misconfiguration/java-apps/spring-actuator-prometheus-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-debug-endpoints-exposed.yaml
+      - template: templates/exposures/error-pages/java-tomcat-stacktrace-exposed.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-mappings-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-configprops-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-boot-env-sensitive-keys-exposed.yaml

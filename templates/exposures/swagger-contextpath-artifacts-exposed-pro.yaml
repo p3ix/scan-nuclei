@@ -36,6 +36,12 @@ http:
       - "{{BaseURL}}/{{ctx}}/api/v3/api-docs"
       - "{{BaseURL}}/{{ctx}}/services/v3/api-docs"
 
+    extractors:
+      - type: dsl
+        name: exposed_path
+        dsl:
+          - trim_prefix(matched, host)
+
     payloads:
       ctx:
         - vesismin-ws

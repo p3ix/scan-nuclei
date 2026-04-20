@@ -32,6 +32,12 @@ http:
       - "{{BaseURL}}/application.xsd"
       - "{{BaseURL}}/wsdl.xsd"
 
+    extractors:
+      - type: dsl
+        name: exposed_path
+        dsl:
+          - trim_prefix(matched, host)
+
     matchers-condition: and
     matchers:
       - type: status

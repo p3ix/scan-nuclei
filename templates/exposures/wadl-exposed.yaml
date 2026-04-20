@@ -24,6 +24,12 @@ http:
       - "{{BaseURL}}/resources/application.wadl?detail=true"
       - "{{BaseURL}}/resources/application.wadl/xsd0.xsd"
 
+    extractors:
+      - type: dsl
+        name: exposed_path
+        dsl:
+          - trim_prefix(matched, host)
+
     matchers-condition: and
     matchers:
       - type: status

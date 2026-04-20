@@ -56,8 +56,18 @@ nuclei -t templates/ -u https://objetivo
 - Priorizar para remediacion en este orden:
   1) `default-logins`, `misconfiguration` de admin panels
   2) `exposures` de secretos/configuracion
-  3) `cves/*-potential` (tras confirmacion manual)
-  4) `technologies` y `posture` (`low/info`)
+  3) `exposures/error-pages` con stacktraces (si revelan clases, rutas o datos internos)
+  4) `cves/*-potential` (tras confirmacion manual)
+  5) `technologies` y `posture` (`low/info`)
+
+## Triage de stacktraces
+
+- `stacktrace` con paquetes internos (`org.*`, `com.*`), clases de framework o line numbers:
+  - priorizar como fuga de informacion util para encadenar ataques.
+- `stacktrace` sin datos sensibles aparentes:
+  - tratar como hallazgo de hardening y mejorar manejo de errores en produccion.
+- Si aparece por input malformado (`?f=[`, comillas, expresiones):
+  - revisar validacion/sanitizacion de parametros y respuestas de excepcion globales.
 
 ## Baseline de calidad antes de commit
 

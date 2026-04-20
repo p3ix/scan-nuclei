@@ -1,0 +1,63 @@
+id: java-tomcat-stacktrace-exposed
+
+info:
+  name: Java/Tomcat Stacktrace Exposed by Invalid Input
+  author: scan-nuclei
+  severity: low
+  description: |
+    Detects Java stacktrace leakage triggered by malformed query inputs.
+    This template is intentionally broad to capture any stacktrace with internal
+    class names and line references.
+  tags:
+    - exposure
+    - java
+    - tomcat
+    - stacktrace
+    - error-page
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?f=["
+      - "{{BaseURL}}/?f=%5B"
+      - "{{BaseURL}}/?f=\\["
+      - "{{BaseURL}}/?f=%5C%5B"
+      - "{{BaseURL}}/?q=%5B"
+      - "{{BaseURL}}/?id='\""
+      - "{{BaseURL}}/?sort=${7*7}"
+      - "{{BaseURL}}/?callback=%7B%7B7*7%7D%7D"
+      - "{{BaseURL}}/?debug=true&f=["
+      - "{{BaseURL}}/?error=["
+      - "{{BaseURL}}/?input=["
+
+    stop-at-first-match: true
+
+    extractors:
+      - type: dsl
+        name: stacktrace_path
+        dsl:
+          - trim_prefix(matched, host)
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 422
+          - 500
+          - 400
+          - 404
+          - 502
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^\\s*at\\s+[a-zA-Z0-9_$.]+\\([A-Za-z0-9_.]+:[0-9]+\\)"
+          - "(?m)^\\s*at\\s+[a-zA-Z0-9_$.]+\\([A-Za-z0-9_$.]+\\.java:[0-9]+\\)"
+          - "(?i)java\\.lang\\.[A-Za-z0-9_$.]*Exception"
+          - "(?i)(javax|jakarta)\\.[a-z0-9_$.]+\\.[A-Za-z0-9_$.]*Exception"
+          - "(?im)^Caused by:\\s+[a-zA-Z0-9_$.]+"
+          - "(?i)nested exception is"
+          - "(?i)\\b(stacktrace|stack trace)\\b"
+          - "(?m)\\b[a-zA-Z0-9_$.]+\\.java:[0-9]{1,6}\\b"

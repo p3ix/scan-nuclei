@@ -5,8 +5,9 @@ info:
   author: scan-nuclei
   severity: medium
   description: |
-    Detects verbose Java servlet error pages that disclose stack traces,
-    framework classes, and internal package paths.
+    Detects generic verbose Java servlet error pages that disclose stack traces,
+    framework classes, and internal package paths. This template does not use
+    malformed-input trigger payloads (covered by dedicated stacktrace templates).
   tags:
     - vulnerability
     - java

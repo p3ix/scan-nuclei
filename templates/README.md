@@ -29,5 +29,8 @@ nuclei -t templates/ -u https://objetivo
 
 - Evitar doble conteo entre templates de docs (`openapi/wadl`) y templates de assets (`swagger-ui/*.map`).
 - Tratar `technologies/*` como contexto de priorizacion, no como finding explotable por si solo.
+- Para stacktraces:
+  - si hay paquetes/clases internas y lineas de codigo, priorizar remediacion;
+  - si solo hay error generico, tratar como hardening de manejo de errores.
 
 Las carpetas vacias mantienen `.gitkeep`.
