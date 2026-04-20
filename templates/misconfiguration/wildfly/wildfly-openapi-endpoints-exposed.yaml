@@ -1,0 +1,44 @@
+id: wildfly-openapi-endpoints-exposed
+
+info:
+  name: WildFly MicroProfile OpenAPI Endpoints Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable OpenAPI endpoints commonly exposed in modern
+    WildFly deployments through MicroProfile OpenAPI integrations.
+  tags:
+    - misconfig
+    - wildfly
+    - microprofile
+    - openapi
+    - docs
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/openapi"
+      - "{{BaseURL}}/openapi/"
+      - "{{BaseURL}}/openapi?format=json"
+      - "{{BaseURL}}/q/openapi"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 204"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"openapi"\\s*:\\s*"3\\.[0-9]+'
+          - "(?i)^openapi:\\s*3\\.[0-9]+"
+          - "(?i)/openapi"
+          - "(?i)application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

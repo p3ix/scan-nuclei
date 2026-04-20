@@ -1,0 +1,42 @@
+id: wildfly-version-hint-fingerprint
+
+info:
+  name: WildFly Version Hint Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Extracts WildFly, JBoss EAP, or Undertow version hints from headers,
+    welcome pages, or error responses for prioritization and CVE mapping.
+  tags:
+    - tech
+    - wildfly
+    - jboss
+    - undertow
+    - version
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei-wildfly-version"
+
+    matchers-condition: and
+    extractors:
+      - type: regex
+        part: all
+        name: wildfly_version
+        regex:
+          - "(?i)WildFly[/\\s]+([0-9]+(?:\\.[0-9]+){0,2})"
+          - "(?i)JBoss(?:\\s+EAP)?[/\\s]+([0-9]+(?:\\.[0-9]+){0,2})"
+          - "(?i)Undertow[/\\s]+([0-9]+(?:\\.[0-9]+){0,2})"
+          - "(?i)server:\\s*(wildfly/[0-9.]+|jboss-eap/[0-9.]+|undertow/[0-9.]+)"
+    matchers:
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)WildFly[/\\s]+[0-9]+(?:\\.[0-9]+){0,2}"
+          - "(?i)JBoss(?:\\s+EAP)?[/\\s]+[0-9]+(?:\\.[0-9]+){0,2}"
+          - "(?i)Undertow[/\\s]+[0-9]+(?:\\.[0-9]+){0,2}"
+          - "(?i)server:\\s*(wildfly/[0-9.]+|jboss-eap/[0-9.]+|undertow/[0-9.]+)"

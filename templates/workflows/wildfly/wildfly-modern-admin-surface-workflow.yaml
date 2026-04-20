@@ -1,0 +1,77 @@
+id: wildfly-modern-admin-surface-workflow
+
+info:
+  name: WildFly Modern Admin Surface Workflow
+  author: scan-nuclei
+  description: Runs modern WildFly administrative surface, disclosure, and hardening checks after WildFly fingerprints are detected.
+
+workflows:
+  - template: templates/technologies/wildfly/wildfly-management-realm-fingerprint.yaml
+    subtemplates:
+      - template: templates/misconfiguration/wildfly/wildfly-console-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-health-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-metrics-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-openapi-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-sample-apps-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-management-endpoint-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-hawtio-console-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-welcome-content-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jolokia-endpoint-exposed.yaml
+      - template: templates/exposures/sensitive-paths/meta-inf-manifest-mf-exposed.yaml
+      - template: templates/misconfiguration/java-apps/java-missing-security-headers.yaml
+      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml
+      - template: templates/technologies/java-web/framework-version-headers-disclosure.yaml
+      - template: templates/vulnerabilities/generic-servlets/jsessionid-missing-secure-httponly.yaml
+      - template: templates/vulnerabilities/generic-servlets/hsts-weak-max-age-or-missing-subdomains.yaml
+      - template: templates/vulnerabilities/generic-servlets/x-frame-options-invalid-or-weak.yaml
+      - template: templates/vulnerabilities/generic-servlets/x-content-type-options-invalid.yaml
+      - template: templates/vulnerabilities/generic-servlets/cors-origin-reflection-with-credentials.yaml
+
+  - template: templates/technologies/wildfly/wildfly-welcome-page-fingerprint.yaml
+    subtemplates:
+      - template: templates/technologies/wildfly/undertow-default-page-fingerprint.yaml
+      - template: templates/technologies/wildfly/undertow-default-error-page-fingerprint.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-console-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-health-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-metrics-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-openapi-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-sample-apps-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-management-endpoint-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-hawtio-console-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-welcome-content-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jolokia-endpoint-exposed.yaml
+      - template: templates/exposures/sensitive-paths/meta-inf-manifest-mf-exposed.yaml
+      - template: templates/exposures/error-pages/wildfly-undertow-stacktrace-exposed.yaml
+      - template: templates/misconfiguration/java-apps/java-missing-security-headers.yaml
+      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml
+      - template: templates/technologies/wildfly/wildfly-version-hint-fingerprint.yaml
+
+  - template: templates/technologies/wildfly/wildfly-server-header-fingerprint.yaml
+    subtemplates:
+      - template: templates/technologies/wildfly/wildfly-version-hint-fingerprint.yaml
+      - template: templates/technologies/wildfly/undertow-default-page-fingerprint.yaml
+      - template: templates/technologies/wildfly/undertow-default-error-page-fingerprint.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-console-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-health-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-metrics-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-openapi-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-sample-apps-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-management-endpoint-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-hawtio-console-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-welcome-content-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jolokia-endpoint-exposed.yaml
+      - template: templates/exposures/error-pages/wildfly-undertow-stacktrace-exposed.yaml
+      - template: templates/misconfiguration/java-apps/java-missing-security-headers.yaml
+      - template: templates/technologies/java-web/framework-version-headers-disclosure.yaml
+
+  - template: templates/technologies/wildfly/undertow-default-page-fingerprint.yaml
+    subtemplates:
+      - template: templates/exposures/sensitive-paths/wildfly-welcome-content-exposed.yaml
+      - template: templates/technologies/wildfly/undertow-default-error-page-fingerprint.yaml
+      - template: templates/exposures/error-pages/wildfly-undertow-stacktrace-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-console-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-health-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-metrics-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-openapi-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-sample-apps-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-management-endpoint-exposed.yaml

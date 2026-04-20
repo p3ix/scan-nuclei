@@ -1,0 +1,59 @@
+id: wildfly-undertow-stacktrace-exposed
+
+info:
+  name: WildFly Undertow Stacktrace Exposed by Invalid Input
+  author: scan-nuclei
+  severity: low
+  description: |
+    Detects Java, Undertow, or WildFly stacktrace leakage triggered by malformed
+    query inputs.
+  tags:
+    - exposure
+    - java
+    - wildfly
+    - undertow
+    - stacktrace
+    - error-page
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?f=["
+      - "{{BaseURL}}/?q=%5B"
+      - "{{BaseURL}}/?id='\""
+      - "{{BaseURL}}/?sort=${7*7}"
+      - "{{BaseURL}}/?debug=true&f=["
+      - "{{BaseURL}}/?error=["
+      - "{{BaseURL}}/?input=["
+
+    stop-at-first-match: true
+
+    extractors:
+      - type: dsl
+        name: stacktrace_path
+        dsl:
+          - trim_prefix(matched, host)
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 400
+          - 404
+          - 422
+          - 500
+          - 502
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^\\s*at\\s+[a-zA-Z0-9_$.]+\\([A-Za-z0-9_.]+:[0-9]+\\)"
+          - "(?m)^\\s*at\\s+[a-zA-Z0-9_$.]+\\([A-Za-z0-9_$.]+\\.java:[0-9]+\\)"
+          - "(?i)java\\.lang\\.[A-Za-z0-9_$.]*Exception"
+          - "(?i)(javax|jakarta)\\.[a-z0-9_$.]+\\.[A-Za-z0-9_$.]*Exception"
+          - "(?im)^Caused by:\\s+[a-zA-Z0-9_$.]+"
+          - "(?i)io\\.undertow\\."
+          - "(?i)org\\.wildfly\\."
+          - "(?i)WFLYUT[0-9]{4}:"

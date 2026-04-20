@@ -1,0 +1,43 @@
+id: jboss-web-console-exposed
+
+info:
+  name: JBoss Web Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed legacy JBoss Web Console interfaces that increase
+    administrative attack surface and usually indicate older JBoss stacks.
+  tags:
+    - exposure
+    - jboss
+    - web-console
+    - admin
+    - legacy
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/web-console"
+      - "{{BaseURL}}/web-console/"
+      - "{{BaseURL}}/web-console/ServerInfo.jsp"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)jboss web console"
+          - "(?i)serverinfo\\.jsp"
+          - "(?i)jboss management"
+          - "(?i)management console"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

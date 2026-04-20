@@ -1,0 +1,47 @@
+id: wildfly-sample-apps-exposed
+
+info:
+  name: WildFly Sample Applications Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable WildFly sample or demonstration applications that
+    should typically be removed from production deployments.
+  tags:
+    - misconfig
+    - wildfly
+    - undertow
+    - samples
+    - examples
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/helloworld"
+      - "{{BaseURL}}/helloworld/"
+      - "{{BaseURL}}/kitchensink"
+      - "{{BaseURL}}/kitchensink/"
+      - "{{BaseURL}}/numberguess"
+      - "{{BaseURL}}/numberguess/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)HelloWorld"
+          - "(?i)JBoss"
+          - "(?i)WildFly"
+          - "(?i)kitchensink"
+          - "(?i)numberguess"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: sample_path

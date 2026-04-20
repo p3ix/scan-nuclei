@@ -1,0 +1,47 @@
+id: wildfly-metrics-endpoints-exposed
+
+info:
+  name: WildFly Metrics Endpoints Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable metrics endpoints commonly exposed in modern
+    WildFly deployments through MicroProfile or Prometheus integrations.
+  tags:
+    - misconfig
+    - wildfly
+    - undertow
+    - microprofile
+    - prometheus
+    - metrics
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/metrics"
+      - "{{BaseURL}}/metrics/"
+      - "{{BaseURL}}/metrics/base"
+      - "{{BaseURL}}/metrics/vendor"
+      - "{{BaseURL}}/metrics/application"
+      - "{{BaseURL}}/prometheus"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^#\\s*HELP\\s+"
+          - "(?m)^#\\s*TYPE\\s+"
+          - '(?i)"(base|vendor|application)"\\s*:'
+          - "(?i)microprofile"
+          - "(?i)wildfly"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

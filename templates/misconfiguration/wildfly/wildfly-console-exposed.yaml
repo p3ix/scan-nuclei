@@ -1,0 +1,35 @@
+id: wildfly-console-exposed
+
+info:
+  name: WildFly Management Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects an exposed WildFly or JBoss administrative console, either directly
+    reachable or guarded by a recognizable management realm.
+  tags:
+    - wildfly
+    - jboss
+    - management
+    - console
+    - misconfig
+    - panel
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/console"
+      - "{{BaseURL}}/console/"
+      - "{{BaseURL}}/console/index.html"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "(status_code == 200 && (contains(to_lower(body), \"wildfly\") || contains(to_lower(body), \"jboss\")) && (contains(to_lower(body), \"management console\") || contains(to_lower(body), \"hal management\"))) || ((status_code == 401 || status_code == 403) && contains(to_lower(all_headers), \"managementrealm\"))"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

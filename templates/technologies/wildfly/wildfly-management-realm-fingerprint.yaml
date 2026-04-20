@@ -1,0 +1,35 @@
+id: wildfly-management-realm-fingerprint
+
+info:
+  name: WildFly Management Realm Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects WildFly or JBoss management authentication challenges exposed by
+    administrative endpoints.
+  tags:
+    - tech
+    - wildfly
+    - jboss
+    - management
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management"
+      - "{{BaseURL}}/management/"
+      - "{{BaseURL}}/console"
+      - "{{BaseURL}}/console/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 401 || status_code == 403"
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)www-authenticate:\\s*(basic|digest)\\s+realm=\"ManagementRealm\""
+          - "(?i)www-authenticate:\\s*(basic|digest)\\s+realm=\".*jboss.*\""

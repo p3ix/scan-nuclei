@@ -1,0 +1,42 @@
+id: wildfly-welcome-content-exposed
+
+info:
+  name: WildFly Welcome Content Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects the default WildFly welcome content, which indicates undeployed or
+    minimally hardened server state and discloses application server identity.
+  tags:
+    - exposure
+    - wildfly
+    - undertow
+    - welcome-content
+    - default-page
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/welcome-content/"
+      - "{{BaseURL}}/welcome-content/index.html"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Welcome to WildFly"
+          - "(?i)Your WildFly is running"
+          - "(?i)To replace this page simply deploy your own war"
+          - "(?i)welcome-content"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

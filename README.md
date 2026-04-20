@@ -1,6 +1,6 @@
 # scan-nuclei
 
-Plantillas Nuclei enfocadas en auditoria de Java, Tomcat y Apache HTTPD.
+Plantillas Nuclei enfocadas en auditoria de Java, Tomcat, WildFly/JBoss y Apache HTTPD.
 
 ## Estructura
 

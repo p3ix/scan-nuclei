@@ -1,0 +1,35 @@
+id: undertow-default-error-page-fingerprint
+
+info:
+  name: Undertow Default Error Page Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Undertow or WildFly default error responses that disclose server
+    technology and sometimes version or stack details.
+  tags:
+    - tech
+    - wildfly
+    - undertow
+    - fingerprint
+    - error-page
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei-undertow-404"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 404
+          - 500
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)UT[0-9]{6}:"
+          - "(?i)undertow"
+          - "(?i)<title>.*404.*</title>"
+          - "(?i)WFLYUT[0-9]{4}:"

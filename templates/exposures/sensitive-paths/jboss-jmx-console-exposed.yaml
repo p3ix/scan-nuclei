@@ -1,0 +1,44 @@
+id: jboss-jmx-console-exposed
+
+info:
+  name: JBoss JMX Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed legacy JBoss JMX Console endpoints that provide sensitive
+    administrative surface and are strongly associated with older JBoss
+    deployments.
+  tags:
+    - exposure
+    - jboss
+    - jmx
+    - console
+    - legacy
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/jmx-console"
+      - "{{BaseURL}}/jmx-console/"
+      - "{{BaseURL}}/jmx-console/HtmlAdaptor"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)jmx console"
+          - "(?i)htmladaptor"
+          - "(?i)jboss\\.system"
+          - "(?i)managementrealm"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,42 @@
+id: wildfly-hawtio-console-exposed
+
+info:
+  name: WildFly Hawtio Console Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Hawtio console paths commonly deployed alongside WildFly or
+    JBoss environments, increasing operational and management attack surface.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - hawtio
+    - console
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/hawtio"
+      - "{{BaseURL}}/hawtio/"
+      - "{{BaseURL}}/hawtio/login"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)hawtio"
+          - "(?i)jolokia"
+          - "(?i)management console"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

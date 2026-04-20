@@ -1,0 +1,16 @@
+id: jboss-legacy-migration-debt-workflow
+
+info:
+  name: JBoss Legacy Migration Debt Workflow
+  author: scan-nuclei
+  description: Runs legacy JBoss administrative surface and historical risk checks after JBoss or WildFly version indicators are detected.
+
+workflows:
+  - template: templates/technologies/wildfly/wildfly-version-hint-fingerprint.yaml
+    subtemplates:
+      - template: templates/exposures/sensitive-paths/jboss-jmx-console-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jboss-web-console-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jboss-invoker-servlet-exposed.yaml
+      - tags: potential
+      - template: templates/cves/java/CVE-2010-0738-jboss-jmx-console-auth-bypass-potential.yaml
+      - template: templates/cves/java/CVE-2017-12149-jboss-invoker-deserialization-rce-potential.yaml

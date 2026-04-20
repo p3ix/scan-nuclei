@@ -1,0 +1,42 @@
+id: wildfly-management-endpoint-exposed
+
+info:
+  name: WildFly Management Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed WildFly or JBoss management API endpoints that increase
+    administrative attack surface, even when authentication is still required.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - management
+    - api
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management"
+      - "{{BaseURL}}/management/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)ManagementRealm"
+          - "(?i)\"outcome\"\\s*:\\s*\"(success|failed)\""
+          - "(?i)\"result\"\\s*:"
+          - "(?i)wildfly"
+          - "(?i)jboss"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

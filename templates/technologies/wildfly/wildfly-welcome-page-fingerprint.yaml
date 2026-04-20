@@ -1,0 +1,34 @@
+id: wildfly-welcome-page-fingerprint
+
+info:
+  name: WildFly Welcome Page Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects WildFly or JBoss application server welcome pages that expose
+    technology identity on the HTTP connector.
+  tags:
+    - tech
+    - wildfly
+    - jboss
+    - undertow
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Welcome to WildFly"
+          - "(?i)Your WildFly is running"
+          - "(?i)Welcome to JBoss"
+          - "(?i)JBoss Enterprise Application Platform"

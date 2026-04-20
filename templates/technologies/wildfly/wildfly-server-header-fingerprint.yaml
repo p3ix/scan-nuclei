@@ -1,0 +1,38 @@
+id: wildfly-server-header-fingerprint
+
+info:
+  name: WildFly or Undertow Server Header Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects WildFly, JBoss EAP, or Undertow identity exposed through HTTP
+    response headers.
+  tags:
+    - tech
+    - wildfly
+    - jboss
+    - undertow
+    - headers
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)server:\\s*wildfly/?[0-9.]*"
+          - "(?i)server:\\s*jboss-eap/?[0-9.]*"
+          - "(?i)server:\\s*undertow/?[0-9.]*"
+
+    extractors:
+      - type: regex
+        name: server_header
+        part: header
+        regex:
+          - "(?i)server:\\s*([^\\r\\n]+)"

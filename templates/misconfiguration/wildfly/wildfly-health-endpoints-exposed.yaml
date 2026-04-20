@@ -1,0 +1,45 @@
+id: wildfly-health-endpoints-exposed
+
+info:
+  name: WildFly Health Endpoints Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable health endpoints commonly exposed in modern
+    WildFly deployments through MicroProfile Health integrations.
+  tags:
+    - misconfig
+    - wildfly
+    - microprofile
+    - health
+    - diagnostics
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/health"
+      - "{{BaseURL}}/health/"
+      - "{{BaseURL}}/health/live"
+      - "{{BaseURL}}/health/ready"
+      - "{{BaseURL}}/q/health"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"status"\\s*:\\s*"(UP|DOWN)"'
+          - '(?i)"checks"\\s*:'
+          - "(?i)microprofile"
+          - "(?i)health"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
