@@ -1,0 +1,37 @@
+id: spring-actuator-root-exposed
+
+info:
+  name: Spring Actuator Root Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Spring Actuator root endpoint that enumerates
+    management links and increases operational attack surface.
+  tags:
+    - misconfig
+    - java
+    - spring
+    - spring-boot
+    - actuator
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"_links"\\s*:\\s*\\{'
+          - '(?i)"self"\\s*:'
+          - '(?i)"health"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"

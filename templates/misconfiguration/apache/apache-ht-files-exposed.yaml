@@ -1,0 +1,44 @@
+id: apache-ht-files-exposed
+
+info:
+  name: Apache .ht* Files Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly accessible Apache .htaccess/.htpasswd files that may expose
+    rewrite rules, credentials, or internal pathing details.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - htaccess
+    - htpasswd
+    - secrets
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.htaccess"
+      - "{{BaseURL}}/.htpasswd"
+      - "{{BaseURL}}/conf/.htaccess"
+      - "{{BaseURL}}/config/.htpasswd"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^AuthType\\s+\\w+"
+          - "(?im)^AuthName\\s+\"?.+\"?$"
+          - "(?im)^Require\\s+.+"
+          - "(?im)^RewriteEngine\\s+On"
+          - "(?im)^[a-zA-Z0-9._-]+:\\$apr1\\$[A-Za-z0-9./$]+"
+          - "(?im)^[a-zA-Z0-9._-]+:\\$2[aby]?\\$[0-9]{2}\\$[A-Za-z0-9./]+"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/plain|text/html|application/octet-stream)"

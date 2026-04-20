@@ -1,13 +1,13 @@
 id: swagger-contextpath-artifacts-exposed-pro
 
 info:
-  name: Swagger or WADL Artifacts Exposed on Java Context Paths (Pro)
+  name: OpenAPI and WADL Nested Context Paths Exposed (Pro)
   author: scan-nuclei
   severity: medium
   description: |
-    High-coverage variant focused on nested Java context path artifacts to reduce
-    overlaps with baseline templates and still detect hidden API documentation
-    surfaces in production deployments.
+    High-coverage variant focused on nested OpenAPI/WADL context path artifacts.
+    Excludes generic Swagger UI asset paths to minimize overlap with dedicated
+    source-map and UI templates.
   tags:
     - exposure
     - swagger
@@ -35,12 +35,6 @@ http:
       - "{{BaseURL}}/{{ctx}}/rest/v3/api-docs"
       - "{{BaseURL}}/{{ctx}}/api/v3/api-docs"
       - "{{BaseURL}}/{{ctx}}/services/v3/api-docs"
-      - "{{BaseURL}}/{{ctx}}/rest/swagger-ui.js"
-      - "{{BaseURL}}/{{ctx}}/api/swagger-ui.js"
-      - "{{BaseURL}}/{{ctx}}/services/swagger-ui.js"
-      - "{{BaseURL}}/{{ctx}}/rest/swagger-ui-bundle.js.map"
-      - "{{BaseURL}}/{{ctx}}/api/swagger-ui-bundle.js.map"
-      - "{{BaseURL}}/{{ctx}}/services/swagger-ui-bundle.js.map"
 
     payloads:
       ctx:
@@ -78,9 +72,6 @@ http:
     stop-at-first-match: true
     matchers-condition: or
     matchers:
-      - type: dsl
-        dsl:
-          - "status_code == 200 && (contains(body, \"SwaggerUIBundle\") || contains(body, \"swagger-ui\") || contains(body, \"sourceMappingURL\") || contains(body, \"Swagger UI\")) && (contains(to_lower(all_headers), \"application/javascript\") || contains(to_lower(all_headers), \"text/javascript\") || contains(to_lower(all_headers), \"application/json\") || contains(to_lower(all_headers), \"text/plain\"))"
       - type: dsl
         dsl:
           - "status_code == 200 && (contains(body, \"\\\"openapi\\\"\") || contains(body, \"\\\"swagger\\\"\") || contains(body, \"openapi:\")) && (contains(body, \"\\\"paths\\\"\") || contains(body, \"paths:\")) && (contains(to_lower(all_headers), \"application/json\") || contains(to_lower(all_headers), \"application/yaml\") || contains(to_lower(all_headers), \"application/x-yaml\") || contains(to_lower(all_headers), \"text/yaml\") || contains(to_lower(all_headers), \"text/plain\"))"

@@ -1,0 +1,34 @@
+id: apache-unsafe-http-methods-enabled
+
+info:
+  name: Apache Unsafe HTTP Methods Enabled
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects potentially unsafe HTTP methods (PUT, DELETE, TRACE) advertised in
+    the Allow header, indicating increased attack surface.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - methods
+
+http:
+  - method: OPTIONS
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 204
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^allow:\\s*.*\\b(PUT|DELETE|TRACE)\\b"

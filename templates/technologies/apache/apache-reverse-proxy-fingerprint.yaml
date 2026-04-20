@@ -1,0 +1,39 @@
+id: apache-reverse-proxy-fingerprint
+
+info:
+  name: Apache Reverse Proxy Indicators
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Apache reverse proxy behavior through common proxy-related headers
+    and backend signaling artifacts.
+  tags:
+    - tech
+    - apache
+    - reverse-proxy
+    - mod_proxy
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    headers:
+      X-Forwarded-For: 127.0.0.1
+      X-Forwarded-Proto: https
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)^via:\\s*.*apache"
+          - "(?i)^x-forwarded-(for|proto|host):"
+          - "(?i)^x-proxy-id:"
+          - "(?i)^x-cache:"

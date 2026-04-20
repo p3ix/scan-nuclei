@@ -1,0 +1,39 @@
+id: apache-server-info-exposed
+
+info:
+  name: Apache mod_info Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly accessible Apache mod_info output, leaking loaded modules
+    and configuration details that can accelerate targeted exploitation.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - mod_info
+    - panel
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-info"
+      - "{{BaseURL}}/server-info?config"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Server Information</title>"
+          - "(?i)Apache Server Information"
+          - "(?i)Loaded Modules"
+          - "(?i)<h2>Module Name</h2>"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*text/html"

@@ -1,0 +1,40 @@
+id: apache-cgi-bin-exposed
+
+info:
+  name: Apache cgi-bin Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Apache cgi-bin directories or default CGI scripts that may
+    disclose environment details and increase legacy attack surface.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - cgi
+    - legacy
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/cgi-bin/"
+      - "{{BaseURL}}/cgi-bin/printenv"
+      - "{{BaseURL}}/cgi-bin/test-cgi"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Index of /cgi-bin/?</title>"
+          - "(?i)SERVER_SOFTWARE="
+          - "(?i)<h1>CGI/1\\.0 test script report</h1>"
+          - "(?i)GATEWAY_INTERFACE=CGI/"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)(server:\\s*apache|content-type:\\s*text/html|content-type:\\s*text/plain)"

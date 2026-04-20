@@ -1,0 +1,16 @@
+id: apache-fronting-tomcat-workflow
+
+info:
+  name: Apache Fronting Tomcat Workflow
+  author: scan-nuclei
+  description: Chains Tomcat and Java exposure checks when Apache appears to front a Tomcat backend.
+
+workflows:
+  - template: templates/technologies/apache/apache-fronting-tomcat-fingerprint.yaml
+    subtemplates:
+      - template: templates/misconfiguration/tomcat/tomcat-manager-html-exposed.yaml
+      - template: templates/exposures/sensitive-paths/web-inf-web-xml-exposed.yaml
+      - template: templates/exposures/openapi-json-exposed.yaml
+      - template: templates/exposures/wadl-exposed.yaml
+      - template: templates/exposures/swagger-contextpath-artifacts-exposed.yaml
+      - template: templates/exposures/swagger-contextpath-artifacts-exposed-pro.yaml

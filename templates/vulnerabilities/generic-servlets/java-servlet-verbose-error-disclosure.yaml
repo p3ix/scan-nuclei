@@ -1,0 +1,36 @@
+id: java-servlet-verbose-error-disclosure
+
+info:
+  name: Java Servlet Verbose Error Disclosure
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects verbose Java servlet error pages that disclose stack traces,
+    framework classes, and internal package paths.
+  tags:
+    - vulnerability
+    - java
+    - servlet
+    - info-disclosure
+    - error-page
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/this-should-404-nuclei-servlet-check"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 404
+          - 500
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Exception report"
+          - "(?i)type Exception report"
+          - "(?i)java\\.lang\\.[A-Za-z]+Exception"
+          - "(?i)at [a-zA-Z0-9_$.]+\\([A-Za-z0-9_.]+:[0-9]+\\)"
+          - "(?i)org\\.apache\\.catalina\\."

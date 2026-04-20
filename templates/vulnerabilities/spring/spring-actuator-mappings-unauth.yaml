@@ -1,0 +1,38 @@
+id: spring-actuator-mappings-unauth
+
+info:
+  name: Spring Actuator Mappings Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated exposure of Spring Actuator mappings endpoint,
+    disclosing internal route inventory and handler metadata.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/mappings"
+      - "{{BaseURL}}/mappings"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"contexts"\\s*:\\s*\\{'
+          - '(?i)"dispatcherServlets"\\s*:'
+          - '(?i)"handler"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"

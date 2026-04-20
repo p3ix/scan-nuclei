@@ -1,0 +1,40 @@
+id: tomcat-examples-docs-exposed
+
+info:
+  name: Tomcat Examples or Documentation Apps Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly exposed Tomcat sample and documentation applications that
+    are commonly left enabled in non-hardened deployments.
+  tags:
+    - tomcat
+    - exposure
+    - examples
+    - docs
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/docs/"
+      - "{{BaseURL}}/examples/"
+      - "{{BaseURL}}/examples/jsp/"
+      - "{{BaseURL}}/examples/servlets/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Apache Tomcat Documentation"
+          - "(?i)Tomcat Examples"
+          - "(?i)Servlet and JSP Examples"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*text/html"

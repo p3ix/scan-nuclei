@@ -1,0 +1,39 @@
+id: tomcat-catalina-signatures-fingerprint
+
+info:
+  name: Tomcat Catalina Signature Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Apache Tomcat by Catalina/Coyote class and package signatures in
+    responses and error output.
+  tags:
+    - tech
+    - tomcat
+    - catalina
+    - coyote
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei-tomcat-signatures"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)org\\.apache\\.catalina\\."
+          - "(?i)org\\.apache\\.coyote\\."
+          - "(?i)Apache-Coyote/[0-9.]+"
+          - "(?i)Apache Tomcat/[0-9.]+"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)HTTP Status 404"
+          - "(?i)Exception report"
+          - "(?i)Set-Cookie:\\s*JSESSIONID="

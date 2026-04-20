@@ -1,0 +1,43 @@
+id: application-yaml-exposed
+
+info:
+  name: Spring Application YAML Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects direct access to Spring application YAML files and backup variants,
+    which may reveal credentials and environment-specific configuration.
+  tags:
+    - exposure
+    - spring
+    - config
+    - yaml
+    - secrets
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/application.yml"
+      - "{{BaseURL}}/application.yaml"
+      - "{{BaseURL}}/application.yml.bak"
+      - "{{BaseURL}}/application.yaml.bak"
+      - "{{BaseURL}}/application.yml.old"
+      - "{{BaseURL}}/application.yaml.old"
+      - "{{BaseURL}}/application.yml~"
+      - "{{BaseURL}}/application.yaml~"
+      - "{{BaseURL}}/config/application.yml"
+      - "{{BaseURL}}/config/application.yaml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - "(?im)^(spring|server|management|logging|datasource|security)\\s*:"
+      - type: regex
+        part: body
+        regex:
+          - "(?im)^(\\s*)(password|passwd|secret|token|api[-_]?key|client-secret)\\s*:\\s*.+$"

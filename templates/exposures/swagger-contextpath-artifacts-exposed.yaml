@@ -1,12 +1,13 @@
 id: swagger-contextpath-artifacts-exposed
 
 info:
-  name: Swagger or WADL Artifacts Exposed on Java Context Paths
+  name: OpenAPI Docs Exposed on Java Context Paths
   author: scan-nuclei
   severity: medium
   description: |
-    Detects publicly exposed Swagger/OpenAPI/WADL artifacts under common Java
-    application context paths (for example /vesismin-ws/swagger-ui.js).
+    Detects publicly exposed OpenAPI/Swagger specification endpoints under common
+    Java application context paths. Focused on JSON docs to reduce overlap with
+    dedicated Swagger assets/source-map templates.
   tags:
     - exposure
     - swagger
@@ -18,9 +19,6 @@ info:
 http:
   - method: GET
     path:
-      - "{{BaseURL}}/{{ctx}}/swagger-ui.js"
-      - "{{BaseURL}}/{{ctx}}/swagger-ui-bundle.js"
-      - "{{BaseURL}}/{{ctx}}/swagger-ui-bundle.js.map"
       - "{{BaseURL}}/{{ctx}}/docs.json"
       - "{{BaseURL}}/{{ctx}}/v3/api-docs"
       - "{{BaseURL}}/{{ctx}}/v2/api-docs"
@@ -43,9 +41,6 @@ http:
     stop-at-first-match: true
     matchers-condition: or
     matchers:
-      - type: dsl
-        dsl:
-          - "status_code == 200 && (contains(body, \"SwaggerUIBundle\") || contains(body, \"swagger-ui\") || contains(body, \"sourceMappingURL\")) && (contains(to_lower(all_headers), \"application/javascript\") || contains(to_lower(all_headers), \"text/javascript\") || contains(to_lower(all_headers), \"application/json\") || contains(to_lower(all_headers), \"text/plain\"))"
       - type: dsl
         dsl:
           - "status_code == 200 && (contains(body, \"\\\"openapi\\\"\") || contains(body, \"\\\"swagger\\\"\")) && contains(body, \"\\\"paths\\\"\") && (contains(to_lower(all_headers), \"application/json\") || contains(to_lower(all_headers), \"text/plain\"))"

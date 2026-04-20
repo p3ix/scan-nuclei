@@ -1,0 +1,42 @@
+id: apache-missing-security-headers
+
+info:
+  name: Apache Missing Core Security Headers
+  author: scan-nuclei
+  severity: low
+  description: |
+    Detects Apache responses missing baseline browser hardening headers.
+    This is posture-oriented and should be triaged with application context.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - headers
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)server:\\s*apache"
+      - type: word
+        part: header
+        words:
+          - "X-Frame-Options:"
+        negative: true
+      - type: word
+        part: header
+        words:
+          - "X-Content-Type-Options:"
+        negative: true
+      - type: word
+        part: header
+        words:
+          - "Content-Security-Policy:"
+        negative: true

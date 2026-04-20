@@ -1,0 +1,39 @@
+id: java-debug-endpoints-exposed
+
+info:
+  name: Java Debug or Diagnostic Endpoints Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable diagnostic endpoints often left enabled in dev
+    or weakly hardened production deployments.
+  tags:
+    - misconfig
+    - java
+    - debug
+    - diagnostics
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/threaddump"
+      - "{{BaseURL}}/threaddump"
+      - "{{BaseURL}}/actuator/loggers"
+      - "{{BaseURL}}/loggers"
+      - "{{BaseURL}}/actuator/scheduledtasks"
+      - "{{BaseURL}}/scheduledtasks"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"threads"\\s*:'
+          - '(?i)"loggers"\\s*:'
+          - '(?i)"scheduledTasks"\\s*:'
+          - "(?i)java\\.lang\\.Thread\\.State"

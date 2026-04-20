@@ -1,0 +1,42 @@
+id: spring-boot-trace-http-inclusion-exposed
+
+info:
+  name: Spring Boot HTTP Trace Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed trace/httptrace actuator endpoints which may disclose
+    request metadata, headers, and session-related operational details.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - trace
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/httptrace"
+      - "{{BaseURL}}/httptrace"
+      - "{{BaseURL}}/actuator/trace"
+      - "{{BaseURL}}/trace"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"traces"\\s*:'
+          - '(?i)"timestamp"\\s*:'
+          - '(?i)"principal"\\s*:'
+          - '(?i)"request"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"

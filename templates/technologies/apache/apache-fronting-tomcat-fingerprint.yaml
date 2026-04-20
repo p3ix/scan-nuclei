@@ -1,0 +1,37 @@
+id: apache-fronting-tomcat-fingerprint
+
+info:
+  name: Apache Fronting Tomcat Indicators
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects indicators that Apache HTTPD is likely fronting a Tomcat backend,
+    based on header and cookie artifacts.
+  tags:
+    - tech
+    - apache
+    - tomcat
+    - mod_jk
+    - reverse-proxy
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/manager/html"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Set-Cookie:\\s*JSESSIONID="
+          - "(?i)Tomcat"
+          - "(?i)mod_jk"
+          - "(?i)Apache-Coyote"

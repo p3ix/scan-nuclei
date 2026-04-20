@@ -1,0 +1,38 @@
+id: apache-open-proxy-potential
+
+info:
+  name: Apache Potential Open Proxy Behavior
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects potential forward proxy behavior by sending an absolute URI request.
+    A successful non-error response may indicate unsafe ProxyRequests exposure.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - proxy
+    - open-proxy
+
+http:
+  - raw:
+      - |
+        GET http://example.com/ HTTP/1.1
+        Host: {{Hostname}}
+        User-Agent: nuclei-open-proxy-check
+        Connection: close
+
+    unsafe: true
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 301 || status_code == 302"
+      - type: word
+        part: body
+        words:
+          - "Example Domain"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)server:\\s*apache"

@@ -1,0 +1,42 @@
+id: spring-boot-env-sensitive-keys-exposed
+
+info:
+  name: Spring Boot Env Endpoint Sensitive Keys Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects environment endpoints exposing sensitive key names (password/token/secret),
+    indicating likely credential leakage risk.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - env
+    - secrets
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/env"
+      - "{{BaseURL}}/env"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"(password|passwd|secret|token|api[_-]?key|client[_-]?secret)"\\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"propertySources"\\s*:'
+          - '(?i)"systemEnvironment"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"

@@ -1,0 +1,35 @@
+id: apache-httpd-server-header-fingerprint
+
+info:
+  name: Apache HTTP Server Header Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Apache HTTPD technology via the Server response header.
+    Informational fingerprint only.
+  tags:
+    - tech
+    - apache
+    - httpd
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 301
+          - 302
+          - 401
+          - 403
+          - 404
+          - 500
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"

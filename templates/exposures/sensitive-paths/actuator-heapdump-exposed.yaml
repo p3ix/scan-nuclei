@@ -1,0 +1,36 @@
+id: actuator-heapdump-exposed
+
+info:
+  name: Spring Boot Actuator Heapdump Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly accessible Spring Boot heap dump endpoints that can leak
+    in-memory secrets, credentials, tokens, and application internals.
+  tags:
+    - exposure
+    - spring
+    - spring-boot
+    - actuator
+    - heapdump
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/heapdump"
+      - "{{BaseURL}}/heapdump"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/octet-stream|application/x-java-heap-dump|application/zip)"
+      - type: binary
+        part: body
+        binary:
+          - "4A4156412050524F46494C4520312E302E32"

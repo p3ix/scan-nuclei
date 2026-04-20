@@ -1,0 +1,38 @@
+id: apache-server-status-exposed
+
+info:
+  name: Apache mod_status Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly reachable Apache mod_status pages, which disclose runtime
+    process and request telemetry useful for reconnaissance and attack planning.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - mod_status
+    - panel
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-status"
+      - "{{BaseURL}}/server-status?auto"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Apache Server Status for"
+          - "(?m)^Total Accesses:\\s*[0-9]+"
+          - "(?m)^Scoreboard:\\s*[_SRWKDCLGI\\.]+"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/html|text/plain)"

@@ -1,0 +1,45 @@
+id: log-config-exposed
+
+info:
+  name: Log Configuration Files Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed logging configuration files (Logback/Log4j2), which can leak
+    file paths, appenders, remote sinks, and operational internals.
+  tags:
+    - exposure
+    - java
+    - logback
+    - log4j
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/logback.xml"
+      - "{{BaseURL}}/config/logback.xml"
+      - "{{BaseURL}}/WEB-INF/classes/logback.xml"
+      - "{{BaseURL}}/log4j2.xml"
+      - "{{BaseURL}}/config/log4j2.xml"
+      - "{{BaseURL}}/WEB-INF/classes/log4j2.xml"
+      - "{{BaseURL}}/log4j.properties"
+      - "{{BaseURL}}/WEB-INF/classes/log4j.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<configuration\\b"
+          - "(?is)<appender\\b"
+          - "(?is)<loggers?>\\b"
+          - "(?im)^log4j\\.rootLogger\\s*="
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/xml|text/xml|text/plain)"

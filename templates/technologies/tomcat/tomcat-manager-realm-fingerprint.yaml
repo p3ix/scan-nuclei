@@ -1,0 +1,33 @@
+id: tomcat-manager-realm-fingerprint
+
+info:
+  name: Tomcat Manager Realm Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Tomcat administrative realm challenges exposed by manager and
+    host-manager interfaces.
+  tags:
+    - tech
+    - tomcat
+    - manager
+    - host-manager
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/html"
+      - "{{BaseURL}}/host-manager/html"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 401
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)www-authenticate:\\s*basic\\s+realm=\"Tomcat Manager Application\""
+          - "(?i)www-authenticate:\\s*basic\\s+realm=\"Tomcat Host Manager Application\""

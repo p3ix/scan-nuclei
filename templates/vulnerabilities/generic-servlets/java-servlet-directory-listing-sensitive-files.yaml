@@ -1,0 +1,40 @@
+id: java-servlet-directory-listing-sensitive-files
+
+info:
+  name: Java Servlet Directory Listing with Sensitive Artifacts
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects directory listings exposing Java-sensitive artifacts such as class,
+    jar, war, xml config, and backup files.
+  tags:
+    - vulnerability
+    - java
+    - servlet
+    - listing
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/WEB-INF/"
+      - "{{BaseURL}}/classes/"
+      - "{{BaseURL}}/lib/"
+      - "{{BaseURL}}/backup/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Index of /"
+          - "(?i)<h1>Index of /"
+      - type: regex
+        part: body
+        regex:
+          - "(?i)\\.(war|jar|class|xml|properties|yml|yaml|bak|old|log)\\b"

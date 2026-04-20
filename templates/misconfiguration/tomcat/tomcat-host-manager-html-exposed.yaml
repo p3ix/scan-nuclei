@@ -1,0 +1,25 @@
+id: tomcat-host-manager-html-exposed
+
+info:
+  name: Apache Tomcat Host Manager Interface Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat Host Manager HTML interface (`/host-manager/html`),
+    indicating administrative host-level attack surface.
+  tags:
+    - tomcat
+    - host-manager
+    - misconfig
+    - panel
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/host-manager/html"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - '(status_code == 200 && contains(body, "Tomcat Virtual Host Manager")) || (status_code == 401 && contains(to_lower(all_headers), "tomcat host manager application"))'

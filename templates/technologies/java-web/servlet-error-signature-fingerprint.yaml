@@ -1,0 +1,36 @@
+id: servlet-error-signature-fingerprint
+
+info:
+  name: Java Servlet Error Signature Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Java servlet container signatures on error pages and stack traces,
+    useful for identifying backend technology during reconnaissance.
+  tags:
+    - tech
+    - java
+    - servlet
+    - tomcat
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei-404"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 404
+          - 500
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)javax\\.servlet\\."
+          - "(?i)jakarta\\.servlet\\."
+          - "(?i)org\\.apache\\.catalina\\."
+          - "(?i)Apache Tomcat/[0-9.]+"
+          - "(?i)Whitelabel Error Page"

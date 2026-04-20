@@ -1,0 +1,36 @@
+id: apache-trace-method-enabled
+
+info:
+  name: HTTP TRACE Method Enabled on Apache
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects enabled TRACE method behavior that echoes request data. This may
+    increase attack surface for cross-site tracing and proxy abuse scenarios.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - trace
+    - methods
+
+http:
+  - method: TRACE
+    path:
+      - "{{BaseURL}}/"
+
+    headers:
+      X-Trace-Test: nuclei-trace-check
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: dsl
+        dsl:
+          - "contains(to_lower(body), \"trace /\") || contains(to_lower(body), \"x-trace-test: nuclei-trace-check\") || contains(to_lower(all_headers), \"content-type: message/http\")"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)server:\\s*apache"

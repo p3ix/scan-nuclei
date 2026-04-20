@@ -1,0 +1,39 @@
+id: java-servlet-trace-echo-enabled
+
+info:
+  name: Java Servlet TRACE Echo Enabled
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects TRACE method echo behavior on Java servlet stacks, which can
+    increase risk of header reflection abuse and diagnostic leakage.
+  tags:
+    - vulnerability
+    - java
+    - servlet
+    - trace
+    - methods
+
+http:
+  - method: TRACE
+    path:
+      - "{{BaseURL}}/"
+
+    headers:
+      X-Nuclei-Trace: servlet-trace-check
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: dsl
+        dsl:
+          - "contains(to_lower(body), 'trace /') || contains(to_lower(body), 'x-nuclei-trace: servlet-trace-check') || contains(to_lower(all_headers), 'content-type: message/http')"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)JSESSIONID="
+          - "(?i)Apache-Coyote"
+          - "(?i)org\\.apache\\.catalina"

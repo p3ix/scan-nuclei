@@ -1,0 +1,24 @@
+id: apache-misconfig-from-fingerprint-workflow
+
+info:
+  name: Apache Fingerprint to Misconfiguration Workflow
+  author: scan-nuclei
+  description: Runs Apache misconfiguration templates only when Apache technology is detected.
+
+workflows:
+  - template: templates/technologies/apache/apache-httpd-server-header-fingerprint.yaml
+    subtemplates:
+      - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml
+      - template: templates/misconfiguration/apache/apache-directory-listing-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-ht-files-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-cgi-bin-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-open-proxy-potential.yaml
+      - template: templates/misconfiguration/apache/apache-missing-security-headers.yaml
+
+  - template: templates/technologies/apache/apache-default-page-fingerprint.yaml
+    subtemplates:
+      - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml

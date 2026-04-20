@@ -20,4 +20,14 @@ nuclei -t templates/ -u https://objetivo
 - `default-logins/`: credenciales por defecto.
 - `workflows/`: encadenado de templates.
 
+## Nota de nomenclatura
+
+- `*-exposed`: evidencia confirmada de exposicion.
+- `*-potential`: superficie/version compatible que requiere validacion manual.
+
+## Nota de triage rapido
+
+- Evitar doble conteo entre templates de docs (`openapi/wadl`) y templates de assets (`swagger-ui/*.map`).
+- Tratar `technologies/*` como contexto de priorizacion, no como finding explotable por si solo.
+
 Las carpetas vacias mantienen `.gitkeep`.

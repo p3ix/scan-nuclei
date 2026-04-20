@@ -1,0 +1,39 @@
+id: spring-actuator-configprops-unauth
+
+info:
+  name: Spring Actuator ConfigProps Exposed Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated access to Spring Actuator configprops endpoint,
+    which can disclose bean configuration and sensitive runtime properties.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - config
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/configprops"
+      - "{{BaseURL}}/configprops"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"contexts"\\s*:\\s*\\{'
+          - '(?i)"beans"\\s*:\\s*\\{'
+          - '(?i)"prefix"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"

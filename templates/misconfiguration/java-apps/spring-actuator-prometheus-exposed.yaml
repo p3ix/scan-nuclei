@@ -1,0 +1,35 @@
+id: spring-actuator-prometheus-exposed
+
+info:
+  name: Spring Actuator Prometheus Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Prometheus metrics endpoint in Spring Boot Actuator, which
+    can disclose internal component names and runtime metadata.
+  tags:
+    - misconfig
+    - java
+    - spring
+    - actuator
+    - prometheus
+    - metrics
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/prometheus"
+      - "{{BaseURL}}/prometheus"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^#\\s*HELP\\s+"
+          - "(?m)^#\\s*TYPE\\s+"
+          - "(?m)^jvm_(memory|threads|gc)_"

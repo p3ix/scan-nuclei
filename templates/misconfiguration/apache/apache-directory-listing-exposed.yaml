@@ -1,0 +1,48 @@
+id: apache-directory-listing-exposed
+
+info:
+  name: Apache Directory Listing Enabled
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache autoindex directory listings on common paths, potentially
+    exposing source files, backups, and internal assets.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - autoindex
+    - listing
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/icons/"
+      - "{{BaseURL}}/uploads/"
+      - "{{BaseURL}}/backup/"
+      - "{{BaseURL}}/files/"
+      - "{{BaseURL}}/static/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Index of /"
+          - "(?i)<h1>Index of /"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Parent Directory"
+          - "(?i)Last modified"
+          - "(?i)Size</a>"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*text/html"

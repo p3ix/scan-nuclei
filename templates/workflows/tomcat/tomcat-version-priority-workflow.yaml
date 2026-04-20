@@ -1,0 +1,19 @@
+id: tomcat-version-priority-workflow
+
+info:
+  name: Tomcat Version Priority Workflow
+  author: scan-nuclei
+  description: Runs actionable Tomcat checks after detecting Tomcat version/fingerprint indicators.
+
+workflows:
+  - template: templates/technologies/tomcat/tomcat-version-hint-fingerprint.yaml
+    subtemplates:
+      - template: templates/misconfiguration/tomcat/tomcat-manager-html-exposed.yaml
+      - template: templates/misconfiguration/tomcat/tomcat-host-manager-html-exposed.yaml
+      - template: templates/default-logins/tomcat-manager/tomcat-manager-default-credentials.yaml
+      - template: templates/default-logins/apache-tomcat/apache-tomcat-admin-default-credentials.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-examples-docs-exposed.yaml
+      - template: templates/exposures/sensitive-paths/web-inf-web-xml-exposed.yaml
+      - template: templates/cves/tomcat/CVE-2017-12617-tomcat-put-jsp-upload-potential.yaml
+      - template: templates/cves/tomcat/CVE-2019-0232-tomcat-cgi-rce-potential.yaml
+      - template: templates/cves/tomcat/CVE-2020-1938-tomcat-ghostcat-potential.yaml

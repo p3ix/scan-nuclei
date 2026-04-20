@@ -1,0 +1,36 @@
+id: struts-devmode-debug-parameter-exposed
+
+info:
+  name: Struts Debug Parameter Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects potential Struts debug/devmode surface through debug parameters and
+    framework-specific response signatures.
+  tags:
+    - vulnerability
+    - struts
+    - devmode
+    - debug
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?debug=browser"
+      - "{{BaseURL}}/?debug=xml"
+      - "{{BaseURL}}/struts2-showcase/?debug=browser"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)struts\\.devMode"
+          - "(?i)Debugging Interceptor"
+          - "(?i)ValueStack"
+          - "(?i)com\\.opensymphony\\.xwork2"

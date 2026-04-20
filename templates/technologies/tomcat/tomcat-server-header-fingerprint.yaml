@@ -1,0 +1,37 @@
+id: tomcat-server-header-fingerprint
+
+info:
+  name: Tomcat Server Header Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Apache Tomcat technology via explicit server header signatures.
+  tags:
+    - tech
+    - tomcat
+    - fingerprint
+    - header
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 301
+          - 302
+          - 401
+          - 403
+          - 404
+          - 500
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)^server:\\s*apache-coyote/[0-9.]+"
+          - "(?i)^server:\\s*apache tomcat/[0-9.]+"
+          - "(?i)^server:\\s*tomcat/?[0-9.]*"

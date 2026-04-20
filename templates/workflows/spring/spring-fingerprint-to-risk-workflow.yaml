@@ -1,0 +1,19 @@
+id: spring-fingerprint-to-risk-workflow
+
+info:
+  name: Spring Fingerprint to Risk Workflow
+  author: scan-nuclei
+  description: Chains Spring exposure and vulnerability checks after Spring Boot fingerprint detection.
+
+workflows:
+  - template: templates/technologies/spring-boot/spring-boot-whitelabel-fingerprint.yaml
+    subtemplates:
+      - template: templates/misconfiguration/java-apps/spring-actuator-root-exposed.yaml
+      - template: templates/misconfiguration/java-apps/spring-actuator-prometheus-exposed.yaml
+      - template: templates/misconfiguration/java-apps/java-debug-endpoints-exposed.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-mappings-unauth.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-configprops-unauth.yaml
+      - template: templates/vulnerabilities/spring/spring-boot-env-sensitive-keys-exposed.yaml
+      - template: templates/vulnerabilities/spring/spring-boot-trace-http-inclusion-exposed.yaml
+      - template: templates/vulnerabilities/spring/spring-cors-wildcard-credentials-potential.yaml
+      - template: templates/cves/java/CVE-2022-22965-spring4shell-potential.yaml

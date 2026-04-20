@@ -1,0 +1,36 @@
+id: tomcat-version-hint-fingerprint
+
+info:
+  name: Tomcat Version Hint Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Extracts explicit Tomcat version hints from headers or default error pages
+    for triage and vulnerability mapping.
+  tags:
+    - tech
+    - tomcat
+    - version
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei-tomcat-version"
+
+    matchers-condition: and
+    extractors:
+      - type: regex
+        part: all
+        name: tomcat_version
+        regex:
+          - "(?i)Apache Tomcat/([0-9]+\\.[0-9]+\\.[0-9]+)"
+          - "(?i)Apache-Coyote/([0-9]+\\.[0-9]+)"
+    matchers:
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Apache Tomcat/[0-9]+\\.[0-9]+\\.[0-9]+"
+          - "(?i)Apache-Coyote/[0-9]+\\.[0-9]+"

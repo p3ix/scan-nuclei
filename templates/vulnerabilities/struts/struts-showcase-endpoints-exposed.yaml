@@ -1,0 +1,35 @@
+id: struts-showcase-endpoints-exposed
+
+info:
+  name: Struts Showcase Endpoints Exposed
+  author: scan-nuclei
+  severity: low
+  description: |
+    Detects exposed Struts showcase/demo endpoints that should not typically be
+    present in hardened production environments.
+  tags:
+    - vulnerability
+    - struts
+    - showcase
+    - demo
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/struts2-showcase/"
+      - "{{BaseURL}}/struts2-showcase/index.action"
+      - "{{BaseURL}}/struts2-showcase/showcase.action"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Struts2 Showcase"
+          - "(?i)Apache Struts"
+          - "(?i)showcase"

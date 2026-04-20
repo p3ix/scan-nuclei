@@ -1,0 +1,37 @@
+id: java-servlet-examples-endpoints-exposed
+
+info:
+  name: Java Servlet Example Endpoints Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable servlet/JSP example endpoints that should
+    typically be removed or restricted in production deployments.
+  tags:
+    - vulnerability
+    - java
+    - servlet
+    - examples
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/examples/"
+      - "{{BaseURL}}/examples/servlets/servlet/RequestInfoExample"
+      - "{{BaseURL}}/examples/jsp/index.html"
+      - "{{BaseURL}}/servlet/HelloWorldExample"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Servlet and JSP Examples"
+          - "(?i)Request Information Example"
+          - "(?i)Hello World"
+          - "(?i)Apache Tomcat"
