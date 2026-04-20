@@ -1,0 +1,34 @@
+id: tomcat-context-xml-exposed
+
+info:
+  name: Tomcat Context XML Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat context XML configuration that may leak datasource
+    credentials, JNDI resources, and deployment internals.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/META-INF/context.xml"
+      - "{{BaseURL}}/conf/context.xml"
+      - "{{BaseURL}}/context.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Context\\b"
+          - "(?is)<Resource\\b"
+          - "(?i)(username|password|driverClassName|jdbc:)"

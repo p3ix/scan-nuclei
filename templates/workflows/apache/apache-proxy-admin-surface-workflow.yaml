@@ -1,0 +1,15 @@
+id: apache-proxy-admin-surface-workflow
+
+info:
+  name: Apache Proxy and Admin Surface Workflow
+  author: scan-nuclei
+  description: Chains Apache proxy/admin surface checks after Apache fingerprint.
+
+workflows:
+  - template: templates/technologies/apache/apache-httpd-server-header-fingerprint.yaml
+    subtemplates:
+      - template: templates/misconfiguration/apache/apache-balancer-manager-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-jk-status-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-open-proxy-potential.yaml
+      - template: templates/cves/apache/CVE-2023-25690-apache-mod-proxy-request-smuggling-potential.yaml
+      - template: templates/cves/apache/CVE-2021-40438-apache-mod-proxy-ssrf-potential.yaml

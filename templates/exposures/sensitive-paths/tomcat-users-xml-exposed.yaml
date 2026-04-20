@@ -1,0 +1,32 @@
+id: tomcat-users-xml-exposed
+
+info:
+  name: Tomcat Users XML Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed tomcat-users.xml, potentially disclosing admin usernames and roles.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - credentials
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/tomcat-users.xml"
+      - "{{BaseURL}}/tomcat-users.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<tomcat-users\\b"
+          - "(?is)<user\\s+username="
+          - "(?is)manager-(gui|script|jmx|status)"

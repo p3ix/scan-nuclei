@@ -1,0 +1,32 @@
+id: apache-jk-status-exposed
+
+info:
+  name: Apache mod_jk Status Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed mod_jk status endpoint with backend worker details.
+  tags:
+    - apache
+    - misconfig
+    - mod_jk
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/jkstatus"
+      - "{{BaseURL}}/jk-status"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)JK Status Manager"
+          - "(?i)Worker list"
+          - "(?i)mod_jk"

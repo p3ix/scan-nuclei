@@ -13,7 +13,11 @@ workflows:
       - template: templates/default-logins/tomcat-manager/tomcat-manager-default-credentials.yaml
       - template: templates/default-logins/apache-tomcat/apache-tomcat-admin-default-credentials.yaml
       - template: templates/exposures/sensitive-paths/tomcat-examples-docs-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-users-xml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-context-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/web-inf-web-xml-exposed.yaml
+      - tags: potential
       - template: templates/cves/tomcat/CVE-2017-12617-tomcat-put-jsp-upload-potential.yaml
       - template: templates/cves/tomcat/CVE-2019-0232-tomcat-cgi-rce-potential.yaml
       - template: templates/cves/tomcat/CVE-2020-1938-tomcat-ghostcat-potential.yaml
+      - template: templates/cves/tomcat/CVE-2020-9484-tomcat-session-deserialization-rce-potential.yaml

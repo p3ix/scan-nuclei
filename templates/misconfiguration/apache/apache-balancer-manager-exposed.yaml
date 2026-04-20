@@ -1,0 +1,30 @@
+id: apache-balancer-manager-exposed
+
+info:
+  name: Apache Balancer Manager Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly accessible Apache balancer-manager interface.
+  tags:
+    - apache
+    - misconfig
+    - balancer
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/balancer-manager"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Balancer Manager"
+          - "(?i)LoadBalancer Status for"
