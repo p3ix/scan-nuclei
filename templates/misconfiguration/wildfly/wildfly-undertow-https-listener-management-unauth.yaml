@@ -1,0 +1,50 @@
+id: wildfly-undertow-https-listener-management-unauth
+
+info:
+  name: WildFly Undertow HTTPS Listener Management Read Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated management reads against Undertow HTTPS listener
+    resources. Successful responses can disclose listener names, socket
+    bindings, redirect behavior, and HTTPS termination structure.
+  tags:
+    - misconfig
+    - wildfly
+    - undertow
+    - management
+    - https
+    - listener
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=undertow?operation=read-children-names&child-type=server"
+      - "{{BaseURL}}/management/subsystem=undertow/server=default-server?operation=read-children-names&child-type=https-listener"
+      - "{{BaseURL}}/management/subsystem=undertow/server=default-server?operation=read-resource"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"https-listener"'
+          - '(?i)"ssl-context"'
+          - '(?i)"redirect-socket"'
+          - '(?i)"socket-binding"'
+          - '(?i)"default-server"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

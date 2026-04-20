@@ -1,0 +1,48 @@
+id: apache-uriworkermap-properties-exposed
+
+info:
+  name: Apache URIWorkerMap Properties Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed `uriworkermap.properties` files that may disclose exact URL
+    to worker mappings, administrative routes, wildcard exclusions, or backend
+    segmentation logic for Java applications behind Apache.
+  tags:
+    - apache
+    - misconfig
+    - config
+    - mod_jk
+    - proxy
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/uriworkermap.properties"
+      - "{{BaseURL}}/conf/uriworkermap.properties"
+      - "{{BaseURL}}/conf.d/uriworkermap.properties"
+      - "{{BaseURL}}/config/uriworkermap.properties"
+      - "{{BaseURL}}/apache2/uriworkermap.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^/.*\\s*=\\s*[^#\\s]+"
+          - "(?im)^!/"
+          - "(?im)^/jmx-console"
+          - "(?im)^/manager"
+          - "(?im)^/host-manager"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+

@@ -1,0 +1,46 @@
+id: apache-redirect-host-header-trust-bypass
+
+info:
+  name: Apache Redirect Host Header Trust Surface
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects redirects whose Location appears to reflect client-controlled Host
+    or X-Forwarded-Host style values, which can indicate trust issues in
+    frontend redirect generation.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - redirect
+    - host-header
+    - proxy
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    redirects: false
+
+    headers:
+      Host: host-header-check.invalid
+      X-Forwarded-Host: host-header-check.invalid
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: status
+        status:
+          - 301
+          - 302
+          - 303
+          - 307
+          - 308
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^location:\\s*https?://host-header-check\\.invalid"

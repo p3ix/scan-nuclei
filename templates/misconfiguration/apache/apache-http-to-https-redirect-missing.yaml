@@ -1,0 +1,41 @@
+id: apache-http-to-https-redirect-missing
+
+info:
+  name: Apache Missing HTTP to HTTPS Redirect
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache frontends served over HTTP without an evident redirect to the
+    HTTPS scheme. This weakens transport protection and may allow accidental use
+    of cleartext entrypoints.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - tls
+    - https
+    - redirect
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "http://{{Host}}/"
+
+    redirects: false
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: status
+        status:
+          - 200
+          - 401
+          - 403
+          - 404
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(all_headers), 'location: https://')"

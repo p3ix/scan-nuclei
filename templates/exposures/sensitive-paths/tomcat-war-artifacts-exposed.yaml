@@ -1,0 +1,56 @@
+id: tomcat-war-artifacts-exposed
+
+info:
+  name: Tomcat WAR Artifacts Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat deployment archives and common backup variants for
+    default or administrative web applications. Directly downloadable WAR files
+    can leak full application code, bundled libraries, and embedded secrets.
+  tags:
+    - tomcat
+    - exposure
+    - artifacts
+    - war
+    - backup
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/webapps/ROOT.war"
+      - "{{BaseURL}}/webapps/examples.war"
+      - "{{BaseURL}}/webapps/docs.war"
+      - "{{BaseURL}}/webapps/manager.war"
+      - "{{BaseURL}}/webapps/host-manager.war"
+      - "{{BaseURL}}/ROOT.war"
+      - "{{BaseURL}}/examples.war"
+      - "{{BaseURL}}/docs.war"
+      - "{{BaseURL}}/manager.war"
+      - "{{BaseURL}}/host-manager.war"
+      - "{{BaseURL}}/webapps/ROOT.war.bak"
+      - "{{BaseURL}}/webapps/ROOT.war.old"
+      - "{{BaseURL}}/webapps/ROOT.war~"
+      - "{{BaseURL}}/webapps/examples.war.bak"
+      - "{{BaseURL}}/webapps/manager.war.bak"
+      - "{{BaseURL}}/webapps/host-manager.war.bak"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: raw
+        condition: or
+        words:
+          - "PK\u0003\u0004"
+          - "application/java-archive"
+          - "application/zip"
+          - "application/octet-stream"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

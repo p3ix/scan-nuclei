@@ -1,0 +1,38 @@
+id: apache-cookie-secure-httponly-missing
+
+info:
+  name: Apache Frontend Session Cookie Missing Secure or HttpOnly
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects frontend session cookies on Apache responses missing Secure and/or
+    HttpOnly flags. This is useful when Apache terminates TLS or rewrites
+    headers for backend applications.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - cookie
+    - session
+    - headers
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)^set-cookie:\\s*(jsessionid|session|sid|phpsessid|connect.sid)="
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(all_headers), 'httponly') || !contains(to_lower(all_headers), 'secure')"

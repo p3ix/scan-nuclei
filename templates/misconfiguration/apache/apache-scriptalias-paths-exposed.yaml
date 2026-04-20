@@ -1,0 +1,47 @@
+id: apache-scriptalias-paths-exposed
+
+info:
+  name: Apache ScriptAlias Paths Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposure of common ScriptAlias-backed paths that may reveal CGI or
+    legacy script execution surface beyond the default `/cgi-bin/`.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - scriptalias
+    - cgi
+    - legacy
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/cgi-bin/"
+      - "{{BaseURL}}/scripts/"
+      - "{{BaseURL}}/fcgi-bin/"
+      - "{{BaseURL}}/perl/"
+      - "{{BaseURL}}/php-cgi/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 403
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)<title>Index of /cgi-bin/?</title>"
+          - "(?i)GATEWAY_INTERFACE=CGI/"
+          - "(?i)CGI/1\\.0 test script report"
+          - "(?i)/scripts/"
+          - "(?i)/fcgi-bin/"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

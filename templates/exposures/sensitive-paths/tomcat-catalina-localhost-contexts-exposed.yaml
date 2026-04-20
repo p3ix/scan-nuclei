@@ -1,0 +1,46 @@
+id: tomcat-catalina-localhost-contexts-exposed
+
+info:
+  name: Tomcat Catalina Localhost Contexts Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed application context descriptors under
+    `conf/Catalina/localhost/` that may leak per-application resources,
+    datasource references, authentication valves, or deployment metadata.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - config
+    - context
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/Catalina/localhost/manager.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/host-manager.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/examples.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/docs.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/localhost.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Context\\b"
+          - "(?is)<Resource\\b"
+          - "(?is)<Manager\\b"
+          - "(?is)<Valve\\b"
+          - "(?i)(docBase|path|reloadable|antiResourceLocking)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,44 @@
+id: apache-basic-auth-surface-exposed
+
+info:
+  name: Apache Basic Auth Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache HTTP Basic authentication surfaces on common administrative
+    or protected paths. While auth may be expected, these paths often expose
+    admin or legacy content that should be tightly scoped.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - auth
+    - basic
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/admin/"
+      - "{{BaseURL}}/protected/"
+      - "{{BaseURL}}/private/"
+      - "{{BaseURL}}/server-status"
+      - "{{BaseURL}}/server-info"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 401
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)^www-authenticate:\\s*basic\\s+realm="
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: protected_path

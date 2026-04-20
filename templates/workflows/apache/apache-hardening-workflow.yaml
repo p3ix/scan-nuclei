@@ -20,11 +20,22 @@ workflows:
       - template: templates/misconfiguration/apache/apache-jk-status-exposed.yaml
       - template: templates/misconfiguration/apache/apache-directory-listing-exposed.yaml
       - template: templates/misconfiguration/apache/apache-ht-files-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-basic-auth-surface-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-digest-auth-surface-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-alias-paths-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-scriptalias-paths-exposed.yaml
       - template: templates/misconfiguration/apache/apache-cgi-bin-exposed.yaml
       - template: templates/misconfiguration/apache/apache-httpd-conf-exposed.yaml
       - template: templates/misconfiguration/apache/apache-vhosts-config-exposed.yaml
       - template: templates/misconfiguration/apache/apache-ssl-conf-exposed.yaml
       - template: templates/misconfiguration/apache/apache-config-backups-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-http-to-https-redirect-missing.yaml
+      - template: templates/misconfiguration/apache/apache-hsts-missing-on-https.yaml
+      - template: templates/misconfiguration/apache/apache-hsts-weak-policy.yaml
+      - template: templates/misconfiguration/apache/apache-cookie-secure-httponly-missing.yaml
+      - template: templates/misconfiguration/apache/apache-samesite-none-without-secure.yaml
+      - template: templates/misconfiguration/apache/apache-redirect-host-header-trust-bypass.yaml
+      - template: templates/misconfiguration/apache/apache-internal-backend-location-disclosure.yaml
       - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml
       - template: templates/misconfiguration/apache/apache-unsafe-http-methods-enabled.yaml
       - template: templates/misconfiguration/apache/apache-missing-security-headers.yaml

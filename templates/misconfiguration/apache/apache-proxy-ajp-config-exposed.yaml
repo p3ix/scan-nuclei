@@ -1,0 +1,51 @@
+id: apache-proxy-ajp-config-exposed
+
+info:
+  name: Apache AJP Proxy Config Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache proxy configuration snippets for AJP backends, which
+    may leak internal hosts, ports, balancer members, routes, or backend path
+    mappings for Tomcat and WildFly deployments.
+  tags:
+    - apache
+    - misconfig
+    - config
+    - proxy
+    - ajp
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/proxy_ajp.conf"
+      - "{{BaseURL}}/conf/proxy_ajp.conf"
+      - "{{BaseURL}}/conf.d/proxy_ajp.conf"
+      - "{{BaseURL}}/conf/extra/proxy_ajp.conf"
+      - "{{BaseURL}}/mod_cluster.conf"
+      - "{{BaseURL}}/conf/mod_cluster.conf"
+      - "{{BaseURL}}/conf.d/mod_cluster.conf"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^ProxyPass\\s+.*ajp://"
+          - "(?im)^ProxyPassReverse\\s+.*ajp://"
+          - "(?im)^BalancerMember\\s+ajp://"
+          - "(?im)^JkMount\\s+"
+          - "(?im)^EnableMCPMReceive\\s+"
+          - "(?im)^ManagerBalancerName\\s+"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+

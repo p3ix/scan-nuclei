@@ -1,0 +1,46 @@
+id: wildfly-datasource-descriptors-exposed
+
+info:
+  name: WildFly Datasource Descriptors Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed datasource descriptor files such as `*-ds.xml`, which may
+    leak JNDI names, connection URLs, pool configuration, and database
+    integration details.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - datasource
+    - descriptor
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/db-ds.xml"
+      - "{{BaseURL}}/datasource-ds.xml"
+      - "{{BaseURL}}/mysql-ds.xml"
+      - "{{BaseURL}}/postgresql-ds.xml"
+      - "{{BaseURL}}/oracle-ds.xml"
+      - "{{BaseURL}}/META-INF/db-ds.xml"
+      - "{{BaseURL}}/META-INF/datasource-ds.xml"
+      - "{{BaseURL}}/WEB-INF/db-ds.xml"
+      - "{{BaseURL}}/WEB-INF/datasource-ds.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<datasources?\\b"
+          - "(?i)<datasource\\b"
+          - "(?i)<xa-datasource\\b"
+          - "(?i)<connection-url>"
+          - "(?i)<jndi-name>"

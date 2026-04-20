@@ -1,0 +1,41 @@
+id: wildfly-elytron-properties-exposed
+
+info:
+  name: WildFly Elytron Properties Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Elytron property files that may reveal realm users, groups,
+    filesystem paths, or security-domain related configuration.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - elytron
+    - properties
+    - security
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/application-users.properties"
+      - "{{BaseURL}}/application-roles.properties"
+      - "{{BaseURL}}/elytron-users.properties"
+      - "{{BaseURL}}/elytron-roles.properties"
+      - "{{BaseURL}}/config/application-users.properties"
+      - "{{BaseURL}}/config/application-roles.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^#\\$REALM_NAME="
+          - "(?im)^#\\$ALGORITHM="
+          - "(?im)^[A-Za-z0-9_.-]+=([A-Fa-f0-9]{16,}|[A-Za-z0-9_, -]{3,})$"
+          - "(?im)^(SuperUser|Administrator|Maintainer|Deployer)\\b"

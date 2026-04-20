@@ -1,0 +1,40 @@
+id: wildfly-jboss-app-xml-exposed
+
+info:
+  name: WildFly JBoss App Descriptor Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects access to `jboss-app.xml`, which may reveal application module
+    structure, security-domain bindings, JNDI setup, and deployment metadata.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - app
+    - descriptor
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/META-INF/jboss-app.xml"
+      - "{{BaseURL}}/meta-inf/jboss-app.xml"
+      - "{{BaseURL}}/WEB-INF/jboss-app.xml"
+      - "{{BaseURL}}/web-inf/jboss-app.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<jboss-app\\b"
+          - "(?i)<module\\b"
+          - "(?i)<loader-repository>"
+          - "(?i)<security-domain>"
+          - "(?i)<jndi-name>"

@@ -1,0 +1,35 @@
+id: apache-hsts-weak-policy
+
+info:
+  name: Apache HSTS Weak Policy
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache HTTPS responses with a weak HSTS policy, typically because
+    max-age is too low or includeSubDomains is absent.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - hsts
+    - tls
+    - https
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "starts_with(base_url, 'https://')"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: dsl
+        dsl:
+          - "(contains(to_lower(all_headers), 'strict-transport-security: max-age=0') || contains(to_lower(all_headers), 'strict-transport-security: max-age=1') || contains(to_lower(all_headers), 'strict-transport-security: max-age=2') || contains(to_lower(all_headers), 'strict-transport-security: max-age=3') || contains(to_lower(all_headers), 'strict-transport-security: max-age=4') || contains(to_lower(all_headers), 'strict-transport-security: max-age=5') || contains(to_lower(all_headers), 'strict-transport-security: max-age=6') || contains(to_lower(all_headers), 'strict-transport-security: max-age=7') || contains(to_lower(all_headers), 'strict-transport-security: max-age=8') || contains(to_lower(all_headers), 'strict-transport-security: max-age=9') || contains(to_lower(all_headers), 'strict-transport-security: max-age=10') || (contains(to_lower(all_headers), 'strict-transport-security:') && !contains(to_lower(all_headers), 'includesubdomains')))"

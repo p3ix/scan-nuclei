@@ -1,0 +1,46 @@
+id: apache-mod-cluster-manager-exposed
+
+info:
+  name: Apache mod_cluster Manager Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly accessible `mod_cluster` manager interfaces leaking
+    backend node names, balancer groups, routes, contexts, or cluster topology
+    for Java application backends.
+  tags:
+    - apache
+    - misconfig
+    - mod_cluster
+    - proxy
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/mod_cluster_manager"
+      - "{{BaseURL}}/mod-cluster-manager"
+      - "{{BaseURL}}/mod_cluster-manager"
+      - "{{BaseURL}}/modcluster-manager"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)mod_cluster Manager"
+          - "(?i)LBGroup"
+          - "(?i)Node Name"
+          - "(?i)Balancer:"
+          - "(?i)Contexts?"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+

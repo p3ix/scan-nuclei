@@ -1,0 +1,53 @@
+id: wildfly-elytron-tls-management-unauth
+
+info:
+  name: WildFly Elytron TLS Management Read Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated management reads against Elytron TLS-related
+    resources such as key-stores, key-managers, trust-managers, and SSL
+    contexts. Successful responses can disclose TLS topology and security
+    configuration structure.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - management
+    - elytron
+    - tls
+    - unauth
+    - security
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=key-store"
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=trust-manager"
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=key-manager"
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=server-ssl-context"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"key-store"'
+          - '(?i)"trust-manager"'
+          - '(?i)"key-manager"'
+          - '(?i)"server-ssl-context"'
+          - '(?i)"client-ssl-context"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

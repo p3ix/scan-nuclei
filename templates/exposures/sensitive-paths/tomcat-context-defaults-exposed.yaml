@@ -1,0 +1,42 @@
+id: tomcat-context-defaults-exposed
+
+info:
+  name: Tomcat Context Defaults Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Tomcat default context descriptors such as
+    `context.xml.default`, which may disclose default resource settings,
+    session persistence, valves, and deployment behavior.
+  tags:
+    - tomcat
+    - exposure
+    - config
+    - defaults
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/context.xml.default"
+      - "{{BaseURL}}/context.xml.default"
+      - "{{BaseURL}}/conf/Catalina/localhost/context.xml.default"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Context\\b"
+          - "(?is)<Manager\\b"
+          - "(?is)<Valve\\b"
+          - "(?i)(useHttpOnly|sessionCookiePath|antiResourceLocking|ResourceLink)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

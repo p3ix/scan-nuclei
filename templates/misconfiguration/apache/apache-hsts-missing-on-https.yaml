@@ -1,0 +1,37 @@
+id: apache-hsts-missing-on-https
+
+info:
+  name: Apache HSTS Missing on HTTPS
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache HTTPS responses missing the Strict-Transport-Security header.
+    This is especially relevant for public frontends expected to enforce TLS.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - hsts
+    - tls
+    - https
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "starts_with(base_url, 'https://')"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: word
+        part: header
+        words:
+          - "Strict-Transport-Security:"
+        negative: true

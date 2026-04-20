@@ -1,0 +1,50 @@
+id: tomcat-jndi-resources-exposed
+
+info:
+  name: Tomcat JNDI Resources Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat context descriptors leaking JNDI resource
+    definitions such as datasources, mail sessions, environment entries, and
+    resource links.
+  tags:
+    - tomcat
+    - exposure
+    - jndi
+    - datasource
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/META-INF/context.xml"
+      - "{{BaseURL}}/conf/context.xml"
+      - "{{BaseURL}}/context.xml"
+      - "{{BaseURL}}/conf/context.xml.default"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/manager.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/host-manager.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Resource\\b"
+          - "(?is)<ResourceLink\\b"
+          - "(?is)<Environment\\b"
+          - "(?i)(javax\\.sql\\.DataSource|jakarta\\.mail\\.Session|mail/Session)"
+          - "(?i)(driverClassName|url|username|password|factory)\\s*="
+          - "(?i)java:comp/env"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+

@@ -1,0 +1,40 @@
+id: wildfly-jboss-client-xml-exposed
+
+info:
+  name: WildFly JBoss Client Descriptor Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects access to `jboss-client.xml`, which may disclose remote connection
+    configuration, naming endpoints, EJB client settings, and security-related
+    client metadata.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - client
+    - descriptor
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/META-INF/jboss-client.xml"
+      - "{{BaseURL}}/meta-inf/jboss-client.xml"
+      - "{{BaseURL}}/WEB-INF/classes/META-INF/jboss-client.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<jboss-client\\b"
+          - "(?i)<invocation-timeout>"
+          - "(?i)<ejb-receivers>"
+          - "(?i)<connections>"
+          - "(?i)<connectors>"

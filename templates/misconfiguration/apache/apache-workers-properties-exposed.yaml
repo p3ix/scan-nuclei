@@ -1,0 +1,49 @@
+id: apache-workers-properties-exposed
+
+info:
+  name: Apache mod_jk Workers Properties Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed `workers.properties` files that may leak AJP backend hosts,
+    ports, load balancer workers, routes, and shared secrets used between
+    Apache and Java backends.
+  tags:
+    - apache
+    - misconfig
+    - config
+    - mod_jk
+    - ajp
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/workers.properties"
+      - "{{BaseURL}}/conf/workers.properties"
+      - "{{BaseURL}}/conf.d/workers.properties"
+      - "{{BaseURL}}/config/workers.properties"
+      - "{{BaseURL}}/apache2/workers.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^worker\\.list\\s*="
+          - "(?im)^worker\\.[^.]+\\.type\\s*="
+          - "(?im)^worker\\.[^.]+\\.host\\s*="
+          - "(?im)^worker\\.[^.]+\\.port\\s*="
+          - "(?im)^worker\\.[^.]+\\.secret\\s*="
+          - "(?im)^worker\\.[^.]+\\.route\\s*="
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+

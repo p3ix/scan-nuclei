@@ -1,0 +1,49 @@
+id: apache-alias-paths-exposed
+
+info:
+  name: Apache Alias Paths Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposure of common Apache alias-backed paths such as icons, manual,
+    error docs, and static alias directories that may remain enabled by
+    default or leak environment details.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - alias
+    - paths
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/icons/"
+      - "{{BaseURL}}/manual/"
+      - "{{BaseURL}}/error/"
+      - "{{BaseURL}}/server-icons/"
+      - "{{BaseURL}}/htdocs/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 301
+          - 302
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)<title>Index of /icons/?</title>"
+          - "(?i)Apache HTTP Server Version"
+          - "(?i)Apache HTTP Server Documentation"
+          - "(?i)icons/"
+          - "(?i)/error/HTTP_"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

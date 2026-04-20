@@ -1,0 +1,40 @@
+id: apache-internal-backend-location-disclosure
+
+info:
+  name: Apache Internal Backend Location Disclosure
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects redirects or error responses disclosing internal backend hostnames,
+    loopback targets, RFC1918 addresses, or implementation details behind an
+    Apache frontend.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - redirect
+    - disclosure
+    - backend
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei-apache-backend"
+
+    redirects: false
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)location:\\s*https?://(127\\.0\\.0\\.1|localhost|10\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.|192\\.168\\.)"
+          - "(?i)location:\\s*https?://[a-z0-9._-]+\\.(local|internal|lan|corp|intra)"
+          - "(?i)(proxy error|backend server|upstream|origin server)"
+          - "(?i)(Apache-Coyote|Tomcat|Undertow|WildFly)"

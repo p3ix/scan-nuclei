@@ -1,0 +1,43 @@
+id: apache-digest-auth-surface-exposed
+
+info:
+  name: Apache Digest Auth Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache HTTP Digest authentication surfaces on common protected
+    paths. This is useful for inventorying legacy auth zones and narrowing
+    review of exposed admin or restricted areas.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - auth
+    - digest
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/admin/"
+      - "{{BaseURL}}/protected/"
+      - "{{BaseURL}}/private/"
+      - "{{BaseURL}}/cgi-bin/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 401
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)^www-authenticate:\\s*digest\\s+realm="
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: protected_path

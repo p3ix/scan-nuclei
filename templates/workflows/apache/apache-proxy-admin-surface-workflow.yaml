@@ -9,7 +9,11 @@ workflows:
   - template: templates/technologies/apache/apache-httpd-server-header-fingerprint.yaml
     subtemplates:
       - template: templates/misconfiguration/apache/apache-balancer-manager-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-mod-cluster-manager-exposed.yaml
       - template: templates/misconfiguration/apache/apache-jk-status-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-workers-properties-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-uriworkermap-properties-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-proxy-ajp-config-exposed.yaml
       - template: templates/misconfiguration/apache/apache-forward-proxy-confirmed.yaml
       - template: templates/misconfiguration/apache/apache-proxy-headers-trust-bypass-exposed.yaml
       - template: templates/misconfiguration/apache/apache-open-proxy-potential.yaml

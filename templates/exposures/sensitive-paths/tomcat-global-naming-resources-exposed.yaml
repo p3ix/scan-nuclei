@@ -1,0 +1,45 @@
+id: tomcat-global-naming-resources-exposed
+
+info:
+  name: Tomcat Global Naming Resources Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat global naming resource configuration leaking
+    `GlobalNamingResources`, shared datasources, mail sessions, or default
+    user database references.
+  tags:
+    - tomcat
+    - exposure
+    - jndi
+    - globalnamingresources
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/server.xml"
+      - "{{BaseURL}}/server.xml"
+      - "{{BaseURL}}/conf/server.xml.bak"
+      - "{{BaseURL}}/conf/server.xml.old"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<GlobalNamingResources\\b"
+          - "(?is)<Resource\\b"
+          - "(?i)(javax\\.sql\\.DataSource|jakarta\\.mail\\.Session|UserDatabase)"
+          - "(?i)(driverClassName|url|username|password|factory)\\s*="
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+

@@ -1,0 +1,41 @@
+id: wildfly-ironjacamar-xml-exposed
+
+info:
+  name: WildFly IronJacamar Descriptor Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects access to `ironjacamar.xml`, which may reveal resource adapters,
+    connection definitions, pools, transaction support, and backend
+    integration details.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - ironjacamar
+    - descriptor
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/META-INF/ironjacamar.xml"
+      - "{{BaseURL}}/meta-inf/ironjacamar.xml"
+      - "{{BaseURL}}/WEB-INF/ironjacamar.xml"
+      - "{{BaseURL}}/web-inf/ironjacamar.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<ironjacamar\\b"
+          - "(?i)<connection-definitions>"
+          - "(?i)<admin-objects>"
+          - "(?i)<resource-adapter>"
+          - "(?i)<transaction-support>"

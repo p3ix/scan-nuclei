@@ -76,7 +76,7 @@ Para objetivos Apache, separa el uso segun el tipo de revision:
 - `templates/workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml`
   - para misconfiguracion general, `server-status`, `server-info`, listados, `.ht*` y configuracion expuesta.
 - `templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml`
-  - para proxy/admin surface, `balancer-manager`, `jk-status`, forward/open proxy y CVEs `potential` de proxy.
+  - para proxy/admin surface, `balancer-manager`, `mod_cluster`, `jk-status`, `workers.properties`, `uriworkermap.properties`, AJP config leaks, forward/open proxy y CVEs `potential` de proxy.
 - `templates/workflows/apache/apache-hardening-workflow.yaml`
   - para posture review de Apache, headers, metodos inseguros, directory listing y configuracion expuesta.
 - `templates/workflows/apache/apache-fronting-tomcat-workflow.yaml`
