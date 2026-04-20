@@ -1,0 +1,26 @@
+id: tomcat-manager-html-exposed
+
+info:
+  name: Apache Tomcat Manager HTML Interface Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects an exposed Tomcat Manager HTML interface (`/manager/html`), either reachable
+    with a 200 login page or returning 401 with a Tomcat Manager authentication realm.
+    Indicates administrative attack surface on the connector.
+  tags:
+    - tomcat
+    - manager
+    - misconfig
+    - panel
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/html"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - '(status_code == 200 && contains(body, "Tomcat Web Application Manager") && contains(body, "name=\"password\"")) || (status_code == 401 && contains(to_lower(all_headers), "tomcat manager application"))'

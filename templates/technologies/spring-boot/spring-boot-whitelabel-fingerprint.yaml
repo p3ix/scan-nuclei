@@ -1,0 +1,34 @@
+id: spring-boot-whitelabel-fingerprint
+
+info:
+  name: Spring Boot Default Error Page (Whitelabel) Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects the default Spring Boot "Whitelabel Error Page" on `/error`, indicating a
+    Spring Boot stack (often with default error handling). Informational only; not a vulnerability by itself.
+  tags:
+    - tech
+    - spring
+    - spring-boot
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/error"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 404
+          - 500
+      - type: word
+        part: body
+        words:
+          - "Whitelabel Error Page"
+      - type: word
+        part: body
+        words:
+          - "This application has no explicit mapping for /error"
