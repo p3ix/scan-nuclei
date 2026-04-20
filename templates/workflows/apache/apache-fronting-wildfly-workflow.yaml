@@ -1,0 +1,35 @@
+id: apache-fronting-wildfly-workflow
+
+info:
+  name: Apache Fronting WildFly Workflow
+  author: scan-nuclei
+  description: Chains WildFly and Java exposure checks when Apache appears to front a WildFly or Undertow backend.
+
+workflows:
+  - template: templates/technologies/apache/apache-fronting-wildfly-fingerprint.yaml
+    subtemplates:
+      - template: templates/technologies/wildfly/wildfly-version-hint-fingerprint.yaml
+      - template: templates/technologies/wildfly/undertow-version-disclosure.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-management-endpoint-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-hawtio-console-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jolokia-endpoint-exposed.yaml
+      - template: templates/exposures/sensitive-paths/meta-inf-manifest-mf-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-jboss-web-xml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/wildfly-jboss-deployment-structure-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-persistence-xml-exposed.yaml
+      - template: templates/exposures/openapi-json-exposed.yaml
+      - template: templates/exposures/openapi-yaml-exposed.yaml
+      - template: templates/exposures/wadl-exposed.yaml
+      - template: templates/exposures/wsdl-xsd-exposed.yaml
+      - template: templates/exposures/error-pages/wildfly-undertow-stacktrace-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-health-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-metrics-endpoints-exposed.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-openapi-endpoints-exposed.yaml
+      - template: templates/misconfiguration/java-apps/http-missing-security-headers-summary.yaml
+      - template: templates/vulnerabilities/generic-servlets/java-servlet-verbose-error-disclosure.yaml
+      - template: templates/vulnerabilities/generic-servlets/jsessionid-missing-secure-httponly.yaml
+      - template: templates/vulnerabilities/generic-servlets/hsts-weak-max-age-or-missing-subdomains.yaml
+      - template: templates/vulnerabilities/generic-servlets/x-frame-options-invalid-or-weak.yaml
+      - template: templates/vulnerabilities/generic-servlets/x-content-type-options-invalid.yaml
+      - template: templates/vulnerabilities/generic-servlets/cors-origin-reflection-with-credentials.yaml
+      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml

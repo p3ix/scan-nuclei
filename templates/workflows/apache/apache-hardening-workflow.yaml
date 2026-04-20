@@ -1,19 +1,23 @@
-id: apache-misconfig-from-fingerprint-workflow
+id: apache-hardening-workflow
 
 info:
-  name: Apache Fingerprint to Misconfiguration Workflow
+  name: Apache Hardening Workflow
   author: scan-nuclei
-  description: Runs Apache misconfiguration templates only when Apache technology is detected.
+  description: Runs Apache posture and hardening checks after Apache fingerprint, without focusing on deep exploit templates.
 
 workflows:
   - template: templates/technologies/apache/apache-httpd-server-header-fingerprint.yaml
     subtemplates:
+      - template: templates/technologies/apache/apache-server-version-disclosure.yaml
+      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml
+      - template: templates/technologies/apache/apache-default-page-fingerprint.yaml
       - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-status-auto-exposed.yaml
       - template: templates/misconfiguration/apache/apache-status-json-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
       - template: templates/misconfiguration/apache/apache-info-module-signature-exposed.yaml
-      - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml
+      - template: templates/misconfiguration/apache/apache-balancer-manager-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-jk-status-exposed.yaml
       - template: templates/misconfiguration/apache/apache-directory-listing-exposed.yaml
       - template: templates/misconfiguration/apache/apache-ht-files-exposed.yaml
       - template: templates/misconfiguration/apache/apache-cgi-bin-exposed.yaml
@@ -21,21 +25,22 @@ workflows:
       - template: templates/misconfiguration/apache/apache-vhosts-config-exposed.yaml
       - template: templates/misconfiguration/apache/apache-ssl-conf-exposed.yaml
       - template: templates/misconfiguration/apache/apache-config-backups-exposed.yaml
-      - template: templates/misconfiguration/apache/apache-open-proxy-potential.yaml
+      - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml
+      - template: templates/misconfiguration/apache/apache-unsafe-http-methods-enabled.yaml
       - template: templates/misconfiguration/apache/apache-missing-security-headers.yaml
       - template: templates/misconfiguration/apache/apache-missing-security-headers-extended.yaml
-      - template: templates/misconfiguration/apache/apache-unsafe-http-methods-enabled.yaml
-      - template: templates/technologies/apache/apache-server-version-disclosure.yaml
-      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml
-
+      - template: templates/misconfiguration/apache/apache-proxy-headers-trust-bypass-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-open-proxy-potential.yaml
   - template: templates/technologies/apache/apache-default-page-fingerprint.yaml
     subtemplates:
+      - template: templates/technologies/apache/apache-server-version-disclosure.yaml
       - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-status-auto-exposed.yaml
       - template: templates/misconfiguration/apache/apache-status-json-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
       - template: templates/misconfiguration/apache/apache-info-module-signature-exposed.yaml
-      - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml
+      - template: templates/misconfiguration/apache/apache-directory-listing-exposed.yaml
       - template: templates/misconfiguration/apache/apache-httpd-conf-exposed.yaml
       - template: templates/misconfiguration/apache/apache-vhosts-config-exposed.yaml
       - template: templates/misconfiguration/apache/apache-ssl-conf-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-config-backups-exposed.yaml

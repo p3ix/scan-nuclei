@@ -71,6 +71,38 @@ nuclei -w templates/workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflo
 nuclei -w templates/workflows/tomcat/tomcat-hardening-workflow.yaml -u https://objetivo
 ```
 
+Para objetivos Apache, separa el uso segun el tipo de revision:
+
+- `templates/workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml`
+  - para misconfiguracion general, `server-status`, `server-info`, listados, `.ht*` y configuracion expuesta.
+- `templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml`
+  - para proxy/admin surface, `balancer-manager`, `jk-status`, forward/open proxy y CVEs `potential` de proxy.
+- `templates/workflows/apache/apache-hardening-workflow.yaml`
+  - para posture review de Apache, headers, metodos inseguros, directory listing y configuracion expuesta.
+- `templates/workflows/apache/apache-fronting-tomcat-workflow.yaml`
+  - para Apache actuando como frontend de Tomcat.
+- `templates/workflows/apache/apache-fronting-wildfly-workflow.yaml`
+  - para Apache actuando como frontend de WildFly/Undertow.
+
+Ejemplos:
+
+```bash
+# Apache misconfiguration general
+nuclei -w templates/workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml -u https://objetivo
+
+# Apache proxy/admin surface
+nuclei -w templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml -u https://objetivo
+
+# Apache hardening
+nuclei -w templates/workflows/apache/apache-hardening-workflow.yaml -u https://objetivo
+
+# Apache fronting Tomcat
+nuclei -w templates/workflows/apache/apache-fronting-tomcat-workflow.yaml -u https://objetivo
+
+# Apache fronting WildFly
+nuclei -w templates/workflows/apache/apache-fronting-wildfly-workflow.yaml -u https://objetivo
+```
+
 ## Cobertura WildFly moderna
 
 La linea de `WildFly` moderno esta pensada principalmente para:
@@ -116,6 +148,7 @@ Triage rapido recomendado para estos hallazgos:
   - Fingerprints de tecnologia (`technologies/*`)
   - management reads de WildFly (`wildfly-*-management-unauth`) cuando varias plantillas devuelven la misma causa raiz de exposicion
   - manager/help/text/status de Tomcat cuando varias rutas describen la misma superficie administrativa
+  - `server-status`/`server-info`/`status-json` de Apache cuando describen la misma superficie de administracion
 - Priorizar para remediacion en este orden:
   1) `default-logins`, `misconfiguration` de admin panels
   2) `exposures` de secretos/configuracion
@@ -150,5 +183,6 @@ Triage rapido recomendado para estos hallazgos:
 - Revisar solapamientos de paths para reducir hallazgos duplicados.
 - En workflows WildFly, mantener separadas las familias `modern-admin-surface` y `legacy-migration-debt`.
 - En workflows Tomcat, separar `version-priority`, `java-exposure` y `hardening` segun el objetivo del scan.
+- En workflows Apache, separar `misconfig`, `proxy-admin-surface` y `hardening` segun el objetivo del scan.
 
 Para detalle de clasificacion, ver `templates/README.md`.

@@ -54,4 +54,13 @@ nuclei -t templates/ -u https://objetivo
 - `workflows/tomcat/tomcat-hardening-workflow.yaml`:
   - orientado a posture review, headers, cookies, TRACE, errores verbosos y surface admin.
 
+## Nota de workflows Apache
+
+- `workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml`:
+  - orientado a misconfiguracion general y exposicion de configuracion/modulos.
+- `workflows/apache/apache-proxy-admin-surface-workflow.yaml`:
+  - orientado a proxy/admin surface y CVEs `potential` asociados a proxy.
+- `workflows/apache/apache-hardening-workflow.yaml`:
+  - orientado a posture review, headers, metodos inseguros, listing y configuracion expuesta.
+
 Las carpetas vacias mantienen `.gitkeep`.

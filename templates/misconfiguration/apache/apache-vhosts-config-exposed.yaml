@@ -1,0 +1,42 @@
+id: apache-vhosts-config-exposed
+
+info:
+  name: Apache Virtual Hosts Config Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache virtual host configuration files, which may leak
+    internal hostnames, proxy backends, TLS settings, and per-site auth rules.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - vhosts
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/sites-enabled/000-default.conf"
+      - "{{BaseURL}}/sites-enabled/default-ssl.conf"
+      - "{{BaseURL}}/sites-available/000-default.conf"
+      - "{{BaseURL}}/sites-available/default-ssl.conf"
+      - "{{BaseURL}}/conf/extra/httpd-vhosts.conf"
+      - "{{BaseURL}}/conf.d/vhost.conf"
+      - "{{BaseURL}}/vhosts.conf"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^<VirtualHost\\b"
+          - "(?im)^ServerName\\s+"
+          - "(?im)^ServerAlias\\s+"
+          - "(?im)^ProxyPass\\s+"
+          - "(?im)^SSLEngine\\s+on"

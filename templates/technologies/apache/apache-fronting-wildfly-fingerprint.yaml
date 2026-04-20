@@ -1,0 +1,40 @@
+id: apache-fronting-wildfly-fingerprint
+
+info:
+  name: Apache Fronting WildFly Indicators
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects indicators that Apache HTTPD is likely fronting a WildFly or
+    Undertow backend, based on Apache headers combined with backend stack
+    markers such as Undertow, JSESSIONID, or WildFly default content.
+  tags:
+    - tech
+    - apache
+    - wildfly
+    - undertow
+    - reverse-proxy
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei-apache-wildfly"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)^server:\\s*apache/?[0-9.]*"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Set-Cookie:\\s*JSESSIONID="
+          - "(?i)Welcome to WildFly"
+          - "(?i)Your WildFly is running"
+          - "(?i)Undertow"
+          - "(?i)WFLYUT[0-9]{4}:"
+          - "(?i)io\\.undertow\\."

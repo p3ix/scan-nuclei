@@ -1,0 +1,52 @@
+id: apache-config-backups-exposed
+
+info:
+  name: Apache Config Backups Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed backup or editor-temp copies of Apache configuration files,
+    including main config, vhost config, and SSL config.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - backup
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/httpd.conf.bak"
+      - "{{BaseURL}}/httpd.conf.old"
+      - "{{BaseURL}}/httpd.conf~"
+      - "{{BaseURL}}/apache2.conf.bak"
+      - "{{BaseURL}}/conf/httpd.conf.bak"
+      - "{{BaseURL}}/conf/apache2.conf.old"
+      - "{{BaseURL}}/conf.d/ssl.conf.bak"
+      - "{{BaseURL}}/conf/ssl.conf.old"
+      - "{{BaseURL}}/sites-enabled/000-default.conf.bak"
+      - "{{BaseURL}}/sites-enabled/default-ssl.conf.bak"
+      - "{{BaseURL}}/conf/extra/httpd-vhosts.conf.bak"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^ServerRoot\\s+"
+          - "(?im)^LoadModule\\s+"
+          - "(?im)^<VirtualHost\\b"
+          - "(?im)^SSLEngine\\s+on"
+          - "(?im)^ProxyPass\\s+"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

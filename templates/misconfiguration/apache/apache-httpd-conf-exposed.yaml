@@ -1,0 +1,40 @@
+id: apache-httpd-conf-exposed
+
+info:
+  name: Apache Main Config Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly accessible Apache main configuration files such as
+    `httpd.conf` or `apache2.conf`, which may disclose document roots, loaded
+    modules, virtual hosts, auth rules, and proxy configuration.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/httpd.conf"
+      - "{{BaseURL}}/apache2.conf"
+      - "{{BaseURL}}/conf/httpd.conf"
+      - "{{BaseURL}}/conf/apache2.conf"
+      - "{{BaseURL}}/config/httpd.conf"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^ServerRoot\\s+"
+          - "(?im)^Listen\\s+"
+          - "(?im)^LoadModule\\s+"
+          - "(?im)^DocumentRoot\\s+"
+          - "(?im)^Include(Optional)?\\s+"

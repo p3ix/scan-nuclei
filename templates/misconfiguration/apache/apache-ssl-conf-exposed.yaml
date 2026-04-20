@@ -1,0 +1,41 @@
+id: apache-ssl-conf-exposed
+
+info:
+  name: Apache SSL Config Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache SSL/TLS configuration files, which may disclose
+    certificate paths, protocol policy, cipher configuration, and private key
+    references.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - ssl
+    - tls
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/ssl.conf"
+      - "{{BaseURL}}/conf/ssl.conf"
+      - "{{BaseURL}}/conf.d/ssl.conf"
+      - "{{BaseURL}}/conf/extra/httpd-ssl.conf"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^SSLEngine\\s+on"
+          - "(?im)^SSLProtocol\\s+"
+          - "(?im)^SSLCipherSuite\\s+"
+          - "(?im)^SSLCertificate(File|KeyFile)\\s+"
+          - "(?im)^SSLHonorCipherOrder\\s+"
