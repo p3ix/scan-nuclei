@@ -1,0 +1,53 @@
+id: bootstrap-config-exposed
+
+info:
+  name: Spring Bootstrap Config Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Spring bootstrap configuration files and backup variants,
+    potentially leaking config server endpoints, credentials, and secrets.
+  tags:
+    - exposure
+    - spring
+    - config
+    - bootstrap
+    - secrets
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/bootstrap.yml"
+      - "{{BaseURL}}/bootstrap.yaml"
+      - "{{BaseURL}}/bootstrap.properties"
+      - "{{BaseURL}}/bootstrap.yml.bak"
+      - "{{BaseURL}}/bootstrap.yaml.bak"
+      - "{{BaseURL}}/bootstrap.properties.bak"
+      - "{{BaseURL}}/bootstrap.yml.old"
+      - "{{BaseURL}}/bootstrap.yaml.old"
+      - "{{BaseURL}}/bootstrap.properties.old"
+      - "{{BaseURL}}/config/bootstrap.yml"
+      - "{{BaseURL}}/config/bootstrap.yaml"
+      - "{{BaseURL}}/config/bootstrap.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^(spring\\.cloud\\.config\\.|spring\\.application\\.|encrypt\\.)"
+          - "(?im)^(spring|management|server)\\s*:"
+      - type: regex
+        part: body
+        regex:
+          - "(?im)(password|passwd|secret|token|api[-_]?key|client-secret)\\s*[:=]\\s*.+"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

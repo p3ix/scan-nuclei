@@ -1,0 +1,38 @@
+id: spring-actuator-conditions-unauth
+
+info:
+  name: Spring Actuator Conditions Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Actuator conditions endpoint,
+    disclosing auto-configuration state and conditional logic.
+  tags:
+    - vulnerability
+    - spring
+    - actuator
+    - conditions
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/conditions"
+      - "{{BaseURL}}/conditions"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"positiveMatches"\\s*:'
+          - '(?i)"negativeMatches"\\s*:'
+          - '(?i)"conditionEvaluationReport"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"

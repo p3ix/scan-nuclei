@@ -1,0 +1,44 @@
+id: spring-actuator-sessions-unauth
+
+info:
+  name: Spring Actuator Sessions Exposed Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated access to Spring Actuator sessions endpoint,
+    potentially disclosing active session identifiers and user metadata.
+  tags:
+    - vulnerability
+    - spring
+    - actuator
+    - sessions
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/sessions"
+      - "{{BaseURL}}/sessions"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"sessions"\\s*:'
+          - '(?i)"maxInactiveInterval"\\s*:'
+          - '(?i)"creationTime"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

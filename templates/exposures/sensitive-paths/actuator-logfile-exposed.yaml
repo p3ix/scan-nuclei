@@ -1,0 +1,34 @@
+id: actuator-logfile-exposed
+
+info:
+  name: Spring Actuator Logfile Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Actuator logfile endpoint that may leak tokens, stack traces,
+    internal paths, and operational details.
+  tags:
+    - exposure
+    - spring
+    - actuator
+    - logfile
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/logfile"
+      - "{{BaseURL}}/logfile"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)\\b(ERROR|WARN|INFO)\\b"
+          - "(?m)\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}"
+          - "(?i)(exception|stacktrace|trace)"

@@ -1,0 +1,34 @@
+id: actuator-threaddump-exposed
+
+info:
+  name: Spring Actuator Threaddump Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly accessible Spring Actuator threaddump endpoint leaking
+    thread names, stack traces, class names, and runtime internals.
+  tags:
+    - exposure
+    - spring
+    - actuator
+    - threaddump
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/threaddump"
+      - "{{BaseURL}}/threaddump"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"threads"\\s*:\\s*\\['
+          - '(?i)"threadName"\\s*:'
+          - '(?i)"stackTrace"\\s*:'

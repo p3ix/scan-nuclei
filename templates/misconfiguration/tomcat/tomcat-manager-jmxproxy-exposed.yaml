@@ -1,0 +1,34 @@
+id: tomcat-manager-jmxproxy-exposed
+
+info:
+  name: Tomcat Manager JMX Proxy Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat Manager JMXProxy endpoint, which can reveal sensitive
+    runtime data and, in some setups, permit management operations.
+  tags:
+    - tomcat
+    - misconfiguration
+    - manager
+    - jmx
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/jmxproxy/?qry=*:*"
+      - "{{BaseURL}}/manager/jmxproxy/?get=java.lang:type=Runtime/Uptime"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Tomcat Manager Application"
+          - "(?i)java\\.lang:type=Runtime"
+          - "(?i)OK - Number of results"

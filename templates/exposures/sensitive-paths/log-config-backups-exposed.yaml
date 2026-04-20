@@ -1,0 +1,53 @@
+id: log-config-backups-exposed
+
+info:
+  name: Java Log Config Backups Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed backup and editor-temp copies of Logback/Log4j configs that
+    can reveal internal paths, destinations, and operational internals.
+  tags:
+    - exposure
+    - java
+    - logback
+    - log4j
+    - backup
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/logback.xml.bak"
+      - "{{BaseURL}}/logback.xml.old"
+      - "{{BaseURL}}/logback.xml~"
+      - "{{BaseURL}}/log4j2.xml.bak"
+      - "{{BaseURL}}/log4j2.xml.old"
+      - "{{BaseURL}}/log4j2.xml~"
+      - "{{BaseURL}}/log4j.properties.bak"
+      - "{{BaseURL}}/log4j.properties.old"
+      - "{{BaseURL}}/log4j.properties~"
+      - "{{BaseURL}}/config/logback.xml.bak"
+      - "{{BaseURL}}/config/log4j2.xml.bak"
+      - "{{BaseURL}}/WEB-INF/classes/logback.xml.bak"
+      - "{{BaseURL}}/WEB-INF/classes/log4j2.xml.bak"
+      - "{{BaseURL}}/WEB-INF/classes/log4j.properties.bak"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<configuration\\b"
+          - "(?is)<appender\\b"
+          - "(?im)^log4j\\.rootLogger\\s*="
+          - "(?im)logger\\.[A-Za-z0-9_.-]+\\s*="
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

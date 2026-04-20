@@ -1,0 +1,40 @@
+id: actuator-startup-exposed
+
+info:
+  name: Spring Actuator Startup Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly exposed Actuator startup endpoint, which can disclose bean
+    initialization order, startup phases, and internal application details.
+  tags:
+    - exposure
+    - spring
+    - actuator
+    - startup
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/startup"
+      - "{{BaseURL}}/startup"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"springBootVersion"\\s*:'
+          - '(?i)"timeline"\\s*:'
+          - '(?i)"startupStep"\\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

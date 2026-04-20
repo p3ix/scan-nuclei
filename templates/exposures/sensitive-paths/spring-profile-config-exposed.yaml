@@ -1,0 +1,56 @@
+id: spring-profile-config-exposed
+
+info:
+  name: Spring Profile Config Files Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Spring profile-specific configuration files and backups
+    that commonly include production credentials and environment secrets.
+  tags:
+    - exposure
+    - spring
+    - config
+    - profiles
+    - secrets
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/application-prod.yml"
+      - "{{BaseURL}}/application-prod.yaml"
+      - "{{BaseURL}}/application-prod.properties"
+      - "{{BaseURL}}/application-dev.yml"
+      - "{{BaseURL}}/application-dev.yaml"
+      - "{{BaseURL}}/application-dev.properties"
+      - "{{BaseURL}}/application-test.yml"
+      - "{{BaseURL}}/application-test.yaml"
+      - "{{BaseURL}}/application-test.properties"
+      - "{{BaseURL}}/application-prod.yml.bak"
+      - "{{BaseURL}}/application-prod.yaml.bak"
+      - "{{BaseURL}}/application-prod.properties.bak"
+      - "{{BaseURL}}/config/application-prod.yml"
+      - "{{BaseURL}}/config/application-prod.yaml"
+      - "{{BaseURL}}/config/application-prod.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^(spring\\.|management\\.|server\\.|datasource\\.|logging\\.)"
+          - "(?im)^(spring|management|server|datasource|logging)\\s*:"
+      - type: regex
+        part: body
+        regex:
+          - "(?im)(password|passwd|secret|token|api[-_]?key|client-secret)\\s*[:=]\\s*.+"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

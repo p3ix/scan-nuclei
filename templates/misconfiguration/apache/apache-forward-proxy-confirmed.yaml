@@ -1,0 +1,38 @@
+id: apache-forward-proxy-confirmed
+
+info:
+  name: Apache Forward Proxy Confirmed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Confirms likely forward proxy behavior on Apache by sending an absolute URI
+    request and validating remote content indicators.
+  tags:
+    - apache
+    - misconfig
+    - proxy
+    - open-proxy
+    - confirmed
+
+http:
+  - raw:
+      - |
+        GET http://example.com/ HTTP/1.1
+        Host: {{Hostname}}
+        User-Agent: nuclei-forward-proxy-confirmed
+        Connection: close
+
+    unsafe: true
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 301 || status_code == 302"
+      - type: word
+        part: body
+        words:
+          - "Example Domain"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)server:\\s*apache"

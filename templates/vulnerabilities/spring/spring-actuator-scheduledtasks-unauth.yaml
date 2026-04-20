@@ -1,0 +1,38 @@
+id: spring-actuator-scheduledtasks-unauth
+
+info:
+  name: Spring Actuator ScheduledTasks Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Actuator scheduledtasks endpoint,
+    disclosing cron schedules, fixed delays, and task implementation details.
+  tags:
+    - vulnerability
+    - spring
+    - actuator
+    - scheduledtasks
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/scheduledtasks"
+      - "{{BaseURL}}/scheduledtasks"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"cron"\\s*:\\s*\\['
+          - '(?i)"fixedDelay"\\s*:\\s*\\['
+          - '(?i)"runnable"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"

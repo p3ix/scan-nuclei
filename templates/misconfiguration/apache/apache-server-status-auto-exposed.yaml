@@ -1,0 +1,32 @@
+id: apache-server-status-auto-exposed
+
+info:
+  name: Apache Server Status Auto Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Apache mod_status machine-readable output (`/server-status?auto`)
+    leaking backend workers, requests, and performance telemetry.
+  tags:
+    - apache
+    - misconfiguration
+    - mod-status
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-status?auto"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^ServerVersion:\\s+Apache/"
+          - "(?m)^Total Accesses:\\s+\\d+"
+          - "(?m)^BusyWorkers:\\s+\\d+"

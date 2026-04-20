@@ -1,0 +1,39 @@
+id: apache-proxy-headers-trust-bypass-exposed
+
+info:
+  name: Apache Proxy Header Trust Bypass Surface
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects behavior indicating upstream trust of client-controlled proxy headers
+    (X-Forwarded-*), which may enable access-control bypass in some deployments.
+  tags:
+    - apache
+    - misconfig
+    - proxy
+    - headers
+    - bypass
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    headers:
+      X-Forwarded-For: 127.0.0.1
+      X-Forwarded-Host: localhost
+      X-Original-URL: /admin
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: header
+        regex:
+          - "(?i)server:\\s*apache"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)x-forwarded-(for|host|proto)"
+          - "(?i)x-original-url"
+          - "(?i)localhost"

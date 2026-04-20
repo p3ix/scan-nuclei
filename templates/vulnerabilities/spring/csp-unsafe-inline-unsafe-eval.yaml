@@ -26,4 +26,4 @@ http:
           - "contains(to_lower(all_headers), 'content-security-policy:')"
       - type: dsl
         dsl:
-          - "contains(to_lower(all_headers), \"'unsafe-inline'\") || contains(to_lower(all_headers), \"'unsafe-eval'\")"
+          - "contains(to_lower(all_headers), \"unsafe-inline\") || contains(to_lower(all_headers), \"unsafe-eval\")"

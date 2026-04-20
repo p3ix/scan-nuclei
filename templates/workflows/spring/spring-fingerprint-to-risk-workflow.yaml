@@ -11,15 +11,23 @@ workflows:
       - template: templates/misconfiguration/java-apps/spring-actuator-root-exposed.yaml
       - template: templates/misconfiguration/java-apps/spring-actuator-prometheus-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-debug-endpoints-exposed.yaml
-      - template: templates/misconfiguration/java-apps/java-missing-security-headers.yaml
       - template: templates/exposures/error-pages/java-tomcat-stacktrace-exposed.yaml
+      - template: templates/exposures/sensitive-paths/actuator-env-exposed.yaml
+      - template: templates/exposures/sensitive-paths/actuator-threaddump-exposed.yaml
+      - template: templates/exposures/sensitive-paths/actuator-logfile-exposed.yaml
+      - template: templates/exposures/sensitive-paths/actuator-startup-exposed.yaml
+      - template: templates/exposures/sensitive-paths/bootstrap-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/spring-profile-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/log-config-backups-exposed.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-beans-unauth.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-conditions-unauth.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-metrics-unauth.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-scheduledtasks-unauth.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-sessions-unauth.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-httpexchanges-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-mappings-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-configprops-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-boot-env-sensitive-keys-exposed.yaml
       - template: templates/vulnerabilities/spring/spring-boot-trace-http-inclusion-exposed.yaml
       - template: templates/vulnerabilities/spring/spring-cors-wildcard-credentials-potential.yaml
-      - template: templates/vulnerabilities/spring/csp-unsafe-inline-unsafe-eval.yaml
-      - template: templates/vulnerabilities/spring/cors-overly-permissive-methods-or-exposed-headers.yaml
-      - template: templates/vulnerabilities/spring/jsessionid-samesite-none-without-secure.yaml
-      - template: templates/technologies/java-web/x-powered-by-disclosure.yaml
       - template: templates/cves/java/CVE-2022-22965-spring4shell-potential.yaml

@@ -1,0 +1,34 @@
+id: tomcat-catalina-properties-exposed
+
+info:
+  name: Tomcat Catalina Properties Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed catalina.properties files leaking runtime classpath, package
+    access/security settings, and Tomcat internals.
+  tags:
+    - tomcat
+    - exposure
+    - properties
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/catalina.properties"
+      - "{{BaseURL}}/catalina.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^common\\.loader\\s*="
+          - "(?im)^server\\.loader\\s*="
+          - "(?im)^package\\.access\\s*="
+          - "(?im)^package\\.definition\\s*="

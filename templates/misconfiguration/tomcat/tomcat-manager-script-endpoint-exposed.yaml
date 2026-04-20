@@ -1,0 +1,34 @@
+id: tomcat-manager-script-endpoint-exposed
+
+info:
+  name: Tomcat Manager Script Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat Manager text/script endpoints that provide deployment
+    management capabilities if not properly restricted.
+  tags:
+    - tomcat
+    - misconfig
+    - manager
+    - script
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/text/list"
+      - "{{BaseURL}}/manager/text/serverinfo"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^OK - Listed applications for virtual host"
+          - "(?m)^OK - Server info"
+          - "(?i)Tomcat Version"

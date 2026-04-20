@@ -1,0 +1,35 @@
+id: spring-actuator-metrics-unauth
+
+info:
+  name: Spring Actuator Metrics Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Actuator metrics endpoints exposing
+    application internals and operational telemetry.
+  tags:
+    - vulnerability
+    - spring
+    - actuator
+    - metrics
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/metrics"
+      - "{{BaseURL}}/metrics"
+      - "{{BaseURL}}/actuator/metrics/jvm.memory.used"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"names"\\s*:\\s*\\['
+          - '(?i)"measurements"\\s*:\\s*\\['
+          - '(?i)"jvm\\.memory\\.used"'

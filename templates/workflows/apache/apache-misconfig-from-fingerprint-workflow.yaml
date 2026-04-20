@@ -9,6 +9,7 @@ workflows:
   - template: templates/technologies/apache/apache-httpd-server-header-fingerprint.yaml
     subtemplates:
       - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-server-status-auto-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
       - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml
       - template: templates/misconfiguration/apache/apache-directory-listing-exposed.yaml
@@ -24,5 +25,6 @@ workflows:
   - template: templates/technologies/apache/apache-default-page-fingerprint.yaml
     subtemplates:
       - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-server-status-auto-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
       - template: templates/misconfiguration/apache/apache-trace-method-enabled.yaml

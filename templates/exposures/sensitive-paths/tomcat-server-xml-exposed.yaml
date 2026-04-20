@@ -1,0 +1,34 @@
+id: tomcat-server-xml-exposed
+
+info:
+  name: Tomcat Server XML Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat server.xml configuration that may disclose connector
+    settings, realms, users, and internal deployment architecture.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/server.xml"
+      - "{{BaseURL}}/server.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Server\\b"
+          - "(?is)<Service\\b"
+          - "(?is)<Connector\\b"
+          - "(?is)<Engine\\b"

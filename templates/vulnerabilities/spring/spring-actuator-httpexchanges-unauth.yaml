@@ -1,0 +1,44 @@
+id: spring-actuator-httpexchanges-unauth
+
+info:
+  name: Spring Actuator HTTP Exchanges Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Actuator httpexchanges endpoint,
+    exposing request/response metadata and potentially sensitive paths.
+  tags:
+    - vulnerability
+    - spring
+    - actuator
+    - httpexchanges
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/httpexchanges"
+      - "{{BaseURL}}/httpexchanges"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"exchanges"\\s*:'
+          - '(?i)"request"\\s*:'
+          - '(?i)"response"\\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

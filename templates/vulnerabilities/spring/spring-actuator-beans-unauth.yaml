@@ -1,0 +1,38 @@
+id: spring-actuator-beans-unauth
+
+info:
+  name: Spring Actuator Beans Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Actuator beans endpoint exposing
+    internal component graph and class names.
+  tags:
+    - vulnerability
+    - spring
+    - actuator
+    - beans
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/beans"
+      - "{{BaseURL}}/beans"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"contexts"\\s*:\\s*\\{'
+          - '(?i)"beans"\\s*:\\s*\\{'
+          - '(?i)"type"\\s*:\\s*"[^"]+"'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
