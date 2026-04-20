@@ -1,0 +1,37 @@
+id: wildfly-management-users-properties-exposed
+
+info:
+  name: WildFly Management Users Properties Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed WildFly management user property files, which may reveal
+    usernames and credential material for the administrative plane.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - management
+    - users
+    - secrets
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/mgmt-users.properties"
+      - "{{BaseURL}}/management-users.properties"
+      - "{{BaseURL}}/config/mgmt-users.properties"
+      - "{{BaseURL}}/config/management-users.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^[A-Za-z0-9_.-]+=([A-Fa-f0-9]{16,}|[A-Za-z0-9./$=-]{16,})$"
+          - "(?im)^#\\$REALM_NAME="
+          - "(?im)^#\\$ALGORITHM="

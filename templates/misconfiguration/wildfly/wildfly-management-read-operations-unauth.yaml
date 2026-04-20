@@ -1,0 +1,47 @@
+id: wildfly-management-read-operations-unauth
+
+info:
+  name: WildFly Management Read Operations Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated read-only management operations on the WildFly or
+    JBoss management API. Successful responses can disclose server state,
+    deployment names, and runtime model metadata that materially increase
+    administrative attack surface.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - management
+    - unauth
+    - api
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management?operation=read-attribute&name=server-state"
+      - "{{BaseURL}}/management?operation=read-attribute&name=product-name"
+      - "{{BaseURL}}/management?operation=read-children-names&child-type=deployment"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"result"\\s*:\\s*"(running|reload-required|restart-required|WildFly|JBoss[^"]*)"'
+          - '(?i)"result"\\s*:\\s*\\[[^\\]]*\\]'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

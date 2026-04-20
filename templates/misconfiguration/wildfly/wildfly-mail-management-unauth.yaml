@@ -1,0 +1,48 @@
+id: wildfly-mail-management-unauth
+
+info:
+  name: WildFly Mail Session Management Read Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated management reads against WildFly mail subsystem
+    resources. Successful responses can disclose SMTP hosts, usernames,
+    outbound bindings, and environment topology.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - management
+    - mail
+    - unauth
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=mail?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=mail?operation=read-children-names&child-type=mail-session"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"mail-session"'
+          - '(?i)"smtp-server"'
+          - '(?i)"outbound-socket-binding-ref"'
+          - '(?i)"username"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

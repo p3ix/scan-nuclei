@@ -1,0 +1,38 @@
+id: wildfly-standalone-xml-exposed
+
+info:
+  name: WildFly Standalone XML Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects access to WildFly standalone configuration files, which may reveal
+    listeners, security realms, management interfaces, deployments, and secret
+    handling configuration.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - config
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/standalone.xml"
+      - "{{BaseURL}}/config/standalone.xml"
+      - "{{BaseURL}}/WEB-INF/classes/standalone.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<server\\s+xmlns=\"urn:jboss:domain:"
+          - "(?i)<management>"
+          - "(?i)<subsystem\\s+xmlns=\"urn:jboss:domain:undertow:"
+          - "(?i)<socket-binding-group"

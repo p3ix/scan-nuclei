@@ -1,0 +1,50 @@
+id: wildfly-datasources-management-unauth
+
+info:
+  name: WildFly Datasources Management Read Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated management reads against WildFly datasource
+    resources. Successful responses can disclose JDBC URLs, datasource names,
+    drivers, pool settings, and backend integration details.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - management
+    - datasource
+    - unauth
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=datasources?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=datasources?operation=read-children-names&child-type=data-source"
+      - "{{BaseURL}}/management/subsystem=datasources?operation=read-children-names&child-type=xa-data-source"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"jdbc-url"'
+          - '(?i)"connection-url"'
+          - '(?i)"data-source"'
+          - '(?i)"xa-data-source"'
+          - '(?i)"driver-name"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

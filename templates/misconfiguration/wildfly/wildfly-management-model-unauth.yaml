@@ -1,0 +1,48 @@
+id: wildfly-management-model-unauth
+
+info:
+  name: WildFly Management Resource Model Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated access to basic WildFly or JBoss management resource
+    model operations. Even shallow read-resource responses can disclose runtime
+    topology, subsystem names, and deployment structure.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - management
+    - model
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=undertow?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=logging?operation=read-resource"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"subsystem"\\s*=>?'
+          - '(?i)"result"\\s*:'
+          - '(?i)"undertow"'
+          - '(?i)"logging"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

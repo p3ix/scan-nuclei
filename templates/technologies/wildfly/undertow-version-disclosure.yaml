@@ -1,0 +1,39 @@
+id: undertow-version-disclosure
+
+info:
+  name: Undertow Version Disclosure
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects explicit Undertow version disclosure in response headers or default
+    error content, which helps map patch levels and prioritize review.
+  tags:
+    - tech
+    - wildfly
+    - undertow
+    - version
+    - disclosure
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei-undertow-version"
+
+    extractors:
+      - type: regex
+        name: undertow_version
+        part: all
+        regex:
+          - "(?i)server:\\s*(undertow/[0-9.]+)"
+          - "(?i)undertow[/\\s]+([0-9]+(?:\\.[0-9]+){1,2})"
+
+    matchers-condition: and
+    matchers:
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)server:\\s*undertow/[0-9.]+"
+          - "(?i)undertow[/\\s]+[0-9]+(?:\\.[0-9]+){1,2}"

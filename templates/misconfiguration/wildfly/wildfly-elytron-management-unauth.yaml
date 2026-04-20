@@ -1,0 +1,50 @@
+id: wildfly-elytron-management-unauth
+
+info:
+  name: WildFly Elytron Management Read Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated management reads against WildFly Elytron resources.
+    Successful responses can disclose realms, authentication factories, TLS
+    contexts, and security-domain structure.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - management
+    - elytron
+    - unauth
+    - security
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-types"
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=security-domain"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"elytron"'
+          - '(?i)"security-domain"'
+          - '(?i)"http-authentication-factory"'
+          - '(?i)"key-store"'
+          - '(?i)"server-ssl-context"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,36 @@
+id: wildfly-logging-properties-exposed
+
+info:
+  name: WildFly Logging Properties Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed WildFly or JBoss logging property files, which may leak log
+    paths, handlers, categories, and operational internals.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - logging
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/logging.properties"
+      - "{{BaseURL}}/config/logging.properties"
+      - "{{BaseURL}}/WEB-INF/classes/logging.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^logger\\."
+          - "(?im)^handler\\."
+          - "(?im)^formatter\\."
+          - "(?im)^java\\.util\\.logging\\."

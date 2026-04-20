@@ -1,0 +1,38 @@
+id: wildfly-host-xml-exposed
+
+info:
+  name: WildFly Host XML Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects access to WildFly host controller configuration files, which may
+    reveal local management bindings, remote domain peers, and host topology.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - host-controller
+    - config
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/host.xml"
+      - "{{BaseURL}}/config/host.xml"
+      - "{{BaseURL}}/WEB-INF/classes/host.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<host\\s+xmlns=\"urn:jboss:domain:"
+          - "(?i)<domain-controller>"
+          - "(?i)<management-interfaces>"
+          - "(?i)<servers>"

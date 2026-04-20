@@ -1,0 +1,38 @@
+id: wildfly-domain-xml-exposed
+
+info:
+  name: WildFly Domain XML Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects access to WildFly domain configuration files, which may disclose
+    server groups, host controllers, deployments, and management topology.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - domain
+    - config
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/domain.xml"
+      - "{{BaseURL}}/config/domain.xml"
+      - "{{BaseURL}}/WEB-INF/classes/domain.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<domain\\s+xmlns=\"urn:jboss:domain:"
+          - "(?i)<server-groups>"
+          - "(?i)<host-excludes>"
+          - "(?i)<management-interfaces>"

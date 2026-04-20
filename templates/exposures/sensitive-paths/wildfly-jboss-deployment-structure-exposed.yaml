@@ -1,0 +1,39 @@
+id: wildfly-jboss-deployment-structure-exposed
+
+info:
+  name: WildFly JBoss Deployment Structure Descriptor Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects access to `jboss-deployment-structure.xml`, which can reveal module
+    dependencies, exclusions, and container integration details.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - deployment
+    - descriptor
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/META-INF/jboss-deployment-structure.xml"
+      - "{{BaseURL}}/meta-inf/jboss-deployment-structure.xml"
+      - "{{BaseURL}}/WEB-INF/jboss-deployment-structure.xml"
+      - "{{BaseURL}}/web-inf/jboss-deployment-structure.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<jboss-deployment-structure[^>]*>"
+          - "(?i)<deployment>"
+          - "(?i)<sub-deployment>"
+          - "(?i)<module\\s+name="

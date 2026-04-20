@@ -1,0 +1,37 @@
+id: java-persistence-xml-exposed
+
+info:
+  name: Java Persistence Descriptor Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects access to `persistence.xml`, which may leak datasource names,
+    provider configuration, dialect hints, and persistence unit metadata.
+  tags:
+    - exposure
+    - java
+    - persistence
+    - descriptor
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/META-INF/persistence.xml"
+      - "{{BaseURL}}/meta-inf/persistence.xml"
+      - "{{BaseURL}}/WEB-INF/classes/META-INF/persistence.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<persistence[^>]*>"
+          - "(?i)<persistence-unit"
+          - "(?i)<provider>"
+          - "(?i)<jta-data-source>"

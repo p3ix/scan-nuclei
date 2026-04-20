@@ -29,6 +29,7 @@ nuclei -t templates/ -u https://objetivo
 
 - Evitar doble conteo entre templates de docs (`openapi/wadl`) y templates de assets (`swagger-ui/*.map`).
 - Tratar `technologies/*` como contexto de priorizacion, no como finding explotable por si solo.
+- En WildFly, agrupar `wildfly-*-management-unauth` como evidencia de una misma causa raiz cuando el problema sea lectura no autenticada del management model.
 - Para stacktraces:
   - si hay paquetes/clases internas y lineas de codigo, priorizar remediacion;
   - si solo hay error generico, tratar como hardening de manejo de errores.
@@ -36,5 +37,12 @@ nuclei -t templates/ -u https://objetivo
   - `misconfiguration/*headers*`: postura/hardening (`low`).
   - `vulnerabilities/*headers*` y `cors-*`: riesgo de impacto en navegador/API (`medium`/`high`).
   - `technologies/*disclosure*`: contexto de reconocimiento (`info`).
+
+## Nota de workflows WildFly
+
+- `workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml`:
+  - orientado a WildFly reciente, Undertow, management API, health/metrics y configuracion expuesta.
+- `workflows/wildfly/jboss-legacy-migration-debt-workflow.yaml`:
+  - orientado a deuda de migracion y superficies legacy de JBoss.
 
 Las carpetas vacias mantienen `.gitkeep`.

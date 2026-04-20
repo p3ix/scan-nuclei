@@ -1,0 +1,36 @@
+id: wildfly-jboss-web-xml-exposed
+
+info:
+  name: WildFly JBoss Web Descriptor Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects access to `jboss-web.xml`, which may leak context roots, security
+    domain wiring, virtual hosts, and deployment-specific metadata.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - descriptor
+    - xml
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/WEB-INF/jboss-web.xml"
+      - "{{BaseURL}}/web-inf/jboss-web.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<jboss-web[^>]*>"
+          - "(?i)<context-root>"
+          - "(?i)<security-domain>"
+          - "(?i)<virtual-host>"

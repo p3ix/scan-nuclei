@@ -1,0 +1,36 @@
+id: wildfly-management-groups-properties-exposed
+
+info:
+  name: WildFly Management Groups Properties Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed WildFly management group mapping files, which may reveal
+    administrative role assignments and privileged user identifiers.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - management
+    - groups
+    - roles
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/mgmt-groups.properties"
+      - "{{BaseURL}}/management-groups.properties"
+      - "{{BaseURL}}/config/mgmt-groups.properties"
+      - "{{BaseURL}}/config/management-groups.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^[A-Za-z0-9_.-]+\\s*=\\s*[A-Za-z0-9_, -]+$"
+          - "(?im)^(.*\\b(SuperUser|Administrator|Monitor|Deployer|Maintainer)\\b.*)$"

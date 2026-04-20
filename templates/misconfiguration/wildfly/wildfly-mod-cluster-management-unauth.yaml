@@ -1,0 +1,48 @@
+id: wildfly-mod-cluster-management-unauth
+
+info:
+  name: WildFly mod_cluster Management Read Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated management reads against WildFly mod_cluster
+    resources. Successful responses can disclose balancer configuration,
+    advertised connectors, proxies, and cluster topology.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - management
+    - mod-cluster
+    - unauth
+    - proxy
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=modcluster?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=modcluster?operation=read-children-types"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"modcluster"'
+          - '(?i)"proxy-list"'
+          - '(?i)"advertise"'
+          - '(?i)"balancer"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
