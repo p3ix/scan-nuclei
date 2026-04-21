@@ -14,6 +14,7 @@ workflows:
       - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-status-auto-exposed.yaml
       - template: templates/misconfiguration/apache/apache-status-json-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-server-status-request-metadata-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
       - template: templates/misconfiguration/apache/apache-info-module-signature-exposed.yaml
       - template: templates/misconfiguration/apache/apache-balancer-manager-exposed.yaml
@@ -48,6 +49,7 @@ workflows:
       - template: templates/misconfiguration/apache/apache-server-status-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-status-auto-exposed.yaml
       - template: templates/misconfiguration/apache/apache-status-json-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-server-status-request-metadata-exposed.yaml
       - template: templates/misconfiguration/apache/apache-server-info-exposed.yaml
       - template: templates/misconfiguration/apache/apache-info-module-signature-exposed.yaml
       - template: templates/misconfiguration/apache/apache-directory-listing-exposed.yaml

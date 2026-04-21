@@ -9,8 +9,11 @@ workflows:
   - template: templates/technologies/apache/apache-httpd-server-header-fingerprint.yaml
     subtemplates:
       - template: templates/misconfiguration/apache/apache-balancer-manager-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-balancer-manager-backend-details-exposed.yaml
       - template: templates/misconfiguration/apache/apache-mod-cluster-manager-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-mod-cluster-manager-backend-details-exposed.yaml
       - template: templates/misconfiguration/apache/apache-jk-status-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-jk-status-backend-details-exposed.yaml
       - template: templates/misconfiguration/apache/apache-workers-properties-exposed.yaml
       - template: templates/misconfiguration/apache/apache-uriworkermap-properties-exposed.yaml
       - template: templates/misconfiguration/apache/apache-proxy-ajp-config-exposed.yaml
@@ -18,5 +21,7 @@ workflows:
       - template: templates/misconfiguration/apache/apache-proxy-headers-trust-bypass-exposed.yaml
       - template: templates/misconfiguration/apache/apache-open-proxy-potential.yaml
       - template: templates/misconfiguration/apache/apache-proxy-wstunnel-module-signal-potential.yaml
+      - template: templates/misconfiguration/apache/apache-proxy-wstunnel-routing-signal-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-proxy-backend-routing-disclosure-exposed.yaml
       - template: templates/cves/apache/CVE-2023-25690-apache-mod-proxy-request-smuggling-potential.yaml
       - template: templates/cves/apache/CVE-2021-40438-apache-mod-proxy-ssrf-potential.yaml

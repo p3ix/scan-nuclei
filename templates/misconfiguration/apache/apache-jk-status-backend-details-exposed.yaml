@@ -1,0 +1,74 @@
+id: apache-jk-status-backend-details-exposed
+
+info:
+  name: Apache mod_jk Status Backend Details Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed mod_jk status pages disclosing worker names, types, routes,
+    backend hosts, or AJP ports. This provides actionable backend topology
+    detail beyond the existence of the status panel itself.
+  tags:
+    - apache
+    - misconfig
+    - mod_jk
+    - proxy
+    - backend
+    - disclosure
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/jkstatus"
+      - "{{BaseURL}}/jk-status"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)JK Status Manager"
+          - "(?i)Worker list"
+          - "(?i)mod_jk"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)ajp://"
+          - "(?i)worker"
+          - "(?i)route"
+          - "(?i)host"
+          - "(?i)port"
+          - "(?i)lb_factor"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+      - type: regex
+        part: body
+        name: worker_name
+        regex:
+          - "(?i)worker[\\s:_-]+([a-z0-9._-]+)"
+      - type: regex
+        part: body
+        name: backend_endpoint
+        regex:
+          - "(?i)(?:ajp|http|https)://[a-z0-9._:-]+"
+      - type: regex
+        part: body
+        name: route
+        regex:
+          - "(?i)route[=:\"\\s>]+([a-z0-9._-]+)"
+      - type: regex
+        part: body
+        name: host_port
+        regex:
+          - "(?i)host[=:\"\\s>]+([a-z0-9._-]+)"
+          - "(?i)port[=:\"\\s>]+([0-9]{2,5})"

@@ -161,7 +161,13 @@ Triage rapido recomendado para estos hallazgos:
   - management reads de WildFly (`wildfly-*-management-unauth`) cuando varias plantillas devuelven la misma causa raiz de exposicion
   - manager/help/text/status de Tomcat cuando varias rutas describen la misma superficie administrativa
   - `server-status`/`server-info`/`status-json` de Apache cuando describen la misma superficie de administracion
+  - `apache-server-status-request-metadata-exposed` como detalle mas sensible de `mod_status` cuando hay `Client`, `VHost` y `Request`; si sale junto a `server-status`, contarlo como profundidad adicional de la misma exposicion
+  - `apache-balancer-manager-backend-details-exposed` como detalle operativo de `balancer-manager` cuando revela miembros, rutas o backends; si sale junto a `apache-balancer-manager-exposed`, contarlo como profundidad adicional del mismo panel
+  - `apache-mod-cluster-manager-backend-details-exposed` como detalle operativo de `mod_cluster` cuando revela nodos, `LBGroup`, `Balancer`, `JVMRoute` o `Contexts`; si sale junto a `apache-mod-cluster-manager-exposed`, contarlo como profundidad adicional del mismo panel
+  - `apache-jk-status-backend-details-exposed` como detalle operativo de `mod_jk` cuando revela workers, `route`, `host`, `port` o endpoints AJP; si sale junto a `apache-jk-status-exposed`, contarlo como profundidad adicional del mismo panel
   - señal `proxy_wstunnel` en `apache-proxy-wstunnel-module-signal-potential` como contexto de modulo cuando ya cuentas `server-info` como exposicion de `mod_info`
+  - `apache-proxy-wstunnel-routing-signal-exposed` como evidencia mas accionable de reglas o routing WebSocket; si sale junto a `server-info`, contarlo como detalle de la misma exposicion de `mod_info`, no como panel distinto
+  - `apache-proxy-backend-routing-disclosure-exposed` como correlacion concreta de `frontend path`, esquema y backend interno (`localhost`, RFC1918 o dominios internos); si sale junto a `server-info`, contarlo como detalle de la misma exposicion de `mod_info`
 - Priorizar para remediacion en este orden:
   1) `default-logins`, `misconfiguration` de admin panels
   2) `exposures` de secretos/configuracion

@@ -1,0 +1,72 @@
+id: tomcat-war-backup-artifacts-exposed
+
+info:
+  name: Tomcat WAR Backup Artifacts Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed backup, temporary, or editor-residual copies of Tomcat
+    deployment archives. These files can leak full application source bundles,
+    embedded libraries, and environment-specific secrets without requiring a
+    directory listing.
+  tags:
+    - tomcat
+    - exposure
+    - artifacts
+    - war
+    - backup
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/webapps/ROOT.war.bak"
+      - "{{BaseURL}}/webapps/ROOT.war.old"
+      - "{{BaseURL}}/webapps/ROOT.war.orig"
+      - "{{BaseURL}}/webapps/ROOT.war.save"
+      - "{{BaseURL}}/webapps/ROOT.war.tmp"
+      - "{{BaseURL}}/webapps/ROOT.war.zip"
+      - "{{BaseURL}}/webapps/ROOT.war~"
+      - "{{BaseURL}}/webapps/examples.war.bak"
+      - "{{BaseURL}}/webapps/examples.war.old"
+      - "{{BaseURL}}/webapps/examples.war.orig"
+      - "{{BaseURL}}/webapps/docs.war.bak"
+      - "{{BaseURL}}/webapps/docs.war.old"
+      - "{{BaseURL}}/webapps/manager.war.bak"
+      - "{{BaseURL}}/webapps/manager.war.old"
+      - "{{BaseURL}}/webapps/manager.war.orig"
+      - "{{BaseURL}}/webapps/host-manager.war.bak"
+      - "{{BaseURL}}/webapps/host-manager.war.old"
+      - "{{BaseURL}}/webapps/host-manager.war.orig"
+      - "{{BaseURL}}/ROOT.war.bak"
+      - "{{BaseURL}}/ROOT.war.old"
+      - "{{BaseURL}}/ROOT.war.orig"
+      - "{{BaseURL}}/ROOT.war.save"
+      - "{{BaseURL}}/ROOT.war.tmp"
+      - "{{BaseURL}}/ROOT.war.zip"
+      - "{{BaseURL}}/ROOT.war~"
+      - "{{BaseURL}}/manager.war.bak"
+      - "{{BaseURL}}/manager.war.old"
+      - "{{BaseURL}}/host-manager.war.bak"
+      - "{{BaseURL}}/examples.war.bak"
+      - "{{BaseURL}}/docs.war.bak"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: raw
+        condition: or
+        words:
+          - "PK\u0003\u0004"
+          - "application/java-archive"
+          - "application/zip"
+          - "application/octet-stream"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

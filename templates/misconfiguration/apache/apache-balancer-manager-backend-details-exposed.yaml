@@ -1,0 +1,65 @@
+id: apache-balancer-manager-backend-details-exposed
+
+info:
+  name: Apache Balancer Manager Backend Details Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects Apache balancer-manager pages exposing backend member URLs, routes,
+    balancer names, or worker parameters. This provides actionable insight into
+    internal proxy topology beyond the presence of the panel alone.
+  tags:
+    - apache
+    - misconfig
+    - balancer
+    - proxy
+    - backend
+    - disclosure
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/balancer-manager"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Balancer Manager"
+          - "(?i)LoadBalancer Status for"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)balancer://"
+          - "(?i)(ajp|http|https|ws|wss)://"
+          - "(?i)Route"
+          - "(?i)BalancerMember"
+          - "(?i)Worker URL"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+      - type: regex
+        part: body
+        name: balancer_name
+        regex:
+          - "(?i)balancer://[a-z0-9._-]+"
+      - type: regex
+        part: body
+        name: backend_member
+        regex:
+          - "(?i)(?:ajp|http|https|ws|wss)://[a-z0-9._:-]+(?:/[a-z0-9._~:/?#\\[\\]@!$&'()*+,;=%-]*)?"
+      - type: regex
+        part: body
+        name: route
+        regex:
+          - "(?i)route[=:\"\\s>]+([a-z0-9._-]+)"

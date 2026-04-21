@@ -1,0 +1,62 @@
+id: apache-proxy-backend-routing-disclosure-exposed
+
+info:
+  name: Apache Internal Proxy Backend Routing Disclosure Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache mod_info output disclosing concrete reverse-proxy mappings
+    or balancer members that point to internal backends. This helps correlate
+    exposed frontend paths with backend hosts, ports, and schemes for Java
+    applications behind Apache.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - mod_info
+    - proxy
+    - backend
+    - disclosure
+    - routing
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-info"
+      - "{{BaseURL}}/server-info?config"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Server Information</title>"
+          - "(?i)Apache Server Information"
+          - "(?i)Loaded Modules"
+          - "(?i)<h2>Module Name</h2>"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^ProxyPass\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://(127\\.0\\.0\\.1|localhost|10\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.|192\\.168\\.|[a-z0-9._-]+\\.(local|internal|lan|corp|intra))"
+          - "(?im)^ProxyPassReverse\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://(127\\.0\\.0\\.1|localhost|10\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.|192\\.168\\.|[a-z0-9._-]+\\.(local|internal|lan|corp|intra))"
+          - "(?im)^BalancerMember\\s+(?:ajp|http|https|ws|wss)://(127\\.0\\.0\\.1|localhost|10\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.|192\\.168\\.|[a-z0-9._-]+\\.(local|internal|lan|corp|intra))"
+          - "(?im)^ProxyPass\\s+\\S+\\s+balancer://"
+          - "(?im)^BalancerMember\\s+(?:ajp|http|https|ws|wss)://"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+      - type: regex
+        part: body
+        name: backend_mapping
+        regex:
+          - "(?im)^ProxyPass\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://[^\\s]+.*$"
+          - "(?im)^ProxyPassReverse\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://[^\\s]+.*$"
+          - "(?im)^BalancerMember\\s+(?:ajp|http|https|ws|wss)://[^\\s]+.*$"

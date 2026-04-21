@@ -10,8 +10,8 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 | Familia | Estado | Notas |
 |---|---|---|
 | Fingerprinting | Fuerte | `apache-httpd-server-header`, default page, reverse proxy, server version, fronting `Tomcat` y `WildFly`. |
-| Admin surface | Fuerte | `server-status`, `status?auto`, `status-json`, `server-info`, `balancer-manager`, `jk-status`. |
-| Proxy surface | Fuerte | `open-proxy`, `forward-proxy`, trust bypass por `X-Forwarded-*`, fronting `Tomcat`/`WildFly`, CVEs `mod_proxy`. |
+| Admin surface | Fuerte | `server-status`, `status?auto`, `status-json`, `server-info`, `balancer-manager`, `jk-status`, detalle de `request metadata` en `mod_status`, detalle de backends/rutas en `balancer-manager`, detalle de topologia en `mod_cluster` y detalle operativo de workers en `mod_jk`. |
+| Proxy surface | Fuerte | `open-proxy`, `forward-proxy`, trust bypass por `X-Forwarded-*`, fronting `Tomcat`/`WildFly`, señal de routing `proxy_wstunnel`, correlacion backend/path via `mod_info`, CVEs `mod_proxy`. |
 | Config leaks | Fuerte | `httpd.conf`, `apache2.conf`, `vhosts`, `ssl.conf`, backups, `.ht*`, alias/script mappings frecuentes. |
 | Hardening | Fuerte | missing headers, TRACE, unsafe methods, directory listing, redirect HTTP->HTTPS, HSTS, cookies de frontend, redirects inseguros, auth surface y disclosure de backend en `Location`. |
 | CVE potential | Bueno | `CVE-2021-40438`, `CVE-2021-41773`, `CVE-2021-42013`, `CVE-2023-25690`. |
@@ -23,7 +23,7 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 |---|---|---|
 | Fingerprinting | Fuerte | `server header`, `catalina signatures`, default error, version hint, manager realm. |
 | Admin surface | Fuerte | `manager`, `host-manager`, `jmxproxy`, `text/*`, `status`, default logins. |
-| Config leaks | Fuerte | `server.xml`, `context.xml`, `tomcat-users.xml`, `web.xml`, `catalina.policy`, `logging.properties`, ROOT context, backups. |
+| Config leaks | Fuerte | `server.xml`, `context.xml`, `tomcat-users.xml`, `web.xml`, `catalina.policy`, `logging.properties`, ROOT context, backups, y variantes `Catalina/localhost/*.xml`. |
 | Defaults / sample apps | Fuerte | ROOT page, docs/examples, artifacts, deployed-artifact listing. |
 | Hardening | Bueno | hardening workflow, headers summary, TRACE, verbose errors, cookies, stacktrace. |
 | CVE potential | Bueno | `CVE-2017-12617`, `CVE-2019-0232`, `CVE-2020-1938`, `CVE-2020-9484`. |
@@ -35,7 +35,7 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 |---|---|---|
 | Fingerprinting | Fuerte | `wildfly server header`, version hint, welcome page, management realm, `undertow` default/error/version. |
 | Admin surface | Fuerte | `management`, console, Hawtio, Jolokia, legacy JBoss consoles/invokers. |
-| Management unauth reads | Fuerte | root/model + `datasources`, `mail`, `elytron`, `elytron TLS`, `mod_cluster`, `undertow https-listener`. |
+| Management unauth reads | Fuerte | root/model + `datasources`, `mail`, `elytron`, `elytron TLS`, `mod_cluster`, `undertow https-listener`, `domain topology`. |
 | Config leaks | Fuerte | `standalone.xml`, `domain.xml`, `host.xml`, `mgmt-users/groups`, `elytron` properties, logging, `jboss-web.xml`, `jboss-app.xml`, `jboss-client.xml`, `jboss-deployment-structure.xml`, `ironjacamar.xml`, `persistence.xml`, `*-ds.xml`. |
 | Defaults / sample apps | Bueno | welcome content, sample apps, health, metrics, OpenAPI. |
 | Hardening | Fuerte | headers, cookies, CORS, verbose errors, stacktraces, TLS/SSL topology via Elytron y Undertow management reads. |
@@ -54,8 +54,8 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 
 ### Apache
 
-- `mod_cluster` / `proxy_ajp` / `proxy_wstunnel` / `mod_status` mas finos cuando el frontend encadena backends Java complejos.
-- `proxy_wstunnel` y cadenas WebSocket backend mas finas.
+- `mod_cluster` / `proxy_ajp` mas finos cuando el frontend encadena backends Java complejos.
+- `proxy_wstunnel` y cadenas WebSocket backend aun mas finas, idealmente con mas correlacion de paths o backends concretos.
 - TLS posture adicional:
   - redirects canonicos de host/scheme/port
   - politicas de cookies de frontend mas finas
@@ -64,9 +64,9 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 ### Tomcat
 
 - Descriptores y configs legacy adicionales:
-  - `catalina.policy` ya existe, pero faltan `catalina.properties` backups y algunas variantes de `Catalina/localhost/*.xml` menos comunes.
+  - `catalina.policy` ya existe, pero faltan `catalina.properties` backups y variantes adicionales de apps no-default bajo `Catalina/localhost/`.
 - Artefactos de despliegue:
-  - WAR/JAR/backups concretos fuera de directory listing.
+  - ampliar a JAR/backups concretos fuera de directory listing y nombres de app menos tipicos.
 - JNDI/resource exposure mas fina:
   - referencias indirectas o menos comunes en descriptores por app y combinaciones de `context.xml.*`.
 
@@ -76,7 +76,7 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
   - ficheros referenciados de keystore/truststore y rutas concretas desde descriptores o propiedades
   - surface de realms/factories mas detallada por tipo de auth factory
 - Domain mode / host-controller:
-  - lecturas y artefactos mas especificos de topologia y despliegue distribuido.
+  - ampliar mas alla de hosts, `server-groups` y overlays hacia artefactos y lecturas mas especificas de despliegue distribuido.
 
 ### Transversal
 
@@ -94,18 +94,30 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 ### Prioridad 1
 
 1. Tomcat deploy artifacts concretos
-   - WAR/JAR/backup files sin depender solo de directory listing
-   - `Catalina/localhost/*.xml` adicionales menos comunes
+   - JAR/backup files sin depender solo de directory listing
+   - `Catalina/localhost/*.xml` adicionales para nombres de app menos comunes
    - variantes legacy y copias editor-temp de despliegues
 
 2. WildFly domain mode / host-controller profundo
    - lecturas y artefactos mas especificos de topologia distribuida
-   - hosts, server-groups y deployment overlays
+   - profundizar en `host=*`, `server-group=*` y `deployment-overlay=*`
 
 3. Apache reverse-proxy Java profundo
-   - `proxy_wstunnel`
    - cadenas frontend->backend mas finas
+   - correlacion de paths/backend sobre `proxy_wstunnel`
    - trust/disclosure adicional en despliegues complejos
+
+4. Apache mod_status profundo
+   - diferenciar `ExtendedStatus` con `Client` / `VHost` / `Request`
+   - extraer mejor request metadata y contexto operativo sin duplicar el panel base
+
+5. Apache balancer/mod_cluster profundo
+   - extraer mejor miembros, rutas, estados y topologia desde `balancer-manager` y `mod_cluster`
+   - evitar contar panel y detalle operativo como dos hallazgos separados
+
+6. Apache mod_jk profundo
+   - extraer workers, `route`, `host`, `port` y endpoints AJP desde `jk-status`
+   - evitar contar panel y detalle operativo como dos hallazgos separados
 
 ### Prioridad 2
 
@@ -125,9 +137,9 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 
 ## Pilar de implementacion actual
 
-**Elegido:** Prioridad 1 con foco en **Tomcat: artefactos de despliegue (WAR) y descriptores bajo `conf/Catalina/localhost/`**, y refuerzo puntual **Apache: superficie reverse-proxy hacia backends Java** mediante señal de modulo **`proxy_wstunnel`** cuando `mod_info` lista modulos cargados.
+**Elegido:** Prioridad 1 con foco en **Tomcat: artefactos de despliegue (WAR) y descriptores bajo `conf/Catalina/localhost/`**, **WildFly: lecturas de topologia en `domain mode`** y **Apache: correlacion de routing proxy hacia backends internos a partir de `mod_info`**.
 
-**Rationale:** Los artefactos y context XML suelen dar el mayor valor por hallazgo en auditorias de aplicaciones servidas por Tomcat; la señal `proxy_wstunnel` acota el hueco P1 de Apache (cadenas WebSocket/proxy) sin duplicar el hallazgo generico de `server-info` ya cubierto por otras plantillas: aqui solo se etiqueta la **superficie** cuando el modulo aparece en la respuesta.
+**Rationale:** Los artefactos y context XML suelen dar el mayor valor por hallazgo en auditorias de aplicaciones servidas por Tomcat, y las lecturas de topologia en WildFly `domain mode` mejoran mucho el entendimiento de despliegues distribuidos con poca complejidad adicional. En Apache, la combinacion de señal `proxy_wstunnel` y correlacion `frontend path -> backend interno` mejora el triage sin duplicar el hallazgo generico de `server-info`.
 
 ## Recomendacion operativa
 

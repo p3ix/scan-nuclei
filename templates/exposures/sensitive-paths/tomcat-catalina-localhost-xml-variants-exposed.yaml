@@ -1,0 +1,68 @@
+id: tomcat-catalina-localhost-xml-variants-exposed
+
+info:
+  name: Tomcat Catalina Localhost XML Variants Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed per-application context descriptors and common backup
+    variants under `conf/Catalina/localhost/`. These files often disclose
+    deployment mappings, JNDI resources, auth valves, and app-specific
+    datasource metadata.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - config
+    - context
+    - backup
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.default"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.template"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.orig"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.save"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml~"
+      - "{{BaseURL}}/conf/Catalina/localhost/manager.xml.default"
+      - "{{BaseURL}}/conf/Catalina/localhost/manager.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/manager.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/manager.xml.orig"
+      - "{{BaseURL}}/conf/Catalina/localhost/host-manager.xml.default"
+      - "{{BaseURL}}/conf/Catalina/localhost/host-manager.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/host-manager.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/examples.xml.default"
+      - "{{BaseURL}}/conf/Catalina/localhost/examples.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/examples.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/docs.xml.default"
+      - "{{BaseURL}}/conf/Catalina/localhost/docs.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/docs.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/default.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/default.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/localhost.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/localhost.xml.old"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Context\\b"
+          - "(?is)<Resource\\b"
+          - "(?is)<ResourceLink\\b"
+          - "(?is)<Valve\\b"
+          - "(?is)<Manager\\b"
+          - "(?i)(docBase|path|reloadable|antiResourceLocking|javax\\.sql\\.DataSource)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

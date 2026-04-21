@@ -1,0 +1,56 @@
+id: wildfly-domain-topology-management-unauth
+
+info:
+  name: WildFly Domain Topology Management Read Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated WildFly or JBoss domain mode management reads that
+    disclose host-controller topology, server-groups, deployments, or
+    deployment overlays. Successful responses expose distributed runtime
+    structure useful for privilege escalation and lateral movement planning.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - domain
+    - host-controller
+    - management
+    - unauth
+    - topology
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management?operation=read-children-names&child-type=host"
+      - "{{BaseURL}}/management?operation=read-children-names&child-type=server-group"
+      - "{{BaseURL}}/management?operation=read-children-names&child-type=deployment"
+      - "{{BaseURL}}/management?operation=read-children-names&child-type=deployment-overlay"
+      - "{{BaseURL}}/management/host=master?operation=read-resource"
+      - "{{BaseURL}}/management/host=master?operation=read-children-names&child-type=server-config"
+      - "{{BaseURL}}/management/server-group=main-server-group?operation=read-resource"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"host"'
+          - '(?i)"server-group"'
+          - '(?i)"server-config"'
+          - '(?i)"deployment-overlay"'
+          - '(?i)"result"\\s*:\\s*\\['
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

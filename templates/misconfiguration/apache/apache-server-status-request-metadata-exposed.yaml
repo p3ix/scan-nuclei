@@ -1,0 +1,61 @@
+id: apache-server-status-request-metadata-exposed
+
+info:
+  name: Apache Server Status Request Metadata Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache mod_status pages exposing live request metadata typically
+    available when `ExtendedStatus` is enabled, including client IPs, virtual
+    hosts, and request lines. This materially increases reconnaissance value
+    beyond basic worker counters.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - mod_status
+    - request
+    - metadata
+    - disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-status"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Apache Server Status for"
+          - "(?i)<th>Client</th>"
+          - "(?i)<th>VHost</th>"
+          - "(?i)<th>Request</th>"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<td>\\s*(?:127\\.0\\.0\\.1|localhost|\\d{1,3}(?:\\.\\d{1,3}){3}|[a-z0-9._-]+)\\s*</td>"
+          - "(?i)<td>\\s*[A-Z]+\\s+\\S+\\s+HTTP/[0-9.]+\\s*</td>"
+          - "(?i)<td>\\s*[^<\\s]+(?::\\d+)?\\s*</td>\\s*<td>\\s*[A-Z]+\\s+\\S+\\s+HTTP/[0-9.]+\\s*</td>"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+      - type: regex
+        part: body
+        name: request_line
+        regex:
+          - "(?i)<td>\\s*([A-Z]+\\s+\\S+\\s+HTTP/[0-9.]+)\\s*</td>"
+      - type: regex
+        part: body
+        name: client_or_vhost
+        regex:
+          - "(?i)<td>\\s*((?:127\\.0\\.0\\.1|localhost|\\d{1,3}(?:\\.\\d{1,3}){3}|[a-z0-9._-]+(?::\\d+)?))\\s*</td>"

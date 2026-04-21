@@ -1,0 +1,59 @@
+id: apache-proxy-wstunnel-routing-signal-exposed
+
+info:
+  name: Apache WebSocket Proxy Routing Signal Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache mod_info output disclosing WebSocket proxy routing patterns
+    such as `ProxyPass ws://`, `ProxyPass wss://`, or rewrite rules that switch
+    traffic on `Upgrade: websocket`. This gives more actionable evidence than a
+    loaded-module signal alone and helps identify frontend-to-backend routing
+    paths toward Java applications.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - mod_info
+    - proxy
+    - websocket
+    - wstunnel
+    - routing
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-info"
+      - "{{BaseURL}}/server-info?config"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Server Information</title>"
+          - "(?i)Apache Server Information"
+          - "(?i)Loaded Modules"
+          - "(?i)<h2>Module Name</h2>"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^ProxyPass\\s+\\S+\\s+ws://"
+          - "(?im)^ProxyPass\\s+\\S+\\s+wss://"
+          - "(?im)^ProxyPassReverse\\s+\\S+\\s+ws://"
+          - "(?im)^ProxyPassReverse\\s+\\S+\\s+wss://"
+          - "(?im)^RewriteCond\\s+%\\{HTTP:Upgrade\\}\\s+websocket"
+          - "(?im)^RewriteRule\\s+.*\\[P"
+          - "(?i)proxy_wstunnel"
+          - "(?i)Upgrade[:=]\\s*websocket"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
