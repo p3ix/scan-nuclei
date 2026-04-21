@@ -103,6 +103,18 @@ nuclei -w templates/workflows/apache/apache-fronting-tomcat-workflow.yaml -u htt
 nuclei -w templates/workflows/apache/apache-fronting-wildfly-workflow.yaml -u https://objetivo
 ```
 
+## Workflow Spring (apps Java)
+
+Para aplicaciones Spring sobre servlet containers o stacks Java genericos, el workflow encadena fingerprint Spring con riesgos tipicos (perfiles, actuators, superficie web):
+
+- `templates/workflows/spring/spring-fingerprint-to-risk-workflow.yaml`
+
+Ejemplo:
+
+```bash
+nuclei -w templates/workflows/spring/spring-fingerprint-to-risk-workflow.yaml -u https://objetivo
+```
+
 ## Cobertura WildFly moderna
 
 La linea de `WildFly` moderno esta pensada principalmente para:
@@ -149,6 +161,7 @@ Triage rapido recomendado para estos hallazgos:
   - management reads de WildFly (`wildfly-*-management-unauth`) cuando varias plantillas devuelven la misma causa raiz de exposicion
   - manager/help/text/status de Tomcat cuando varias rutas describen la misma superficie administrativa
   - `server-status`/`server-info`/`status-json` de Apache cuando describen la misma superficie de administracion
+  - señal `proxy_wstunnel` en `apache-proxy-wstunnel-module-signal-potential` como contexto de modulo cuando ya cuentas `server-info` como exposicion de `mod_info`
 - Priorizar para remediacion en este orden:
   1) `default-logins`, `misconfiguration` de admin panels
   2) `exposures` de secretos/configuracion
@@ -178,6 +191,7 @@ Triage rapido recomendado para estos hallazgos:
 
 ## Baseline de calidad antes de commit
 
+- La validacion `nuclei -validate -t templates/` corre en CI (`.github/workflows/nuclei-validate.yml`) en push y PR hacia `main`/`master`.
 - Parse YAML correcto de todas las plantillas.
 - Campos obligatorios presentes (`id`, `info`, `http/requests`, `matchers-condition`, `matchers`).
 - Revisar solapamientos de paths para reducir hallazgos duplicados.

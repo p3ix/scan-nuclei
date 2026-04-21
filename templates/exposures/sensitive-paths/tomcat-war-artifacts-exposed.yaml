@@ -34,6 +34,18 @@ http:
       - "{{BaseURL}}/webapps/examples.war.bak"
       - "{{BaseURL}}/webapps/manager.war.bak"
       - "{{BaseURL}}/webapps/host-manager.war.bak"
+      - "{{BaseURL}}/webapps/ROOT.war.save"
+      - "{{BaseURL}}/webapps/ROOT.war.tmp"
+      - "{{BaseURL}}/webapps/ROOT.war.orig"
+      - "{{BaseURL}}/webapps/ROOT.war.swp"
+      - "{{BaseURL}}/webapps/manager.war.save"
+      - "{{BaseURL}}/webapps/manager.war.tmp"
+      - "{{BaseURL}}/webapps/host-manager.war.save"
+      - "{{BaseURL}}/ROOT.war.bak"
+      - "{{BaseURL}}/ROOT.war.save"
+      - "{{BaseURL}}/ROOT.war.tmp"
+      - "{{BaseURL}}/examples.war.bak"
+      - "{{BaseURL}}/manager.war.tmp"
 
     matchers-condition: and
     matchers:

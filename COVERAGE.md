@@ -80,12 +80,12 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 
 ### Transversal
 
-- Suite reproducible de laboratorio para validar:
-  - Apache limpio
+- Matriz de validacion en entornos corporativos autorizados (staging, preproduccion o piloto) que cubra:
+  - Apache solo
   - Apache fronting Tomcat
   - Apache fronting WildFly
-  - Tomcat limpio
-  - WildFly limpio
+  - Tomcat solo
+  - WildFly solo
 - Catalogo de falsos positivos conocidos por plantilla.
 - Criterios de deduplicacion mas formales por familia.
 
@@ -119,16 +119,22 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 
 ### Prioridad 3
 
-1. Laboratorio reproducible
+1. Validacion reproducible en entornos reales autorizados (sin depender de contenedores locales)
 2. Falsos positivos conocidos
 3. Tabla de deduplicacion por familia
+
+## Pilar de implementacion actual
+
+**Elegido:** Prioridad 1 con foco en **Tomcat: artefactos de despliegue (WAR) y descriptores bajo `conf/Catalina/localhost/`**, y refuerzo puntual **Apache: superficie reverse-proxy hacia backends Java** mediante señal de modulo **`proxy_wstunnel`** cuando `mod_info` lista modulos cargados.
+
+**Rationale:** Los artefactos y context XML suelen dar el mayor valor por hallazgo en auditorias de aplicaciones servidas por Tomcat; la señal `proxy_wstunnel` acota el hueco P1 de Apache (cadenas WebSocket/proxy) sin duplicar el hallazgo generico de `server-info` ya cubierto por otras plantillas: aqui solo se etiqueta la **superficie** cuando el modulo aparece en la respuesta.
 
 ## Recomendacion operativa
 
 Antes de seguir añadiendo volumen, usar el backlog con este orden:
 
 1. Añadir una subfamilia concreta
-2. Validarla en un objetivo o laboratorio real
+2. Validarla en un objetivo o entorno corporativo real autorizado
 3. Ajustar ruido
 4. Documentar triage
 5. Repetir

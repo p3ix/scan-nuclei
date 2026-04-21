@@ -18,11 +18,13 @@ info:
 http:
   - method: GET
     path:
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml"
       - "{{BaseURL}}/conf/Catalina/localhost/manager.xml"
       - "{{BaseURL}}/conf/Catalina/localhost/host-manager.xml"
       - "{{BaseURL}}/conf/Catalina/localhost/examples.xml"
       - "{{BaseURL}}/conf/Catalina/localhost/docs.xml"
       - "{{BaseURL}}/conf/Catalina/localhost/localhost.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/default.xml"
 
     matchers-condition: and
     matchers:

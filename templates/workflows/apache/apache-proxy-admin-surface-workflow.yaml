@@ -17,5 +17,6 @@ workflows:
       - template: templates/misconfiguration/apache/apache-forward-proxy-confirmed.yaml
       - template: templates/misconfiguration/apache/apache-proxy-headers-trust-bypass-exposed.yaml
       - template: templates/misconfiguration/apache/apache-open-proxy-potential.yaml
+      - template: templates/misconfiguration/apache/apache-proxy-wstunnel-module-signal-potential.yaml
       - template: templates/cves/apache/CVE-2023-25690-apache-mod-proxy-request-smuggling-potential.yaml
       - template: templates/cves/apache/CVE-2021-40438-apache-mod-proxy-ssrf-potential.yaml

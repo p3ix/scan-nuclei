@@ -1,0 +1,39 @@
+id: apache-proxy-wstunnel-module-signal-potential
+
+info:
+  name: Apache proxy_wstunnel Module Signal Potential
+  author: scan-nuclei
+  severity: info
+  description: |
+    When Apache mod_info exposes loaded modules, presence of proxy_wstunnel indicates
+    WebSocket proxying may be configured. This is contextual signal for complex
+    reverse-proxy chains toward Java backends; correlate with routing and TLS review.
+  tags:
+    - apache
+    - httpd
+    - mod_proxy
+    - wstunnel
+    - websocket
+    - potential
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-info"
+      - "{{BaseURL}}/server-info?config"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - "(?i)proxy_wstunnel"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

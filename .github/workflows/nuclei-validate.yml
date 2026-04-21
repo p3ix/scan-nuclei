@@ -1,0 +1,26 @@
+name: Validate Nuclei templates
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+
+      - name: Install Nuclei
+        run: go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+
+      - name: Add Go bin to PATH
+        run: echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Validate all templates
+        run: nuclei -validate -t templates/
