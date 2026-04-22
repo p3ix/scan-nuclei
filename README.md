@@ -30,6 +30,24 @@ nuclei -validate -t templates/
 nuclei -t templates/ -u https://objetivo
 ```
 
+## Flujo recomendado en un comando
+
+Hay un script para dejar un chequeo repetible (version, update opcional, validacion y scan):
+
+```bash
+# dar permisos de ejecucion (solo la primera vez)
+chmod +x scripts/check-nuclei.sh
+
+# validar + scan rapido
+scripts/check-nuclei.sh --target https://objetivo
+
+# validar + scan + actualizar templates
+scripts/check-nuclei.sh --target https://objetivo --update-templates
+
+# actualizar nuclei + templates y luego validar + scan
+scripts/check-nuclei.sh --target https://objetivo --update-nuclei --update-templates
+```
+
 ## Workflows recomendados
 
 Para objetivos WildFly/JBoss, separa el uso segun contexto para evitar ruido y duplicados:

@@ -1,0 +1,55 @@
+id: apache-forwarded-host-redirect-poisoning-potential
+
+info:
+  name: Apache Forwarded Host Redirect Poisoning Potential
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects redirects influenced by client-supplied Host or X-Forwarded-Host
+    headers, which can enable redirect poisoning and trust-boundary bypass.
+  tags:
+    - apache
+    - misconfig
+    - proxy
+    - redirect
+    - host-header
+    - bypass
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/login"
+      - "{{BaseURL}}/signin"
+
+    headers:
+      Host: nuclei-host-poison.test
+      X-Forwarded-Host: nuclei-host-poison.test
+      X-Forwarded-Proto: https
+
+    redirects: false
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 301
+          - 302
+          - 303
+          - 307
+          - 308
+      - type: regex
+        part: header
+        regex:
+          - "(?i)server:\\s*apache"
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)location:\\s*https?://nuclei-host-poison\\.test"
+          - "(?i)location:\\s*//nuclei-host-poison\\.test"
+
+    extractors:
+      - type: kval
+        kval:
+          - location

@@ -19,6 +19,7 @@ workflows:
       - template: templates/misconfiguration/apache/apache-proxy-ajp-config-exposed.yaml
       - template: templates/misconfiguration/apache/apache-forward-proxy-confirmed.yaml
       - template: templates/misconfiguration/apache/apache-proxy-headers-trust-bypass-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-forwarded-host-redirect-poisoning-potential.yaml
       - template: templates/misconfiguration/apache/apache-open-proxy-potential.yaml
       - template: templates/misconfiguration/apache/apache-proxy-wstunnel-module-signal-potential.yaml
       - template: templates/misconfiguration/apache/apache-proxy-wstunnel-routing-signal-exposed.yaml

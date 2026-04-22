@@ -78,4 +78,4 @@ http:
         part: body
         name: context
         regex:
-          - "(?i)(/[a-z0-9._~/-]+)"
+          - "(?i)(/[-a-z0-9._~/]+)"

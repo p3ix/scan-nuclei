@@ -1,0 +1,46 @@
+id: spring-actuator-loggers-write-surface-exposed
+
+info:
+  name: Spring Actuator Loggers Write Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed actuator loggers endpoints that advertise write methods,
+    indicating potential runtime log-level tampering if not properly protected.
+  tags:
+    - misconfig
+    - spring
+    - actuator
+    - loggers
+    - write
+    - exposure
+
+http:
+  - method: OPTIONS
+    path:
+      - "{{BaseURL}}/actuator/loggers"
+      - "{{BaseURL}}/loggers"
+      - "{{BaseURL}}/actuator/loggers/ROOT"
+      - "{{BaseURL}}/loggers/ROOT"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 204"
+      - type: regex
+        part: all_headers
+        condition: or
+        regex:
+          - "(?i)allow:\\s*.*\\bPOST\\b"
+          - "(?i)allow:\\s*.*\\bPUT\\b"
+          - "(?i)allow:\\s*.*\\bPATCH\\b"
+          - "(?i)access-control-allow-methods:\\s*.*\\bPOST\\b"
+          - "(?i)access-control-allow-methods:\\s*.*\\bPUT\\b"
+          - "(?i)access-control-allow-methods:\\s*.*\\bPATCH\\b"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

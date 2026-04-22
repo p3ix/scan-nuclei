@@ -29,6 +29,6 @@ http:
         part: all
         condition: or
         regex:
-          - '(?i)"threads"\\s*:\\s*\\['
+          - '(?i)"threads"\\s*:\\s*\['
           - '(?i)"threadName"\\s*:'
           - '(?i)"stackTrace"\\s*:'

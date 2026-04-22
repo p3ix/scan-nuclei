@@ -57,7 +57,7 @@ http:
         part: body
         name: backend_member
         regex:
-          - "(?i)(?:ajp|http|https|ws|wss)://[a-z0-9._:-]+(?:/[a-z0-9._~:/?#\\[\\]@!$&'()*+,;=%-]*)?"
+          - "(?i)(?:ajp|http|https|ws|wss)://[a-z0-9._:-]+(?:/[-a-z0-9._~:/?#\\[\\]@!$&'()*+,;=%]*)?"
       - type: regex
         part: body
         name: route

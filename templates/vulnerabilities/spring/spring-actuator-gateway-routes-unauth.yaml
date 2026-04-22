@@ -1,0 +1,46 @@
+id: spring-actuator-gateway-routes-unauth
+
+info:
+  name: Spring Actuator Gateway Routes Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Cloud Gateway actuator routes,
+    which can disclose internal upstream URIs, predicates, and route filters.
+  tags:
+    - vulnerability
+    - spring
+    - actuator
+    - gateway
+    - routes
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/gateway/routes"
+      - "{{BaseURL}}/gateway/routes"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"route_id"\\s*:'
+          - '(?i)"predicate"\\s*:'
+          - '(?i)"filters"\\s*:'
+          - '(?i)"uri"\\s*:\\s*"(lb|http|https|ws|wss):'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

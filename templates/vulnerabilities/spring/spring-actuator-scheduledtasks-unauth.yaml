@@ -29,8 +29,8 @@ http:
         part: body
         condition: or
         regex:
-          - '(?i)"cron"\\s*:\\s*\\['
-          - '(?i)"fixedDelay"\\s*:\\s*\\['
+          - '(?i)"cron"\\s*:\\s*\['
+          - '(?i)"fixedDelay"\\s*:\\s*\['
           - '(?i)"runnable"\\s*:'
       - type: regex
         part: header

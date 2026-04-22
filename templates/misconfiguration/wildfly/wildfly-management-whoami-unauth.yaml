@@ -1,0 +1,46 @@
+id: wildfly-management-whoami-unauth
+
+info:
+  name: WildFly Management WhoAmI Read Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated access to WildFly management whoami operation,
+    confirming management API read capabilities and identity context leakage.
+  tags:
+    - wildfly
+    - jboss
+    - management
+    - misconfig
+    - unauth
+    - identity
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management?operation=whoami"
+      - "{{BaseURL}}/management?operation=whoami&verbose=true"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"identity"\\s*:'
+          - '(?i)"username"\\s*:'
+          - '(?i)"mapped-roles"\\s*:'
+          - '(?i)"result"\\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

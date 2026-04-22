@@ -30,6 +30,6 @@ http:
         part: all
         condition: or
         regex:
-          - '(?i)"names"\\s*:\\s*\\['
-          - '(?i)"measurements"\\s*:\\s*\\['
+          - '(?i)"names"\\s*:\\s*\['
+          - '(?i)"measurements"\\s*:\\s*\['
           - '(?i)"jvm\\.memory\\.used"'

@@ -10,6 +10,7 @@ workflows:
     subtemplates:
       - template: templates/misconfiguration/wildfly/wildfly-console-exposed.yaml
       - template: templates/misconfiguration/wildfly/wildfly-management-read-operations-unauth.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-management-whoami-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-management-model-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-datasources-management-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-mail-management-unauth.yaml
@@ -41,6 +42,7 @@ workflows:
       - template: templates/technologies/wildfly/undertow-version-disclosure.yaml
       - template: templates/misconfiguration/wildfly/wildfly-console-exposed.yaml
       - template: templates/misconfiguration/wildfly/wildfly-management-read-operations-unauth.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-management-whoami-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-datasources-management-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-mail-management-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-elytron-management-unauth.yaml

@@ -1,0 +1,44 @@
+id: tomcat-manager-text-deploy-surface-exposed
+
+info:
+  name: Tomcat Manager Text Deploy Surface Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat Manager text deployment commands. Even when
+    authentication is enforced, exposed deploy/undeploy command surfaces
+    increase attackability and brute-force value.
+  tags:
+    - tomcat
+    - misconfiguration
+    - manager
+    - deploy
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/text/deploy?path=/nuclei-check&war=https://example.org/a.war"
+      - "{{BaseURL}}/manager/text/undeploy?path=/nuclei-check"
+      - "{{BaseURL}}/manager/text/list"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Tomcat Manager Application"
+          - "(?i)WWW-Authenticate:\\s*Basic\\s+realm=\"Tomcat Manager Application\""
+          - "(?i)^OK\\s*-"
+          - "(?i)^FAIL\\s*-"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
