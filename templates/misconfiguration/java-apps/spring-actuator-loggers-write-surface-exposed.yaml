@@ -5,8 +5,9 @@ info:
   author: scan-nuclei
   severity: medium
   description: |
-    Detects exposed actuator loggers endpoints that advertise write methods,
-    indicating potential runtime log-level tampering if not properly protected.
+    Detects exposed actuator loggers write endpoints by probing unauthenticated
+    POST handling behavior. This avoids relying on permissive OPTIONS responses
+    that may appear on non-existent routes and cause false positives.
   tags:
     - misconfig
     - spring
@@ -16,28 +17,38 @@ info:
     - exposure
 
 http:
-  - method: OPTIONS
+  - method: POST
     path:
-      - "{{BaseURL}}/actuator/loggers"
-      - "{{BaseURL}}/loggers"
       - "{{BaseURL}}/actuator/loggers/ROOT"
       - "{{BaseURL}}/loggers/ROOT"
+      - "{{BaseURL}}/actuator/loggers/org.springframework"
+      - "{{BaseURL}}/loggers/org.springframework"
+
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+
+    body: "{"
 
     matchers-condition: and
     matchers:
       - type: dsl
         dsl:
-          - "status_code == 200 || status_code == 204"
+          - "status_code == 200 || status_code == 204 || status_code == 400 || status_code == 415"
       - type: regex
-        part: all_headers
+        part: all
         condition: or
         regex:
-          - "(?i)allow:\\s*.*\\bPOST\\b"
-          - "(?i)allow:\\s*.*\\bPUT\\b"
-          - "(?i)allow:\\s*.*\\bPATCH\\b"
-          - "(?i)access-control-allow-methods:\\s*.*\\bPOST\\b"
-          - "(?i)access-control-allow-methods:\\s*.*\\bPUT\\b"
-          - "(?i)access-control-allow-methods:\\s*.*\\bPATCH\\b"
+          - "(?i)application/(json|problem\\+json)"
+          - '(?i)"(timestamp|status|error|path|message|configuredLevel|effectiveLevel)"'
+          - "(?i)invalid\\s+json"
+          - "(?i)http\\s+message\\s+not\\s+readable"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'estado http 404')"
+          - "!contains(to_lower(body), 'status 404')"
+          - "!contains(to_lower(body), 'no encontrado')"
+          - "!contains(to_lower(body), 'not found')"
 
     extractors:
       - type: dsl
