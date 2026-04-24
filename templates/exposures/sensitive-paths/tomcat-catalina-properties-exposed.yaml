@@ -18,6 +18,13 @@ http:
     path:
       - "{{BaseURL}}/conf/catalina.properties"
       - "{{BaseURL}}/catalina.properties"
+      - "{{BaseURL}}/conf/catalina.properties.bak"
+      - "{{BaseURL}}/conf/catalina.properties~"
+      - "{{BaseURL}}/conf/catalina.properties.old"
+      - "{{BaseURL}}/conf/catalina.properties.save"
+      - "{{BaseURL}}/catalina.properties.bak"
+      - "{{BaseURL}}/catalina.properties~"
+      - "{{BaseURL}}/catalina.properties.old"
 
     matchers-condition: and
     matchers:

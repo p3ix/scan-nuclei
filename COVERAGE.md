@@ -28,6 +28,15 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 | Hardening | Bueno | hardening workflow, headers summary, TRACE, verbose errors, cookies, stacktrace. |
 | CVE potential | Bueno | `CVE-2017-12617`, `CVE-2019-0232`, `CVE-2020-1938`, `CVE-2020-9484`. |
 | Workflows | Fuerte | `version-priority`, `java-exposure`, `hardening`. |
+| Ficheros conf | Complemento | `catalina.properties` y variantes de copia/backup frecuentes (`.bak`, `~`, `.old`, `.save`) en `sensitive-paths`. |
+
+### Quarkus / Micronaut (señal Java)
+
+| Familia | Estado | Notas |
+| --- | --- | --- |
+| Fingerprinting | Inicial | Quarkus: `quarkus-stack-fingerprint` ( `/q/health` + `io.quarkus` en checks). Micronaut: `micronaut-signal-fingerprint` (header `Server` con `micronaut`). |
+| Riesgo encadenado | Inicial | `quarkus-dev-ui-surface-exposed`; Micronaut encadena `java-env-files-exposed` en el workflow. |
+| Workflows | Nuevo | `workflows/java/java-modern-stacks-snapshot-workflow.yaml`. |
 
 ### WildFly / JBoss / Undertow
 
@@ -64,7 +73,8 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 ### Tomcat
 
 - Descriptores y configs legacy adicionales:
-  - `catalina.policy` ya existe, pero faltan `catalina.properties` backups y variantes adicionales de apps no-default bajo `Catalina/localhost/`.
+  - `catalina.properties`: rutas de backup frecuentes añadidas; siguen faltando variantes editor-temp y nombres de app no-default bajo `Catalina/localhost/`.
+  - `catalina.policy`: variantes y apps no-default bajo `Catalina/localhost/`.
 - Artefactos de despliegue:
   - ampliar a JAR/backups concretos fuera de directory listing y nombres de app menos tipicos.
 - JNDI/resource exposure mas fina:
@@ -80,13 +90,14 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 
 ### Transversal
 
+- Exposicion **GraphQL** (introspeccion sin autenticacion) en `exposures/apis/`.
 - Matriz de validacion en entornos corporativos autorizados (staging, preproduccion o piloto) que cubra:
   - Apache solo
   - Apache fronting Tomcat
   - Apache fronting WildFly
   - Tomcat solo
   - WildFly solo
-- Catalogo de falsos positivos conocidos por plantilla.
+- Falsos positivos conocidos: [KNOWN-FP.md](KNOWN-FP.md) (hoja viva, ampliar con cada familia nueva).
 - Criterios de deduplicacion mas formales por familia.
 
 ## Backlog priorizado

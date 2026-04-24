@@ -27,6 +27,15 @@ http:
       - "{{BaseURL}}/static/js/bundle.js.map"
       - "{{BaseURL}}/js/app.js.map"
       - "{{BaseURL}}/js/main.js.map"
+      - "{{BaseURL}}/static/chunk-main.js.map"
+      - "{{BaseURL}}/static/chunk-vendor.js.map"
+      - "{{BaseURL}}/build/app.js.map"
+      - "{{BaseURL}}/build/main.js.map"
+      - "{{BaseURL}}/build/static/js/main.js.map"
+      - "{{BaseURL}}/dist/app.js.map"
+      - "{{BaseURL}}/dist/main.js.map"
+      - "{{BaseURL}}/dist/js/app.js.map"
+      - "{{BaseURL}}/dist/js/bundle.js.map"
 
     matchers-condition: and
     matchers:

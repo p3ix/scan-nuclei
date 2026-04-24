@@ -1,0 +1,33 @@
+id: micronaut-signal-fingerprint
+
+info:
+  name: Micronaut Stack Fingerprint (Server header)
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Micronaut when the Server response header advertises the framework.
+    Informational only; many deployments disable or alter this header.
+  tags:
+    - tech
+    - micronaut
+    - java
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 204
+          - 301
+          - 302
+          - 404
+      - type: regex
+        part: header
+        regex:
+          - '(?i)server:\s*[^\r\n]*micronaut'

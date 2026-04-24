@@ -16,8 +16,10 @@ jobs:
         with:
           go-version: "1.22.x"
 
+      # Pin a released tag so CI is reproducible; review quarterly or when you need
+      # new Nuclei DSL features. See: https://github.com/projectdiscovery/nuclei/releases
       - name: Install Nuclei
-        run: go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+        run: go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@v3.8.0
 
       - name: Add Go bin to PATH
         run: echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"

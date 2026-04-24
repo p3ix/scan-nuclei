@@ -15,7 +15,7 @@ nuclei -t templates/ -u https://objetivo
 - `cves/`: detecciones ligadas a CVEs concretos.
 - `vulnerabilities/`: fallos sin CVE unico.
 - `misconfiguration/`: configuraciones inseguras.
-- `exposures/`: endpoints o archivos sensibles expuestos.
+- `exposures/`: endpoints o archivos sensibles expuestos (incluye subcarpeta `apis/`, p. ej. GraphQL).
 - `technologies/`: fingerprinting (`severity: info`).
 - `default-logins/`: credenciales por defecto.
 - `workflows/`: encadenado de templates.
@@ -63,4 +63,4 @@ nuclei -t templates/ -u https://objetivo
 - `workflows/apache/apache-hardening-workflow.yaml`:
   - orientado a posture review, headers, metodos inseguros, listing y configuracion expuesta.
 
-Las carpetas vacias mantienen `.gitkeep`.
+Las subcarpetas de familia (por ejemplo `cves/`, `workflows/`) contienen plantillas; no se usan archivos placeholder para directorios vacios.

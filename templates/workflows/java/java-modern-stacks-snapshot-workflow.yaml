@@ -1,0 +1,16 @@
+id: java-modern-stacks-snapshot-workflow
+
+info:
+  name: Java Modern Stacks Snapshot Workflow
+  author: scan-nuclei
+  description: |
+    Chains Quarkus and Micronaut fingerprints with a small set of follow-up checks
+    (dev surface, common env leaks) when a strong technology signal matches.
+
+workflows:
+  - template: templates/technologies/quarkus/quarkus-stack-fingerprint.yaml
+    subtemplates:
+      - template: templates/misconfiguration/java-apps/quarkus-dev-ui-surface-exposed.yaml
+  - template: templates/technologies/micronaut/micronaut-signal-fingerprint.yaml
+    subtemplates:
+      - template: templates/exposures/sensitive-paths/java-env-files-exposed.yaml

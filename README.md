@@ -41,6 +41,11 @@ chmod +x scripts/check-nuclei.sh
 # validar + scan rapido
 scripts/check-nuclei.sh --target https://objetivo
 
+# un solo workflow, limite de tasa, o argumentos extra a nuclei (despues de --)
+scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/apache/apache-hardening-workflow.yaml
+scripts/check-nuclei.sh --target https://objetivo --rate-limit 5
+scripts/check-nuclei.sh --target https://objetivo -- -c 10 -timeout 15s
+
 # validar + scan + actualizar templates
 scripts/check-nuclei.sh --target https://objetivo --update-templates
 
@@ -133,6 +138,19 @@ Ejemplo:
 nuclei -w templates/workflows/spring/spring-fingerprint-to-risk-workflow.yaml -u https://objetivo
 ```
 
+## Workflow Java (Quarkus / Micronaut)
+
+Para stacks reactivos o ligeros con señales distintas a Spring Boot, el workflow encadena fingerprint **Quarkus** (`/q/health` con check `io.quarkus`) y **Micronaut** (cabecera `Server: ...micronaut...`) con comprobaciones de riesgo acotadas (Dev UI Quarkus, fugas de env para Micronaut).
+
+- `templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml`
+
+Ejemplo:
+
+```bash
+nuclei -w templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml -u https://objetivo
+# o con el script: scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml
+```
+
 ## Cobertura WildFly moderna
 
 La linea de `WildFly` moderno esta pensada principalmente para:
@@ -213,9 +231,14 @@ Triage rapido recomendado para estos hallazgos:
   - combinaciones CORS peligrosas (`Allow-Credentials: true` + Origin reflejado arbitrario).
 - En disclosure (`Server`, `X-Powered-By`, version headers), tratar como `info` para priorizacion de superficie.
 
+## Licencia
+
+[MIT](LICENSE) (repositorio de plantillas comunitario).
+
 ## Baseline de calidad antes de commit
 
-- La validacion `nuclei -validate -t templates/` corre en CI (`.github/workflows/nuclei-validate.yml`) en push y PR hacia `main`/`master`.
+- La validacion `nuclei -validate -t templates/` corre en CI (`.github/workflows/nuclei-validate.yml`) con una **version fija de Nuclei** (reproducible); se recomienda revisar la actualizacion al menos **trimestral** o al necesitar nuevas capacidades de motor.
+- CI en push y PR hacia `main`/`master`.
 - Parse YAML correcto de todas las plantillas.
 - Campos obligatorios presentes (`id`, `info`, `http/requests`, `matchers-condition`, `matchers`).
 - Revisar solapamientos de paths para reducir hallazgos duplicados.
@@ -223,4 +246,4 @@ Triage rapido recomendado para estos hallazgos:
 - En workflows Tomcat, separar `version-priority`, `java-exposure` y `hardening` segun el objetivo del scan.
 - En workflows Apache, separar `misconfig`, `proxy-admin-surface` y `hardening` segun el objetivo del scan.
 
-Para detalle de clasificacion, ver `templates/README.md`.
+Para detalle de clasificacion, ver `templates/README.md`. Falsos positivos frecuentes: `KNOWN-FP.md`.

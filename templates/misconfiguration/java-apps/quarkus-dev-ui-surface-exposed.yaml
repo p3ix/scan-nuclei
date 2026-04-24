@@ -1,0 +1,40 @@
+id: quarkus-dev-ui-surface-exposed
+
+info:
+  name: Quarkus Dev UI Surface Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects reachable Quarkus Dev UI or dev-only management pages (paths under /q/
+    that ship the interactive dev experience in non-production). Public exposure
+    significantly increases attack surface.
+  tags:
+    - misconfig
+    - quarkus
+    - dev
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/q/dev"
+      - "{{BaseURL}}/q/dev-ui"
+      - "{{BaseURL}}/q/dev-ui/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?is)quarkus'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)dev\s*ui'
+          - '(?i)dev-ui'
+          - '(?i)Dev Services'
+          - '(?i)quarkus\.dev'

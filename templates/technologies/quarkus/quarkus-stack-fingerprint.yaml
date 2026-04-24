@@ -1,0 +1,34 @@
+id: quarkus-stack-fingerprint
+
+info:
+  name: Quarkus Stack Fingerprint (health)
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Quarkus through the MicroProfile/SmallRye health endpoint at /q/health
+    when the response includes the typical Quarkus check name (io.quarkus). This
+    avoids matching generic MicroProfile health on other runtimes that also use /q/health.
+  tags:
+    - tech
+    - quarkus
+    - java
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/q/health"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?is)io\.quarkus'
+      - type: regex
+        part: body
+        regex:
+          - '(?is)"status"\s*:\s*"(UP|DOWN)"'

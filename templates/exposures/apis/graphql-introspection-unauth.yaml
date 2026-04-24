@@ -1,0 +1,54 @@
+id: graphql-introspection-unauth
+
+info:
+  name: GraphQL Introspection Query Allowed (unauthenticated)
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Probes for GraphQL endpoints that answer a minimal introspection query with a JSON
+    body including data and __schema. A positive match indicates the schema can be
+    discovered without prior auth. Rejects obvious HTML error pages.
+  tags:
+    - exposure
+    - graphql
+    - api
+    - java
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/graphql"
+      - "{{BaseURL}}/api/graphql"
+      - "{{BaseURL}}/v1/graphql"
+      - "{{BaseURL}}/v2/graphql"
+      - "{{BaseURL}}/query"
+      - "{{BaseURL}}/graphql/v1"
+    headers:
+      Content-Type: "application/json"
+    body: '{"query":"query{__schema{queryType{name}}}"}'
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - '(?i)content-type:\s*application/[^\r\n;]*'
+      - type: word
+        part: body
+        words:
+          - '"__schema"'
+      - type: word
+        part: body
+        words:
+          - '"data"'
+      - type: word
+        part: body
+        words:
+          - '"queryType"'
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<!doctype")'
+          - '!contains(to_lower(body), "<html")'
