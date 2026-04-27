@@ -1,0 +1,42 @@
+id: micronaut-management-endpoints-exposed
+
+info:
+  name: Micronaut Management Endpoints Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Micronaut management endpoints (env/routes/beans/loggers)
+    that can disclose runtime metadata and internal API structure.
+  tags:
+    - misconfig
+    - micronaut
+    - java
+    - management
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/env"
+      - "{{BaseURL}}/routes"
+      - "{{BaseURL}}/beans"
+      - "{{BaseURL}}/loggers"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)activeEnvironments'
+          - '(?i)propertySources'
+          - '(?i)availableLoggers'
+          - '(?i)io\.micronaut'
+          - '(?i)"uri"\s*:\s*"/'
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<!doctype")'
+          - '!contains(to_lower(body), "<html")'

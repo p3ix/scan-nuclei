@@ -1,0 +1,44 @@
+id: micronaut-env-endpoint-exposed
+
+info:
+  name: Micronaut Env Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated access to Micronaut environment endpoint data. Exposed
+    env/config payloads may leak active profiles, property sources, and sensitive
+    runtime configuration values.
+  tags:
+    - exposure
+    - micronaut
+    - java
+    - config
+    - env
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/env"
+      - "{{BaseURL}}/environment"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/(json|problem\\+json)"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"activeEnvironments"'
+          - '(?i)"propertySources"'
+          - '(?i)"packages"'
+          - '(?i)"io\\.micronaut"'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), '<!doctype')"
+          - "!contains(to_lower(body), '<html')"

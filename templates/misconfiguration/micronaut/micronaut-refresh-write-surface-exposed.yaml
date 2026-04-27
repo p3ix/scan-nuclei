@@ -1,0 +1,54 @@
+id: micronaut-refresh-write-surface-exposed
+
+info:
+  name: Micronaut Refresh Write Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Probes unauthenticated POST handling on Micronaut refresh endpoints. A positive
+    result indicates that runtime refresh actions may be exposed without auth.
+  tags:
+    - misconfig
+    - micronaut
+    - java
+    - refresh
+    - write
+    - exposure
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/refresh"
+      - "{{BaseURL}}/admin/refresh"
+
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+
+    body: "{}"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 202 || status_code == 204 || status_code == 400 || status_code == 415"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)application/(json|problem\\+json)"
+          - '(?i)"(message|path|status|error|timestamp|_links|refreshed|refresh)"'
+          - "(?i)invalid\\s+json"
+          - "(?i)unsupported\\s+media\\s+type"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'status 404')"
+          - "!contains(to_lower(body), 'not found')"
+          - "!contains(to_lower(body), '<!doctype')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

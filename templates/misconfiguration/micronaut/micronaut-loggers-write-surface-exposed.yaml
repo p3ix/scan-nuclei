@@ -1,0 +1,57 @@
+id: micronaut-loggers-write-surface-exposed
+
+info:
+  name: Micronaut Loggers Write Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects potentially writable Micronaut logger endpoints by probing unauthenticated
+    POST behavior on common loggers routes. Positive matches indicate that log level
+    reconfiguration may be reachable without authentication.
+  tags:
+    - misconfig
+    - micronaut
+    - java
+    - loggers
+    - write
+    - exposure
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/loggers/root"
+      - "{{BaseURL}}/loggers/ROOT"
+      - "{{BaseURL}}/loggers/io.micronaut"
+      - "{{BaseURL}}/loggers/ch.qos.logback"
+
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+
+    body: "{"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 204 || status_code == 400 || status_code == 415"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)application/(json|problem\\+json)"
+          - '(?i)"(message|error|path|_links|loggers|configuredLevel|effectiveLevel|timestamp)"'
+          - "(?i)invalid\\s+json"
+          - "(?i)malformed\\s+json"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'status 404')"
+          - "!contains(to_lower(body), 'not found')"
+          - "!contains(to_lower(body), '<!doctype')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

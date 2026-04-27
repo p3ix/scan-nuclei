@@ -1,0 +1,37 @@
+id: quarkus-metrics-endpoint-exposed
+
+info:
+  name: Quarkus Metrics Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable metrics endpoints in Quarkus deployments. Exposed
+    metrics can leak internal component names, runtime behavior, and deployment
+    metadata useful for attack surface mapping.
+  tags:
+    - misconfig
+    - quarkus
+    - metrics
+    - prometheus
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/q/metrics"
+      - "{{BaseURL}}/metrics"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^#\\s*HELP\\s+"
+          - "(?m)^#\\s*TYPE\\s+"
+          - "(?m)^base_gc_total\\s+"
+          - "(?m)^vendor_memory_"
+          - "(?i)quarkus"

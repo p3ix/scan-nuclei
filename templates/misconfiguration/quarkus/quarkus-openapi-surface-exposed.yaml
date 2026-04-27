@@ -1,0 +1,43 @@
+id: quarkus-openapi-surface-exposed
+
+info:
+  name: Quarkus OpenAPI or Swagger UI Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Quarkus OpenAPI/Swagger UI endpoints under /q/.
+    Exposed API documentation can reveal operation names, parameters, and internal
+    service structure useful for attack surface mapping.
+  tags:
+    - misconfig
+    - quarkus
+    - openapi
+    - swagger
+    - api
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/q/openapi"
+      - "{{BaseURL}}/q/openapi?format=json"
+      - "{{BaseURL}}/q/swagger-ui"
+      - "{{BaseURL}}/q/swagger-ui/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?is)"openapi"\s*:\s*"3\.'
+          - '(?im)^openapi\s*:\s*3\.'
+          - '(?i)swagger\s*ui'
+          - '(?i)/q/openapi'
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
