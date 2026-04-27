@@ -35,3 +35,9 @@ http:
           - "(?m)^base_gc_total\\s+"
           - "(?m)^vendor_memory_"
           - "(?i)quarkus"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -41,3 +41,9 @@ http:
         dsl:
           - '!contains(to_lower(body), "<title>404")'
           - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

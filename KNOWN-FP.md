@@ -11,3 +11,18 @@ Registro breve de plantillas que requieren contexto adicional o correlacion para
 | `templates/exposures/javascript-sourcemap-exposed.yaml` | Cualquier respuesta 200 con JSON con forma de source map (incl. mensajes o rutas falsa similitud) puede requerir revision manual del payload. |
 
 Para triage generico, seguir [README.md](README.md#triage-recomendado-evitar-duplicados).
+
+## Regla de deduplicacion agregada (salida JSONL resumida)
+
+Cuando uses `scripts/check-nuclei.sh --aggregate-output`, aplicar esta regla:
+
+- misma combinacion `host + template-id` => **un solo hallazgo** con multiples evidencias (`paths`).
+
+Esto aplica especialmente a familias con alta repeticion por rutas:
+
+- API docs (`wadl`, `openapi`, `swagger-assets`)
+- `sensitive-paths`
+- management endpoints
+
+Si aparecen varios `matcher-name` dentro del mismo `template-id`, tratalos como profundidad
+de evidencia del mismo hallazgo, no como vulnerabilidades independientes.

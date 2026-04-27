@@ -40,3 +40,9 @@ http:
         dsl:
           - '!contains(to_lower(body), "<!doctype")'
           - '!contains(to_lower(body), "<html")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

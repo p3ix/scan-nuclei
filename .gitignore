@@ -26,3 +26,7 @@ nuclei-*.log
 tmp/
 temp/
 *.tmp
+
+# Python
+__pycache__/
+*.pyc

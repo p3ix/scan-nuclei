@@ -46,12 +46,30 @@ scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/apache/
 scripts/check-nuclei.sh --target https://objetivo --rate-limit 5
 scripts/check-nuclei.sh --target https://objetivo -- -c 10 -timeout 15s
 
+# salida agregada (1 hallazgo por template+host, con paths consolidados)
+scripts/check-nuclei.sh --target https://objetivo --aggregate-output
+
 # validar + scan + actualizar templates
 scripts/check-nuclei.sh --target https://objetivo --update-templates
 
 # actualizar nuclei + templates y luego validar + scan
 scripts/check-nuclei.sh --target https://objetivo --update-nuclei --update-templates
 ```
+
+### Salida agregada (menos ruido)
+
+Cuando varias rutas de la misma plantilla hacen match (por ejemplo WADL en
+`/rest/application.wadl`, `?detail=true` y `xsd0.xsd`), `nuclei` las imprime por
+separado. Para agruparlas en una sola entrada por `host + template`, usa:
+
+```bash
+scripts/check-nuclei.sh --target https://objetivo --aggregate-output
+```
+
+Tradeoff:
+
+- salida normal: detalle raw por cada request/path coincidente;
+- salida agregada: una linea por plantilla/host y lista de paths evidenciados.
 
 ## Workflows recomendados
 

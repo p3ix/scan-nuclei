@@ -11,6 +11,7 @@ UPDATE_TEMPLATES=0
 SKIP_VALIDATE=0
 WORKFLOW=""
 RATE_LIMIT=""
+AGGREGATE_OUTPUT=0
 EXTRA=()
 
 usage() {
@@ -23,6 +24,8 @@ Opciones:
   -w, --workflow PATH     Ruta a un workflow YAML (relativa al raiz del repo o absoluta).
                             Si se indica, el scan usa "nuclei -w" en vez de "nuclei -t templates/".
   -rl, --rate-limit N     Pasa a nuclei: limite de peticiones por segundo (p. ej. 10).
+      --aggregate-output  Ejecuta nuclei en JSONL y muestra resumen agrupado
+                          por host+template (paths consolidados).
       --update-nuclei      Ejecuta "nuclei -update" antes de validar/scanear.
       --update-templates   Ejecuta "nuclei -update-templates" antes de validar/scanear.
       --skip-validate      Omite "nuclei -validate -t templates/".
@@ -34,6 +37,7 @@ Ejemplos:
   scripts/check-nuclei.sh --target https://cliente.dgh.es:8143/vesismin-ws
   scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/apache/apache-hardening-workflow.yaml
   scripts/check-nuclei.sh --target https://x --rate-limit 5
+  scripts/check-nuclei.sh --target https://x --aggregate-output
   scripts/check-nuclei.sh --target https://x -- -c 10 -timeout 15s
   scripts/check-nuclei.sh --target https://objetivo --update-templates
   scripts/check-nuclei.sh --target https://objetivo --update-nuclei --update-templates
@@ -67,6 +71,10 @@ while [[ $# -gt 0 ]]; do
       RATE_LIMIT="${2:-}"
       shift 2
       ;;
+    --aggregate-output)
+      AGGREGATE_OUTPUT=1
+      shift
+      ;;
     --update-nuclei)
       UPDATE_NUCLEI=1
       shift
@@ -98,6 +106,9 @@ if [[ -z "$TARGET" ]]; then
 fi
 
 require_bin nuclei
+if [[ "$AGGREGATE_OUTPUT" -eq 1 ]]; then
+  require_bin python3
+fi
 
 WFPATH=""
 if [[ -n "$WORKFLOW" ]]; then
@@ -145,5 +156,14 @@ if [[ -n "$RATE_LIMIT" ]]; then
 fi
 NUCLEI_CMD+=("${EXTRA[@]}")
 
-"${NUCLEI_CMD[@]}"
+if [[ "$AGGREGATE_OUTPUT" -eq 1 ]]; then
+  TMP_JSONL="$(mktemp)"
+  trap 'rm -f "$TMP_JSONL"' EXIT
+  NUCLEI_CMD+=(-jsonl -o "$TMP_JSONL")
+  echo "[INF] Ejecutando con salida agregada (jsonl -> resumen)..."
+  "${NUCLEI_CMD[@]}"
+  python3 "${ROOT_DIR}/scripts/summarize-nuclei-jsonl.py" -i "$TMP_JSONL"
+else
+  "${NUCLEI_CMD[@]}"
+fi
 echo "[OK] Flujo completado."

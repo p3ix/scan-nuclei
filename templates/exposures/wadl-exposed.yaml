@@ -20,9 +20,23 @@ http:
       - "{{BaseURL}}/application.wadl"
       - "{{BaseURL}}/application.wadl?detail=true"
       - "{{BaseURL}}/application.wadl/xsd0.xsd"
+      - "{{BaseURL}}/rest/application.wadl"
+      - "{{BaseURL}}/rest/application.wadl/"
+      - "{{BaseURL}}/rest/application.wadl?detail=true"
+      - "{{BaseURL}}/rest/application.wadl/xsd0.xsd"
+      - "{{BaseURL}}/REST/application.wadl"
+      - "{{BaseURL}}/api/application.wadl"
+      - "{{BaseURL}}/api/application.wadl?detail=true"
+      - "{{BaseURL}}/api/application.wadl/xsd0.xsd"
+      - "{{BaseURL}}/api/rest/application.wadl"
+      - "{{BaseURL}}/api/rest/application.wadl?detail=true"
+      - "{{BaseURL}}/services/application.wadl"
+      - "{{BaseURL}}/services/application.wadl?detail=true"
       - "{{BaseURL}}/resources/application.wadl"
       - "{{BaseURL}}/resources/application.wadl?detail=true"
       - "{{BaseURL}}/resources/application.wadl/xsd0.xsd"
+      - "{{BaseURL}}/webresources/application.wadl"
+      - "{{BaseURL}}/webresources/application.wadl?detail=true"
 
     extractors:
       - type: dsl
@@ -38,12 +52,16 @@ http:
       - type: regex
         part: body
         regex:
-          - "(?is)<application[^>]+xmlns\\s*=\\s*[\"']http://wadl\\.dev\\.java\\.net/2009/02[\"']"
+          - "(?is)<application[^>]+xmlns\\s*=\\s*[\"']https?://wadl\\.dev\\.java\\.net/2009/02[\"']"
+          - "(?is)<wadl:application\\b"
           - "(?is)<resources\\b"
+          - "(?is)<wadl:resources\\b"
           - "(?is)<grammars\\b"
+          - "(?is)<wadl:grammars\\b"
           - "(?is)<xs:schema\\b"
+          - "(?is)wadl\\.dev\\.java\\.net/2009/02"
         condition: or
       - type: regex
         part: header
         regex:
-          - "(?i)content-type:\\s*(application/xml|text/xml|application/xsd\\+xml|text/plain)"
+          - "(?i)content-type:\\s*(application/xml|text/xml|application/xsd\\+xml|application/vnd\\.sun\\.wadl\\+xml|application/.*xml|text/plain)"
