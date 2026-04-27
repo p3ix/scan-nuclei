@@ -25,6 +25,11 @@ http:
       - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml"
       - "{{BaseURL}}/conf/Catalina/localhost/manager.xml"
       - "{{BaseURL}}/conf/Catalina/localhost/host-manager.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/api.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/admin.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/portal.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/service.xml"
 
     matchers-condition: and
     matchers:
@@ -47,4 +52,3 @@ http:
         dsl:
           - path
         name: exposed_path
-

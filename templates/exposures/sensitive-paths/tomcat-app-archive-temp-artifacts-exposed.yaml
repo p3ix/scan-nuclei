@@ -1,0 +1,78 @@
+id: tomcat-app-archive-temp-artifacts-exposed
+
+info:
+  name: Tomcat App Archive Temp Artifacts Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed deployment archives and common backup or temporary variants
+    for non-default Tomcat application names such as `app`, `api`, `admin`,
+    `portal`, and `service`. These files often leak proprietary application
+    code, bundled libraries, and embedded environment-specific secrets.
+  tags:
+    - tomcat
+    - exposure
+    - artifacts
+    - archive
+    - war
+    - jar
+    - backup
+    - temp
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/webapps/app.war"
+      - "{{BaseURL}}/webapps/api.war"
+      - "{{BaseURL}}/webapps/admin.war"
+      - "{{BaseURL}}/webapps/portal.war"
+      - "{{BaseURL}}/webapps/service.war"
+      - "{{BaseURL}}/webapps/app.war.bak"
+      - "{{BaseURL}}/webapps/app.war.old"
+      - "{{BaseURL}}/webapps/app.war.orig"
+      - "{{BaseURL}}/webapps/app.war.save"
+      - "{{BaseURL}}/webapps/app.war.tmp"
+      - "{{BaseURL}}/webapps/app.war~"
+      - "{{BaseURL}}/webapps/app.war.swp"
+      - "{{BaseURL}}/webapps/api.war.bak"
+      - "{{BaseURL}}/webapps/api.war.old"
+      - "{{BaseURL}}/webapps/admin.war.bak"
+      - "{{BaseURL}}/webapps/portal.war.bak"
+      - "{{BaseURL}}/webapps/service.war.bak"
+      - "{{BaseURL}}/webapps/app.jar"
+      - "{{BaseURL}}/webapps/api.jar"
+      - "{{BaseURL}}/webapps/admin.jar"
+      - "{{BaseURL}}/webapps/portal.jar"
+      - "{{BaseURL}}/webapps/service.jar"
+      - "{{BaseURL}}/webapps/app.jar.bak"
+      - "{{BaseURL}}/webapps/app.jar.old"
+      - "{{BaseURL}}/webapps/app.jar.orig"
+      - "{{BaseURL}}/webapps/app.jar.save"
+      - "{{BaseURL}}/webapps/app.jar.tmp"
+      - "{{BaseURL}}/webapps/app.jar~"
+      - "{{BaseURL}}/webapps/api.jar.bak"
+      - "{{BaseURL}}/webapps/admin.jar.bak"
+      - "{{BaseURL}}/app.war.bak"
+      - "{{BaseURL}}/api.war.bak"
+      - "{{BaseURL}}/app.jar.bak"
+      - "{{BaseURL}}/api.jar.bak"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?s)PK\\x03\\x04"
+          - "(?i)application/java-archive"
+          - "(?i)application/zip"
+          - "(?i)application/octet-stream"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

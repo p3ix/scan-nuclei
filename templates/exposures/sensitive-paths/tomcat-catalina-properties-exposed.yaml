@@ -21,10 +21,15 @@ http:
       - "{{BaseURL}}/conf/catalina.properties.bak"
       - "{{BaseURL}}/conf/catalina.properties~"
       - "{{BaseURL}}/conf/catalina.properties.old"
+      - "{{BaseURL}}/conf/catalina.properties.orig"
       - "{{BaseURL}}/conf/catalina.properties.save"
+      - "{{BaseURL}}/conf/catalina.properties.tmp"
+      - "{{BaseURL}}/conf/catalina.properties.swp"
       - "{{BaseURL}}/catalina.properties.bak"
       - "{{BaseURL}}/catalina.properties~"
       - "{{BaseURL}}/catalina.properties.old"
+      - "{{BaseURL}}/catalina.properties.orig"
+      - "{{BaseURL}}/catalina.properties.save"
 
     matchers-condition: and
     matchers:

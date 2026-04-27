@@ -26,9 +26,17 @@ El arbol principal vive en `templates/` y separa los hallazgos por tipo:
 # validar sintaxis de templates
 nuclei -validate -t templates/
 
+# chequeo estructural del repo (ids, severities, referencias internas)
+scripts/check-repo.sh
+
+# regresion minima con fixtures HTTP locales
+python3 scripts/run-http-regression.py
+
 # ejecutar contra un objetivo
 nuclei -t templates/ -u https://objetivo
 ```
+
+Para detalles de testing y regresion minima, ver [TESTING.md](TESTING.md).
 
 ## Flujo recomendado en un comando
 
@@ -73,6 +81,48 @@ Tradeoff:
 
 ## Workflows recomendados
 
+## Que workflow usar segun escenario
+
+Guia rapida para no tener que elegir a ciegas:
+
+| Escenario | Workflow recomendado | Objetivo principal | Ruido esperado |
+| --- | --- | --- | --- |
+| Apache solo | `templates/workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml` | misconfiguracion general, `server-status`, `server-info`, listados y config expuesta | medio |
+| Apache solo (posture review) | `templates/workflows/apache/apache-hardening-workflow.yaml` | headers, cookies, TRACE, metodos inseguros y postura de frontend | bajo-medio |
+| Apache con foco proxy/admin | `templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml` | `balancer-manager`, `mod_cluster`, `jk-status`, AJP, trust bypass y CVEs `potential` de proxy | medio-alto |
+| Apache fronting Tomcat | `templates/workflows/apache/apache-fronting-tomcat-workflow.yaml` | correlacion frontend Apache con superficie y señales tipicas de Tomcat | medio |
+| Apache fronting WildFly | `templates/workflows/apache/apache-fronting-wildfly-workflow.yaml` | correlacion frontend Apache con superficie y señales tipicas de WildFly/Undertow | medio |
+| Tomcat solo | `templates/workflows/tomcat/tomcat-version-priority-workflow.yaml` | manager/admin surface, defaults, archivos sensibles y CVEs `potential` | medio-alto |
+| Tomcat solo (hardening) | `templates/workflows/tomcat/tomcat-hardening-workflow.yaml` | hardening HTTP, cookies, TRACE, verbose errors y postura | bajo-medio |
+| Tomcat con apps Java | `templates/workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflow.yaml` | exposiciones Java tipicas desplegadas sobre Tomcat | medio |
+| WildFly moderno | `templates/workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml` | management, consola, Hawtio, Jolokia, health/metrics y config sensible | medio-alto |
+| JBoss legacy / migracion | `templates/workflows/wildfly/jboss-legacy-migration-debt-workflow.yaml` | deuda de migracion, superficies legacy y artefactos historicos | medio |
+| Spring sobre stack Java | `templates/workflows/spring/spring-fingerprint-to-risk-workflow.yaml` | actuators, perfiles, docs y superficie web Spring | medio |
+| Quarkus / Micronaut | `templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml` | snapshot acotado de superficie moderna Java | bajo-medio |
+
+Regla practica:
+
+- si buscas **amplitud con coste razonable**, empieza por el workflow del escenario
+- si buscas **posture review**, usa los workflows de `hardening`
+- si buscas **superficie admin/proxy**, usa los workflows mas profundos aunque metan mas ruido
+- si el objetivo responde por multiples stacks o frontends, usa `--aggregate-output` para reducir duplicados
+
+Ejemplos rapidos:
+
+```bash
+# Apache solo
+scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml --aggregate-output
+
+# Apache fronting Tomcat
+scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/apache/apache-fronting-tomcat-workflow.yaml --aggregate-output
+
+# Tomcat solo
+scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/tomcat/tomcat-version-priority-workflow.yaml --aggregate-output
+
+# WildFly moderno
+scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml --aggregate-output
+```
+
 Para objetivos WildFly/JBoss, separa el uso segun contexto para evitar ruido y duplicados:
 
 - `templates/workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml`
@@ -93,7 +143,7 @@ nuclei -w templates/workflows/wildfly/jboss-legacy-migration-debt-workflow.yaml 
 Para objetivos Tomcat, separa el uso segun el tipo de revision:
 
 - `templates/workflows/tomcat/tomcat-version-priority-workflow.yaml`
-  - para superficie admin, archivos sensibles, defaults y CVEs `potential`.
+  - para superficie admin, archivos sensibles, defaults, descriptores `Catalina/localhost/`, recursos `JNDI` y CVEs `potential`.
 - `templates/workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflow.yaml`
   - para exposiciones Java tipicas desplegadas sobre Tomcat.
 - `templates/workflows/tomcat/tomcat-hardening-workflow.yaml`
@@ -111,6 +161,17 @@ nuclei -w templates/workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflo
 # Tomcat hardening
 nuclei -w templates/workflows/tomcat/tomcat-hardening-workflow.yaml -u https://objetivo
 ```
+
+Triage practico para Tomcat:
+
+- contar `manager/html`, `help`, `text`, `status` y `host-manager` como una
+  misma superficie admin cuando dependen del mismo conector
+- agrupar `context.xml`, `ROOT.xml`, `Catalina/localhost/*.xml`,
+  `JNDI/resources`, `GlobalNamingResources` y backups relacionados como una
+  misma familia de fuga de configuracion, destacando aparte solo la evidencia
+  mas sensible
+- agrupar `WAR/JAR` y residuos `.bak/.old/.orig/.save/.tmp/~/.swp` por
+  aplicacion o raiz de despliegue, no como findings independientes por fichero
 
 Para objetivos Apache, separa el uso segun el tipo de revision:
 
@@ -169,6 +230,23 @@ nuclei -w templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml -u 
 # o con el script: scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml
 ```
 
+Notas de interpretacion:
+
+- `Quarkus`:
+  - el fingerprint actual busca `/q/health` y exige señal `io.quarkus` en el cuerpo para reducir ruido frente a otros runtimes con `MicroProfile Health`
+  - si `/q/health` esta deshabilitado, protegido, remapeado o filtrado por proxy/WAF, la ausencia de match no descarta `Quarkus`
+  - `quarkus-openapi-surface-exposed` y `quarkus-metrics-endpoint-exposed` deben leerse como exposicion operativa/documental, no como confirmacion de una vulnerabilidad explotable por si sola
+- `Micronaut`:
+  - el fingerprint actual depende de `Server: ...micronaut...` y es deliberadamente conservador
+  - en produccion es comun que Apache, Nginx, balanceadores o gateways sobrescriban el header `Server`, por lo que la ausencia de match no descarta `Micronaut`
+  - los checks de `env`, `management`, `loggers` y `refresh` describen superficie expuesta o potencialmente escribible; requieren correlacion con contexto operativo antes de priorizar como riesgo alto
+
+Estado recomendado de esta familia:
+
+- tratarla como **inicial pero fiable**
+- usarla como snapshot acotado de superficie moderna Java
+- ampliar cobertura solo tras validar ruido en objetivos reales autorizados
+
 ## Cobertura WildFly moderna
 
 La linea de `WildFly` moderno esta pensada principalmente para:
@@ -207,6 +285,8 @@ Triage rapido recomendado para estos hallazgos:
 - `*-potential.yaml`: indica **riesgo potencial** por superficie/version; requiere validacion manual adicional antes de concluir vulnerabilidad.
 
 ## Triage recomendado (evitar duplicados)
+
+La guia operativa completa de triage y deduplicacion esta en [TRIAGE.md](TRIAGE.md).
 
 - Contar una sola vez por tipo de evidencia:
   - OpenAPI/WADL docs (`docs.json`, `v2/v3/api-docs`, `application.wadl`)
@@ -256,6 +336,8 @@ Triage rapido recomendado para estos hallazgos:
 ## Baseline de calidad antes de commit
 
 - La validacion `nuclei -validate -t templates/` corre en CI (`.github/workflows/nuclei-validate.yml`) con una **version fija de Nuclei** (reproducible); se recomienda revisar la actualizacion al menos **trimestral** o al necesitar nuevas capacidades de motor.
+- El chequeo estructural `scripts/check-repo.sh` revisa ids duplicados, severidades, convenciones de nombre y referencias internas de workflows/templates.
+- La regresion minima `python3 scripts/run-http-regression.py` ejecuta escenarios locales controlados para `Quarkus`, `Micronaut`, `Apache`, `Tomcat`, `WildFly` y `Spring`, y muestra resumen por familia al final.
 - CI en push y PR hacia `main`/`master`.
 - Parse YAML correcto de todas las plantillas.
 - Campos obligatorios presentes (`id`, `info`, `http/requests`, `matchers-condition`, `matchers`).

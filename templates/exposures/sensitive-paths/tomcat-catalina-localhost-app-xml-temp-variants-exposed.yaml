@@ -1,0 +1,64 @@
+id: tomcat-catalina-localhost-app-xml-temp-variants-exposed
+
+info:
+  name: Tomcat Catalina Localhost App XML Temp Variants Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed per-application context descriptors and common editor or
+    temporary variants for non-default application names under
+    `conf/Catalina/localhost/`. These files frequently leak custom `docBase`
+    mappings, JNDI resources, authentication valves, and deployment metadata
+    for real business applications rather than only Tomcat defaults.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - config
+    - context
+    - backup
+    - temp
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/api.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/admin.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/portal.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/service.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.orig"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.save"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.tmp"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml~"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.swp"
+      - "{{BaseURL}}/conf/Catalina/localhost/api.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/api.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/admin.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/portal.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/service.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/service.xml.old"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Context\\b"
+          - "(?is)<Resource\\b"
+          - "(?is)<ResourceLink\\b"
+          - "(?is)<Valve\\b"
+          - "(?is)<Manager\\b"
+          - "(?i)(docBase|path|reloadable|antiResourceLocking|javax\\.sql\\.DataSource)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

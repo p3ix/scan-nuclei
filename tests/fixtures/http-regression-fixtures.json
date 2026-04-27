@@ -1,0 +1,267 @@
+{
+  "quarkus-positive": {
+    "GET /q/health": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"status\":\"UP\",\"checks\":[{\"name\":\"io.quarkus.agroal.runtime.health.DataSourceHealthCheck\",\"status\":\"UP\"}]}"
+    },
+    "GET /q/openapi": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"openapi\":\"3.0.3\",\"info\":{\"title\":\"Quarkus API\"}}"
+    },
+    "GET /q/openapi?format=json": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"openapi\":\"3.0.3\",\"info\":{\"title\":\"Quarkus API\"}}"
+    },
+    "GET /q/metrics": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain; version=0.0.4"
+      },
+      "body": "# HELP base_gc_total Total number of garbage collections\n# TYPE base_gc_total counter\nbase_gc_total 3\n"
+    },
+    "GET /q/dev": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>Quarkus Dev UI</h1><p>quarkus.dev Dev Services</p></body></html>"
+    }
+  },
+  "quarkus-generic-health": {
+    "GET /q/health": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"status\":\"UP\",\"checks\":[{\"name\":\"datasource\",\"status\":\"UP\"}]}"
+    }
+  },
+  "micronaut-positive": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "Micronaut"
+      },
+      "body": "ok"
+    },
+    "GET /env": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"activeEnvironments\":[\"prod\"],\"propertySources\":[{\"name\":\"applicationConfig\"}],\"packages\":[\"io.micronaut.runtime\"]}"
+    },
+    "GET /routes": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"routes\":[{\"uri\":\"/api/customers\"}],\"io.micronaut\":\"present\"}"
+    },
+    "GET /beans": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"beans\":[\"io.micronaut.context.DefaultBeanContext\"]}"
+    },
+    "GET /loggers": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"availableLoggers\":[\"ROOT\"],\"configuredLevel\":\"INFO\"}"
+    },
+    "POST /loggers/root": {
+      "status": 400,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"message\":\"invalid json\",\"path\":\"/loggers/root\"}"
+    },
+    "POST /refresh": {
+      "status": 202,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"refresh\":\"accepted\",\"refreshed\":[\"applicationConfig\"]}"
+    }
+  },
+  "micronaut-hidden-server": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "nginx"
+      },
+      "body": "ok"
+    }
+  },
+  "apache-positive": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/plain"
+      },
+      "body": "home"
+    },
+    "GET /server-status": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/plain"
+      },
+      "body": "Total Accesses: 7\nScoreboard: _W__\n"
+    },
+    "GET /server-status?auto": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/plain"
+      },
+      "body": "Total Accesses: 7\nScoreboard: _W__\n"
+    }
+  },
+  "apache-hidden-server": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Content-Type": "text/plain"
+      },
+      "body": "home"
+    }
+  },
+  "tomcat-positive": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "home"
+    },
+    "GET /this-path-should-not-exist-nuclei-tomcat-version": {
+      "status": 404,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>Apache Tomcat/9.0.85</h1></body></html>"
+    },
+    "GET /manager/html": {
+      "status": 401,
+      "headers": {
+        "WWW-Authenticate": "Basic realm=\"Tomcat Manager Application\"",
+        "Content-Type": "text/html"
+      },
+      "body": "auth required"
+    },
+    "GET /conf/Catalina/localhost/app.xml.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context path=\"/app\" docBase=\"/srv/tomcat/webapps/app.war\"><Resource name=\"jdbc/app\" type=\"javax.sql.DataSource\"/></Context>"
+    },
+    "GET /conf/Catalina/localhost/app.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context path=\"/app\"><ResourceLink name=\"jdbc/app\" global=\"jdbc/app\" type=\"javax.sql.DataSource\"/></Context>"
+    },
+    "GET /webapps/app.war.old": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/octet-stream"
+      },
+      "body": "PK\u0003\u0004fakewar"
+    }
+  },
+  "tomcat-generic": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "home"
+    },
+    "GET /this-path-should-not-exist-nuclei-tomcat-version": {
+      "status": 404,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body>not found</body></html>"
+    }
+  },
+  "wildfly-positive": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "Undertow/2"
+      },
+      "body": "home"
+    },
+    "GET /health": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"status\":\"UP\",\"checks\":[{\"name\":\"microprofile-health\",\"status\":\"UP\"}]}"
+    }
+  },
+  "wildfly-generic": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "nginx"
+      },
+      "body": "home"
+    }
+  },
+  "spring-positive": {
+    "GET /error": {
+      "status": 404,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>Whitelabel Error Page</h1><p>This application has no explicit mapping for /error</p></body></html>"
+    },
+    "GET /actuator": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"_links\":{\"self\":{\"href\":\"/actuator\"},\"health\":{\"href\":\"/actuator/health\"}}}"
+    },
+    "GET /actuator/prometheus": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "# HELP jvm_memory_used_bytes The amount of used memory\n# TYPE jvm_memory_used_bytes gauge\njvm_memory_used_bytes 42\n"
+    }
+  },
+  "spring-generic": {
+    "GET /error": {
+      "status": 404,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>Error</h1><p>not found</p></body></html>"
+    }
+  }
+}

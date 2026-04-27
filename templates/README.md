@@ -27,9 +27,12 @@ nuclei -t templates/ -u https://objetivo
 
 ## Nota de triage rapido
 
+La guia operativa completa vive en `../TRIAGE.md`.
+
 - Evitar doble conteo entre templates de docs (`openapi/wadl`) y templates de assets (`swagger-ui/*.map`).
 - Tratar `technologies/*` como contexto de priorizacion, no como finding explotable por si solo.
 - En WildFly, agrupar `wildfly-*-management-unauth` como evidencia de una misma causa raiz cuando el problema sea lectura no autenticada del management model.
+- En `Quarkus/Micronaut`, tratar la familia como snapshot acotado: señal util si hay match, pero sin asumir ausencia de stack cuando el fingerprint no dispara por proxy, hardening o rutas remapeadas.
 - Para stacktraces:
   - si hay paquetes/clases internas y lineas de codigo, priorizar remediacion;
   - si solo hay error generico, tratar como hardening de manejo de errores.

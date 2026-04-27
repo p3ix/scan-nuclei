@@ -39,6 +39,13 @@ http:
       - "{{BaseURL}}/conf/logging.properties.old"
       - "{{BaseURL}}/conf/catalina.policy.bak"
       - "{{BaseURL}}/conf/catalina.policy.old"
+      - "{{BaseURL}}/conf/catalina.policy.orig"
+      - "{{BaseURL}}/conf/catalina.policy.save"
+      - "{{BaseURL}}/conf/catalina.policy~"
+      - "{{BaseURL}}/conf/catalina.properties.orig"
+      - "{{BaseURL}}/conf/catalina.properties.tmp"
+      - "{{BaseURL}}/conf/catalina.properties.save"
+      - "{{BaseURL}}/conf/catalina.properties.swp"
 
     matchers-condition: and
     matchers:

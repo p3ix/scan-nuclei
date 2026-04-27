@@ -26,3 +26,9 @@ jobs:
 
       - name: Validate all templates
         run: nuclei -validate -t templates/
+
+      - name: Run repository structural checks
+        run: scripts/check-repo.sh
+
+      - name: Run HTTP regression fixtures
+        run: python3 scripts/run-http-regression.py

@@ -20,18 +20,43 @@ http:
     path:
       - "{{BaseURL}}/META-INF/context.xml.bak"
       - "{{BaseURL}}/META-INF/context.xml.old"
+      - "{{BaseURL}}/META-INF/context.xml.orig"
+      - "{{BaseURL}}/META-INF/context.xml.save"
+      - "{{BaseURL}}/META-INF/context.xml.tmp"
       - "{{BaseURL}}/META-INF/context.xml~"
       - "{{BaseURL}}/conf/context.xml.default.bak"
       - "{{BaseURL}}/conf/context.xml.default.old"
+      - "{{BaseURL}}/conf/context.xml.default.orig"
+      - "{{BaseURL}}/conf/context.xml.default.save"
       - "{{BaseURL}}/conf/context.xml.default~"
+      - "{{BaseURL}}/conf/context.xml.bak"
+      - "{{BaseURL}}/conf/context.xml.old"
+      - "{{BaseURL}}/conf/context.xml.orig"
+      - "{{BaseURL}}/conf/context.xml.save"
+      - "{{BaseURL}}/conf/context.xml.tmp"
+      - "{{BaseURL}}/conf/context.xml~"
       - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.bak"
       - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.orig"
+      - "{{BaseURL}}/conf/Catalina/localhost/ROOT.xml.save"
       - "{{BaseURL}}/conf/Catalina/localhost/manager.xml.bak"
       - "{{BaseURL}}/conf/Catalina/localhost/manager.xml.old"
       - "{{BaseURL}}/conf/Catalina/localhost/host-manager.xml.bak"
       - "{{BaseURL}}/conf/Catalina/localhost/host-manager.xml.old"
       - "{{BaseURL}}/conf/Catalina/localhost/examples.xml.bak"
       - "{{BaseURL}}/conf/Catalina/localhost/docs.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.orig"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.save"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml.tmp"
+      - "{{BaseURL}}/conf/Catalina/localhost/app.xml~"
+      - "{{BaseURL}}/conf/Catalina/localhost/api.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/api.xml.old"
+      - "{{BaseURL}}/conf/Catalina/localhost/admin.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/portal.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/service.xml.bak"
+      - "{{BaseURL}}/conf/Catalina/localhost/service.xml.old"
 
     matchers-condition: and
     matchers:
@@ -53,4 +78,3 @@ http:
         dsl:
           - path
         name: exposed_path
-

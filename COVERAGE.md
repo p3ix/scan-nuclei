@@ -23,8 +23,8 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 |---|---|---|
 | Fingerprinting | Fuerte | `server header`, `catalina signatures`, default error, version hint, manager realm. |
 | Admin surface | Fuerte | `manager`, `host-manager`, `jmxproxy`, `text/*`, `status`, default logins. |
-| Config leaks | Fuerte | `server.xml`, `context.xml`, `tomcat-users.xml`, `web.xml`, `catalina.policy`, `logging.properties`, ROOT context, backups, y variantes `Catalina/localhost/*.xml`. |
-| Defaults / sample apps | Fuerte | ROOT page, docs/examples, artifacts, deployed-artifact listing. |
+| Config leaks | Fuerte | `server.xml`, `context.xml`, `tomcat-users.xml`, `web.xml`, `catalina.policy`, `logging.properties`, ROOT context, backups, variantes `Catalina/localhost/*.xml` y nombres de app no-default con residuos editor-temp comunes. |
+| Defaults / sample apps | Fuerte | ROOT page, docs/examples, artifacts, deployed-artifact listing y residuos de archivos de despliegue para nombres de app tipicos no-default. |
 | Hardening | Bueno | hardening workflow, headers summary, TRACE, verbose errors, cookies, stacktrace. |
 | CVE potential | Bueno | `CVE-2017-12617`, `CVE-2019-0232`, `CVE-2020-1938`, `CVE-2020-9484`. |
 | Workflows | Fuerte | `version-priority`, `java-exposure`, `hardening`. |
@@ -73,10 +73,11 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 ### Tomcat
 
 - Descriptores y configs legacy adicionales:
-  - `catalina.properties`: rutas de backup frecuentes añadidas; siguen faltando variantes editor-temp y nombres de app no-default bajo `Catalina/localhost/`.
+  - `catalina.properties`: rutas de backup frecuentes añadidas; siguen faltando algunas variantes editor-temp menos comunes y mas nombres de app no-default bajo `Catalina/localhost/`.
   - `catalina.policy`: variantes y apps no-default bajo `Catalina/localhost/`.
 - Artefactos de despliegue:
   - ampliar a JAR/backups concretos fuera de directory listing y nombres de app menos tipicos.
+  - estado: **en progreso**; ya hay cobertura inicial para `WAR/JAR` y residuos temporales/backup de nombres como `app`, `api`, `admin`, `portal`, `service`.
 - JNDI/resource exposure mas fina:
   - referencias indirectas o menos comunes en descriptores por app y combinaciones de `context.xml.*`.
 
@@ -108,6 +109,7 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
    - JAR/backup files sin depender solo de directory listing
    - `Catalina/localhost/*.xml` adicionales para nombres de app menos comunes
    - variantes legacy y copias editor-temp de despliegues
+   - estado: **en progreso**; ya hay cobertura inicial para nombres tipo `app`, `api`, `admin`, `portal`, `service` y residuos `.bak/.old/.orig/.save/.tmp/~/.swp`
 
 2. WildFly domain mode / host-controller profundo
    - lecturas y artefactos mas especificos de topologia distribuida
