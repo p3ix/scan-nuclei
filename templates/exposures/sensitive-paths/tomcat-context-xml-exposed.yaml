@@ -31,4 +31,8 @@ http:
         regex:
           - "(?is)<Context\\b"
           - "(?is)<Resource\\b"
+          - "(?is)<ResourceLink\\b"
+          - "(?is)<Environment\\b"
           - "(?i)(username|password|driverClassName|jdbc:)"
+          - "(?i)(javax\\.sql\\.DataSource|jakarta\\.mail\\.Session|mail/Session)"
+          - "(?i)java:comp/env"

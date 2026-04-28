@@ -30,6 +30,13 @@ http:
       - "{{BaseURL}}/conf/Catalina/localhost/admin.xml"
       - "{{BaseURL}}/conf/Catalina/localhost/portal.xml"
       - "{{BaseURL}}/conf/Catalina/localhost/service.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/auth.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/console.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/gateway.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/internal.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/backoffice.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/customer.xml"
+      - "{{BaseURL}}/conf/Catalina/localhost/billing.xml"
 
     matchers-condition: and
     matchers:

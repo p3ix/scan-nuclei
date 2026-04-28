@@ -192,6 +192,13 @@
       },
       "body": "auth required"
     },
+    "GET /META-INF/context.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context><Environment name=\"featureFlag\" value=\"true\" type=\"java.lang.String\"/><Resource name=\"jdbc/app\" type=\"javax.sql.DataSource\"/><ResourceLink name=\"mail/Session\" global=\"mail/Session\" type=\"jakarta.mail.Session\"/></Context>"
+    },
     "GET /conf/Catalina/localhost/app.xml.bak": {
       "status": 200,
       "headers": {
@@ -206,12 +213,40 @@
       },
       "body": "<Context path=\"/app\"><ResourceLink name=\"jdbc/app\" global=\"jdbc/app\" type=\"javax.sql.DataSource\"/></Context>"
     },
+    "GET /conf/Catalina/localhost/ROOT.xml.old": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context path=\"\" docBase=\"/srv/tomcat/webapps/ROOT.war\"><Valve className=\"org.apache.catalina.valves.RemoteAddrValve\"/></Context>"
+    },
+    "GET /conf/Catalina/localhost/console.xml.old": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context path=\"/console\" docBase=\"/srv/tomcat/webapps/console.war\"><Valve className=\"org.apache.catalina.valves.RemoteAddrValve\"/></Context>"
+    },
+    "GET /conf/Catalina/localhost/gateway.xml.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context path=\"/gateway\"><Environment name=\"region\" value=\"eu-west\" type=\"java.lang.String\"/><ResourceLink name=\"mail/Session\" global=\"mail/Session\" type=\"jakarta.mail.Session\"/></Context>"
+    },
     "GET /webapps/app.war.old": {
       "status": 200,
       "headers": {
         "Content-Type": "application/octet-stream"
       },
       "body": "PK\u0003\u0004fakewar"
+    },
+    "GET /webapps/console.jar.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/java-archive"
+      },
+      "body": "PK\u0003\u0004fakejar"
     }
   },
   "tomcat-generic": {
@@ -228,6 +263,50 @@
         "Content-Type": "text/html"
       },
       "body": "<html><body>not found</body></html>"
+    }
+  },
+  "tomcat-expanded-positive": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "home"
+    },
+    "GET /this-path-should-not-exist-nuclei-tomcat-version": {
+      "status": 404,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>Apache Tomcat/9.0.85</h1></body></html>"
+    },
+    "GET /conf/Catalina/localhost/internal.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context path=\"/internal\" docBase=\"/srv/tomcat/webapps/internal.war\"><Resource name=\"jdbc/internal\" type=\"javax.sql.DataSource\"/></Context>"
+    },
+    "GET /conf/Catalina/localhost/backoffice.xml.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context path=\"/backoffice\"><ResourceLink name=\"mail/Session\" global=\"mail/Session\" type=\"jakarta.mail.Session\"/></Context>"
+    },
+    "GET /webapps/customer.war.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/octet-stream"
+      },
+      "body": "PK\u0003\u0004fakewar"
+    },
+    "GET /webapps/billing.jar.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/java-archive"
+      },
+      "body": "PK\u0003\u0004fakejar"
     }
   },
   "wildfly-positive": {

@@ -39,6 +39,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/tomcat-catalina-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-context-defaults-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-catalina-localhost-contexts-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-catalina-localhost-xml-variants-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-catalina-localhost-app-xml-temp-variants-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-webapps-root-listing-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-war-artifacts-exposed.yaml
