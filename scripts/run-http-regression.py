@@ -664,7 +664,12 @@ class FixtureHandler(BaseHTTPRequestHandler):
             self.send_header(header_name, header_value)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            # Some clients close the connection early once they have enough
+            # bytes to decide a match. Treat this as benign in fixture mode.
+            return
 
 
 def run_case(port: int, case: Case) -> tuple[bool, str]:

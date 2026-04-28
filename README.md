@@ -89,13 +89,13 @@ Guia rapida para no tener que elegir a ciegas:
 | --- | --- | --- | --- |
 | Apache solo | `templates/workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml` | misconfiguracion general, `server-status`, `server-info`, listados y config expuesta | medio |
 | Apache solo (posture review) | `templates/workflows/apache/apache-hardening-workflow.yaml` | headers, cookies, TRACE, metodos inseguros y postura de frontend | bajo-medio |
-| Apache con foco proxy/admin | `templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml` | `balancer-manager`, `mod_cluster`, `jk-status`, AJP, trust bypass y CVEs `potential` de proxy | medio-alto |
+| Apache con foco proxy/admin | `templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml` | `balancer-manager`, `mod_cluster`, `jk-status`, `workers.properties`, `uriworkermap.properties`, `proxy_ajp.conf`, `server-status`/`server-info` y CVEs `potential` de proxy | medio-alto |
 | Apache fronting Tomcat | `templates/workflows/apache/apache-fronting-tomcat-workflow.yaml` | correlacion frontend Apache con superficie y señales tipicas de Tomcat | medio |
 | Apache fronting WildFly | `templates/workflows/apache/apache-fronting-wildfly-workflow.yaml` | correlacion frontend Apache con superficie y señales tipicas de WildFly/Undertow | medio |
 | Tomcat solo | `templates/workflows/tomcat/tomcat-version-priority-workflow.yaml` | manager/admin surface, defaults, archivos sensibles y CVEs `potential` | medio-alto |
 | Tomcat solo (hardening) | `templates/workflows/tomcat/tomcat-hardening-workflow.yaml` | hardening HTTP, cookies, TRACE, verbose errors y postura | bajo-medio |
 | Tomcat con apps Java | `templates/workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflow.yaml` | exposiciones Java tipicas desplegadas sobre Tomcat | medio |
-| WildFly moderno | `templates/workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml` | management, consola, Hawtio, Jolokia, health/metrics y config sensible | medio-alto |
+| WildFly moderno | `templates/workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml` | management, consola, Hawtio, Jolokia, health/metrics, `domain mode`, Elytron/TLS y config sensible | medio-alto |
 | JBoss legacy / migracion | `templates/workflows/wildfly/jboss-legacy-migration-debt-workflow.yaml` | deuda de migracion, superficies legacy y artefactos historicos | medio |
 | Spring sobre stack Java | `templates/workflows/spring/spring-fingerprint-to-risk-workflow.yaml` | actuators, perfiles, docs y superficie web Spring | medio |
 | Quarkus / Micronaut | `templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml` | snapshot acotado de superficie moderna Java | bajo-medio |
@@ -126,7 +126,7 @@ scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/wildfly
 Para objetivos WildFly/JBoss, separa el uso segun contexto para evitar ruido y duplicados:
 
 - `templates/workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml`
-  - para WildFly moderno y superficie Undertow, management, health, metrics, `domain mode` y hardening.
+  - para WildFly moderno y superficie Undertow, management, health, metrics, `domain mode`, Elytron/TLS, listeners HTTPS y correlacion con `application-users/roles` y `keystore/truststore`.
 - `templates/workflows/wildfly/jboss-legacy-migration-debt-workflow.yaml`
   - para detectar deuda de migracion y superficies legacy de JBoss en nodos antiguos o mixtos.
 
@@ -143,7 +143,7 @@ nuclei -w templates/workflows/wildfly/jboss-legacy-migration-debt-workflow.yaml 
 Para objetivos Tomcat, separa el uso segun el tipo de revision:
 
 - `templates/workflows/tomcat/tomcat-version-priority-workflow.yaml`
-  - para superficie admin, archivos sensibles, defaults, descriptores `Catalina/localhost/`, recursos `JNDI` y CVEs `potential`.
+  - para superficie admin, archivos sensibles, defaults, descriptores `Catalina/localhost/`, recursos `JNDI`, `GlobalNamingResources`, `server.xml`, `tomcat-users.xml`, `web.xml` y CVEs `potential`.
 - `templates/workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflow.yaml`
   - para exposiciones Java tipicas desplegadas sobre Tomcat.
 - `templates/workflows/tomcat/tomcat-hardening-workflow.yaml`
@@ -178,7 +178,7 @@ Para objetivos Apache, separa el uso segun el tipo de revision:
 - `templates/workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml`
   - para misconfiguracion general, `server-status`, `server-info`, listados, `.ht*` y configuracion expuesta.
 - `templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml`
-  - para proxy/admin surface, `balancer-manager`, `mod_cluster`, `jk-status`, `workers.properties`, `uriworkermap.properties`, AJP config leaks, forward/open proxy, correlacion `mod_info` (`ProxyPass`, `ProxyPassMatch`, `ws://` / `wss://`) y CVEs `potential` de proxy.
+  - para proxy/admin surface, `balancer-manager`, `mod_cluster`, `jk-status`, `workers.properties`, `uriworkermap.properties`, `proxy_ajp.conf`, `server-status?auto`, `status-json`, AJP config leaks, forward/open proxy, correlacion `mod_info` (`ProxyPass`, `ProxyPassMatch`, `RewriteRule [P]`, `ws://` / `wss://`) y CVEs `potential` de proxy.
 - `templates/workflows/apache/apache-hardening-workflow.yaml`
   - para posture review de Apache, headers, metodos inseguros, directory listing y configuracion expuesta.
 - `templates/workflows/apache/apache-fronting-tomcat-workflow.yaml`
@@ -238,6 +238,16 @@ Notas de interpretacion:
   - `quarkus-openapi-surface-exposed` y `quarkus-metrics-endpoint-exposed` deben leerse como exposicion operativa/documental, no como confirmacion de una vulnerabilidad explotable por si sola
 - `Micronaut`:
   - el fingerprint actual depende de `Server: ...micronaut...` y es deliberadamente conservador
+
+## Cobertura actual de regresion
+
+La regresion HTTP local cubre ya no solo validacion basica de templates, sino tambien profundidad de workflows y familias con mas riesgo de ruido:
+
+- `Apache`: `mod_status`, `server-info`, `balancer-manager`, `mod_cluster`, `jk-status`, `workers.properties`, `uriworkermap.properties`, `proxy_ajp.conf` y disclosure de backends/routing.
+- `Tomcat`: superficie manager/host-manager, `Catalina/localhost/*.xml`, `JNDI/resources`, `GlobalNamingResources`, `server.xml`, `tomcat-users.xml`, `web.xml` y artefactos temporales/backups.
+- `WildFly`: `domain mode`, Elytron, TLS, Undertow HTTPS listeners, `application-users/roles` y correlacion con `keystore/truststore`.
+
+Para el detalle exacto de la suite y como ampliar fixtures, ver [TESTING.md](TESTING.md).
   - en produccion es comun que Apache, Nginx, balanceadores o gateways sobrescriban el header `Server`, por lo que la ausencia de match no descarta `Micronaut`
   - los checks de `env`, `management`, `loggers` y `refresh` describen superficie expuesta o potencialmente escribible; requieren correlacion con contexto operativo antes de priorizar como riesgo alto
 

@@ -94,6 +94,10 @@ No contar aparte si ya existe el panel o exposicion base:
   superficie operativa
 - `server-info` y detalles extraidos desde `mod_info` suelen describir la misma
   causa raiz
+- `workers.properties`, `uriworkermap.properties`, `proxy_ajp.conf` y
+  `jk-status` suelen reforzar la misma topologia `mod_jk/AJP`; contarlos como
+  familia comun salvo que uno de ellos revele un secreto o mapping claramente
+  mas sensible
 - panel y detalle topologico no deben contarse como dos vulnerabilidades
   separadas
 
@@ -203,6 +207,12 @@ No contar aparte si ya se confirmo lectura no autenticada del management model:
 - ficheros expuestos como `standalone.xml`, `domain.xml` o `mgmt-users` pueden
   reforzar el mismo problema operativo, pero deben seguir informandose como
   evidencia sensible concreta
+- `wildfly-elytron-management-unauth`, `wildfly-elytron-tls-management-unauth`,
+  `wildfly-undertow-https-listener-management-unauth`,
+  `wildfly-elytron-properties-exposed` y `java-keystore-truststore-exposed`
+  suelen describir una misma familia de exposicion TLS/credenciales; informar
+  la topologia como hallazgo base y tratar properties/keystores como evidencia
+  sensible adicional o hallazgo separado solo cuando expongan material secreto
 
 ## OpenAPI / WADL / Swagger
 

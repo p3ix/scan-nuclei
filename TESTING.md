@@ -16,6 +16,8 @@ El repo tiene tres capas de verificacion:
 3. `python3 scripts/run-http-regression.py`
    - ejecuta regresion minima de comportamiento contra fixtures HTTP locales
    - comprueba matches esperados y no esperados
+   - soporta tambien fixtures binarios via `body_base64` para cubrir casos como
+     `keystore/truststore`
 
 ## Que cubre hoy la regresion HTTP
 
@@ -97,6 +99,8 @@ Evitar al principio:
 - algunos workflows profundos pueden disparar hallazgos adicionales validos; por
   eso las expectativas deben centrarse en ids clave, no en listar todo el ruido
 - la suite actual busca estabilidad y cobertura minima, no exhaustividad
+- algunos clientes pueden cerrar conexiones antes de consumir toda la respuesta;
+  el runner ya trata esos cierres tempranos como benignos
 
 ## Recomendacion practica
 
