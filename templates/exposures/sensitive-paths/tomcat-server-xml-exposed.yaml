@@ -18,6 +18,14 @@ http:
     path:
       - "{{BaseURL}}/conf/server.xml"
       - "{{BaseURL}}/server.xml"
+      - "{{BaseURL}}/conf/server.xml.bak"
+      - "{{BaseURL}}/conf/server.xml.old"
+      - "{{BaseURL}}/conf/server.xml.orig"
+      - "{{BaseURL}}/conf/server.xml.save"
+      - "{{BaseURL}}/conf/server.xml.tmp"
+      - "{{BaseURL}}/conf/server.xml~"
+      - "{{BaseURL}}/server.xml.bak"
+      - "{{BaseURL}}/server.xml.old"
 
     matchers-condition: and
     matchers:
@@ -32,3 +40,12 @@ http:
           - "(?is)<Service\\b"
           - "(?is)<Connector\\b"
           - "(?is)<Engine\\b"
+          - "(?is)<Realm\\b"
+          - "(?is)<Host\\b"
+          - "(?i)(AJP/1\\.3|SSLEnabled|keystore(File|Pass)|truststore(File|Pass)|scheme\\s*=\\s*\"https\")"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

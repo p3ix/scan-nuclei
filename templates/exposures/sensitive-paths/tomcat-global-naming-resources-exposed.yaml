@@ -22,6 +22,12 @@ http:
       - "{{BaseURL}}/server.xml"
       - "{{BaseURL}}/conf/server.xml.bak"
       - "{{BaseURL}}/conf/server.xml.old"
+      - "{{BaseURL}}/conf/server.xml.orig"
+      - "{{BaseURL}}/conf/server.xml.save"
+      - "{{BaseURL}}/conf/server.xml.tmp"
+      - "{{BaseURL}}/conf/server.xml~"
+      - "{{BaseURL}}/server.xml.bak"
+      - "{{BaseURL}}/server.xml.old"
 
     matchers-condition: and
     matchers:
@@ -34,12 +40,13 @@ http:
         regex:
           - "(?is)<GlobalNamingResources\\b"
           - "(?is)<Resource\\b"
-          - "(?i)(javax\\.sql\\.DataSource|jakarta\\.mail\\.Session|UserDatabase)"
+          - "(?is)<ResourceLink\\b"
+          - "(?i)(javax\\.sql\\.DataSource|jakarta\\.mail\\.Session|mail/Session|UserDatabase)"
           - "(?i)(driverClassName|url|username|password|factory)\\s*="
+          - "(?i)(global|name)\\s*=\\s*\"(jdbc/|mail/|UserDatabase)"
 
     extractors:
       - type: dsl
         dsl:
           - path
         name: exposed_path
-

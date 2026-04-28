@@ -199,6 +199,48 @@
       },
       "body": "<Context><Environment name=\"featureFlag\" value=\"true\" type=\"java.lang.String\"/><Resource name=\"jdbc/app\" type=\"javax.sql.DataSource\"/><ResourceLink name=\"mail/Session\" global=\"mail/Session\" type=\"jakarta.mail.Session\"/></Context>"
     },
+    "GET /conf/server.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Server port=\"8005\" shutdown=\"SHUTDOWN\"><Service name=\"Catalina\"><Connector port=\"8080\" protocol=\"HTTP/1.1\"/><Connector port=\"8443\" SSLEnabled=\"true\" scheme=\"https\" secure=\"true\" keystoreFile=\"conf/keystore.jks\" keystorePass=\"changeit\"/><Engine name=\"Catalina\" defaultHost=\"localhost\"><Realm className=\"org.apache.catalina.realm.LockOutRealm\"/><Host name=\"localhost\" appBase=\"webapps\"/></Engine></Service><GlobalNamingResources><Resource name=\"jdbc/shared\" auth=\"Container\" type=\"javax.sql.DataSource\" username=\"dbuser\" password=\"dbpass\" url=\"jdbc:postgresql://db.internal/app\"/><ResourceLink name=\"mail/Session\" global=\"mail/Session\" type=\"jakarta.mail.Session\"/><Resource name=\"UserDatabase\" auth=\"Container\" type=\"org.apache.catalina.UserDatabase\"/></GlobalNamingResources></Server>"
+    },
+    "GET /conf/server.xml.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Server port=\"8005\" shutdown=\"SHUTDOWN\"><Service name=\"Catalina\"><Connector port=\"8009\" protocol=\"AJP/1.3\" secretRequired=\"false\"/></Service><GlobalNamingResources><Resource name=\"jdbc/legacy\" auth=\"Container\" type=\"javax.sql.DataSource\" username=\"legacy\" password=\"legacypass\" factory=\"org.apache.tomcat.jdbc.pool.DataSourceFactory\"/></GlobalNamingResources></Server>"
+    },
+    "GET /conf/tomcat-users.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<tomcat-users><role rolename=\"manager-gui\"/><role rolename=\"manager-script\"/><role rolename=\"admin-gui\"/><user username=\"deployer\" password=\"s3cret\" roles=\"manager-gui,manager-script\"/></tomcat-users>"
+    },
+    "GET /conf/tomcat-users.xml.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<tomcat-users><role rolename=\"admin-script\"/><user username=\"legacy-admin\" password=\"changeme\" roles=\"admin-script\"/></tomcat-users>"
+    },
+    "GET /conf/web.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<web-app xmlns=\"http://java.sun.com/xml/ns/javaee\"><filter><filter-name>SecurityHeadersFilter</filter-name><filter-class>com.example.SecurityHeadersFilter</filter-class><init-param><param-name>mode</param-name><param-value>strict</param-value></init-param></filter><filter-mapping><filter-name>SecurityHeadersFilter</filter-name><url-pattern>/*</url-pattern></filter-mapping><servlet><servlet-name>health</servlet-name><servlet-class>com.example.HealthServlet</servlet-class></servlet><servlet-mapping><servlet-name>health</servlet-name><url-pattern>/health</url-pattern></servlet-mapping><security-constraint><web-resource-collection><url-pattern>/admin/*</url-pattern></web-resource-collection><auth-constraint><role-name>admin</role-name></auth-constraint></security-constraint><security-role><role-name>admin</role-name></security-role><login-config><auth-method>BASIC</auth-method></login-config></web-app>"
+    },
+    "GET /WEB-INF/web.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"><context-param><param-name>spring.profiles.active</param-name><param-value>prod</param-value></context-param><servlet><servlet-name>api</servlet-name><servlet-class>com.example.ApiServlet</servlet-class></servlet><filter><filter-name>AuditFilter</filter-name><filter-class>com.example.AuditFilter</filter-class></filter><security-role><role-name>ops</role-name></security-role></web-app>"
+    },
     "GET /conf/Catalina/localhost/app.xml.bak": {
       "status": 200,
       "headers": {
@@ -390,6 +432,14 @@
       },
       "body": "{\"outcome\":\"success\",\"result\":{\"app.war\":{\"runtime-name\":\"app.war\",\"enabled\":true,\"content\":[{\"hash\":\"abc123\"}]}}}"
     },
+    "GET /management/server-group=main-server-group?operation=read-children-names&child-type=deployment": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"app.war\"],\"server-group\":\"main-server-group\",\"deployment\":\"app.war\"}"
+    },
     "GET /management/deployment=app.war?operation=read-resource": {
       "status": 200,
       "headers": {
@@ -406,6 +456,14 @@
       },
       "body": "{\"outcome\":\"success\",\"result\":{\"deployment-overlay\":\"base-overlay\",\"content\":[{\"path\":\"WEB-INF/web.xml\"}]}}"
     },
+    "GET /management/deployment-overlay=base-overlay?operation=read-children-resources&child-type=deployment": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"app.war\":{\"content\":[{\"path\":\"WEB-INF/web.xml\"}],\"deployment-overlay\":\"base-overlay\"}}}"
+    },
     "GET /management/host=master/server-config=server-one?operation=read-resource": {
       "status": 200,
       "headers": {
@@ -413,6 +471,14 @@
         "Server": "Undertow/2"
       },
       "body": "{\"outcome\":\"success\",\"result\":{\"server-config\":\"server-one\",\"socket-binding-group\":\"standard-sockets\"}}"
+    },
+    "GET /management/host=master?operation=read-children-resources&child-type=server-config": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"server-one\":{\"group\":\"main-server-group\",\"socket-binding-group\":\"standard-sockets\",\"status\":\"STARTED\"}},\"server-config\":\"server-one\"}"
     }
   },
   "wildfly-generic": {

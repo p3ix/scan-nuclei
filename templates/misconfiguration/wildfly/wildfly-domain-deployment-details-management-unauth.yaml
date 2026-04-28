@@ -24,9 +24,12 @@ http:
   - method: GET
     path:
       - "{{BaseURL}}/management/server-group=main-server-group?operation=read-children-resources&child-type=deployment"
+      - "{{BaseURL}}/management/server-group=main-server-group?operation=read-children-names&child-type=deployment"
       - "{{BaseURL}}/management/deployment=app.war?operation=read-resource"
       - "{{BaseURL}}/management/deployment-overlay=base-overlay?operation=read-resource"
+      - "{{BaseURL}}/management/deployment-overlay=base-overlay?operation=read-children-resources&child-type=deployment"
       - "{{BaseURL}}/management/host=master/server-config=server-one?operation=read-resource"
+      - "{{BaseURL}}/management/host=master?operation=read-children-resources&child-type=server-config"
 
     matchers-condition: and
     matchers:
@@ -46,6 +49,8 @@ http:
           - '(?i)"content"\s*:'
           - '(?i)"server-config"'
           - '(?i)"socket-binding-group"'
+          - '(?i)"enabled"'
+          - '(?i)"server-group"'
 
     extractors:
       - type: dsl

@@ -38,7 +38,7 @@ http:
       - type: regex
         part: body
         regex:
-          - '(?i)"outcome"\\s*:\\s*"success"'
+          - '(?i)"outcome"\s*:\s*"success"'
       - type: regex
         part: body
         condition: or
@@ -48,7 +48,7 @@ http:
           - '(?i)"server-config"'
           - '(?i)"deployment-overlay"'
           - '(?i)"deployment"'
-          - '(?i)"result"\\s*:'
+          - '(?i)"result"\s*:'
 
     extractors:
       - type: dsl

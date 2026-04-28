@@ -6,7 +6,8 @@ info:
   severity: high
   description: |
     Detects readable access to `/WEB-INF/web.xml`, exposing the deployment descriptor
-    (servlets, filters, context params). Validated with XML-like markers to reduce false positives.
+    (servlets, filters, security roles, constraints, and init params).
+    Validated with XML-like markers to reduce false positives.
   tags:
     - exposure
     - java
@@ -17,6 +18,12 @@ http:
   - method: GET
     path:
       - "{{BaseURL}}/WEB-INF/web.xml"
+      - "{{BaseURL}}/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/WEB-INF/web.xml.old"
+      - "{{BaseURL}}/WEB-INF/web.xml.orig"
+      - "{{BaseURL}}/WEB-INF/web.xml.save"
+      - "{{BaseURL}}/WEB-INF/web.xml.tmp"
+      - "{{BaseURL}}/WEB-INF/web.xml~"
 
     matchers-condition: and
     matchers:
@@ -30,4 +37,10 @@ http:
       - type: regex
         part: body
         regex:
-          - "(?is).*(<servlet>|<servlet-mapping>|<filter>|<context-param>|xmlns=\"http://java\\.sun\\.com/xml/ns/javaee\"|xmlns=\"https://jakarta\\.ee/xml/ns/jakartaee\").*"
+          - "(?is).*(<servlet>|<servlet-mapping>|<filter>|<filter-mapping>|<context-param>|<security-constraint>|<security-role>|<login-config>|<init-param>|<url-pattern>|xmlns=\"http://java\\.sun\\.com/xml/ns/javaee\"|xmlns=\"https://jakarta\\.ee/xml/ns/jakartaee\").*"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

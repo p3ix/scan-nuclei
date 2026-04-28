@@ -7,7 +7,8 @@ info:
   description: |
     Detects exposed Tomcat global `web.xml` configuration, which may reveal
     default servlet mappings, security constraints, MIME mappings, and session
-    configuration.
+    configuration, filters, roles, login configuration, and initialization
+    parameters.
   tags:
     - tomcat
     - exposure
@@ -21,6 +22,13 @@ http:
       - "{{BaseURL}}/conf/web.xml"
       - "{{BaseURL}}/web.xml"
       - "{{BaseURL}}/conf/web.xml.default"
+      - "{{BaseURL}}/conf/web.xml.bak"
+      - "{{BaseURL}}/conf/web.xml.old"
+      - "{{BaseURL}}/conf/web.xml.orig"
+      - "{{BaseURL}}/conf/web.xml.save"
+      - "{{BaseURL}}/conf/web.xml.tmp"
+      - "{{BaseURL}}/conf/web.xml~"
+      - "{{BaseURL}}/web.xml.bak"
 
     matchers-condition: and
     matchers:
@@ -33,5 +41,16 @@ http:
         regex:
           - "(?is)<web-app\\b"
           - "(?is)<servlet\\b"
+          - "(?is)<filter\\b"
           - "(?is)<security-constraint\\b"
+          - "(?is)<security-role\\b"
+          - "(?is)<login-config\\b"
+          - "(?is)<init-param\\b"
+          - "(?is)<url-pattern\\b"
           - "(?is)<session-config\\b"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

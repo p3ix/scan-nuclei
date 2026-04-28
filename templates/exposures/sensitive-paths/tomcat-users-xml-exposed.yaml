@@ -5,7 +5,9 @@ info:
   author: scan-nuclei
   severity: high
   description: |
-    Detects exposed tomcat-users.xml, potentially disclosing admin usernames and roles.
+    Detects exposed `tomcat-users.xml` and common backup variants, potentially
+    disclosing administrative usernames, roles, and legacy in-file credential
+    mappings used by Tomcat Manager, Host Manager, or custom realms.
   tags:
     - tomcat
     - exposure
@@ -17,6 +19,14 @@ http:
     path:
       - "{{BaseURL}}/conf/tomcat-users.xml"
       - "{{BaseURL}}/tomcat-users.xml"
+      - "{{BaseURL}}/conf/tomcat-users.xml.bak"
+      - "{{BaseURL}}/conf/tomcat-users.xml.old"
+      - "{{BaseURL}}/conf/tomcat-users.xml.orig"
+      - "{{BaseURL}}/conf/tomcat-users.xml.save"
+      - "{{BaseURL}}/conf/tomcat-users.xml.tmp"
+      - "{{BaseURL}}/conf/tomcat-users.xml~"
+      - "{{BaseURL}}/tomcat-users.xml.bak"
+      - "{{BaseURL}}/tomcat-users.xml.old"
 
     matchers-condition: and
     matchers:
@@ -28,5 +38,13 @@ http:
         condition: or
         regex:
           - "(?is)<tomcat-users\\b"
-          - "(?is)<user\\s+username="
-          - "(?is)manager-(gui|script|jmx|status)"
+          - "(?is)<user\\b[^>]*\\busername\\s*="
+          - "(?is)<role\\b[^>]*\\brolename\\s*="
+          - "(?i)(manager-(gui|script|jmx|status)|admin-(gui|script))"
+          - "(?i)(MemoryUserDatabase|UserDatabaseRealm|org\\.apache\\.catalina\\.users\\.MemoryUserDatabase)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
