@@ -46,6 +46,7 @@ http:
           - "(?im)^ProxyPassMatch\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://(127\\.0\\.0\\.1|localhost|10\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.|192\\.168\\.|[a-z0-9._-]+\\.(local|internal|lan|corp|intra))"
           - "(?im)^ProxyPassReverse\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://(127\\.0\\.0\\.1|localhost|10\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.|192\\.168\\.|[a-z0-9._-]+\\.(local|internal|lan|corp|intra))"
           - "(?im)^BalancerMember\\s+(?:ajp|http|https|ws|wss)://(127\\.0\\.0\\.1|localhost|10\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.|192\\.168\\.|[a-z0-9._-]+\\.(local|internal|lan|corp|intra))"
+          - "(?im)^RewriteRule\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://(127\\.0\\.0\\.1|localhost|10\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.|192\\.168\\.|[a-z0-9._-]+\\.(local|internal|lan|corp|intra))"
           - "(?im)^ProxyPass\\s+\\S+\\s+balancer://"
           - "(?im)^ProxyPassMatch\\s+\\S+\\s+balancer://"
           - "(?im)^BalancerMember\\s+(?:ajp|http|https|ws|wss)://"
@@ -63,3 +64,4 @@ http:
           - "(?im)^ProxyPassMatch\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://[^\\s]+.*$"
           - "(?im)^ProxyPassReverse\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://[^\\s]+.*$"
           - "(?im)^BalancerMember\\s+(?:ajp|http|https|ws|wss)://[^\\s]+.*$"
+          - "(?im)^RewriteRule\\s+\\S+\\s+(?:ajp|http|https|ws|wss)://[^\\s]+.*$"

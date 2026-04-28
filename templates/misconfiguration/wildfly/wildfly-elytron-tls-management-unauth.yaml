@@ -26,6 +26,9 @@ http:
       - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=trust-manager"
       - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=key-manager"
       - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=server-ssl-context"
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=client-ssl-context"
+      - "{{BaseURL}}/management/subsystem=elytron/server-ssl-context=httpsSSC?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=elytron/key-store=httpsKS?operation=read-resource"
 
     matchers-condition: and
     matchers:
@@ -35,7 +38,7 @@ http:
       - type: regex
         part: body
         regex:
-          - '(?i)"outcome"\\s*:\\s*"success"'
+          - '(?i)"outcome"\s*:\s*"success"'
       - type: regex
         part: body
         condition: or
@@ -45,6 +48,8 @@ http:
           - '(?i)"key-manager"'
           - '(?i)"server-ssl-context"'
           - '(?i)"client-ssl-context"'
+          - '(?i)"path"'
+          - '(?i)"relative-to"'
 
     extractors:
       - type: dsl

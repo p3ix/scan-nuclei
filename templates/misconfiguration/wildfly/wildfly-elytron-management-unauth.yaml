@@ -23,6 +23,8 @@ http:
       - "{{BaseURL}}/management/subsystem=elytron?operation=read-resource"
       - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-types"
       - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=security-domain"
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=http-authentication-factory"
+      - "{{BaseURL}}/management/subsystem=elytron?operation=read-children-names&child-type=sasl-authentication-factory"
 
     matchers-condition: and
     matchers:
@@ -32,7 +34,7 @@ http:
       - type: regex
         part: body
         regex:
-          - '(?i)"outcome"\\s*:\\s*"success"'
+          - '(?i)"outcome"\s*:\s*"success"'
       - type: regex
         part: body
         condition: or
@@ -40,6 +42,7 @@ http:
           - '(?i)"elytron"'
           - '(?i)"security-domain"'
           - '(?i)"http-authentication-factory"'
+          - '(?i)"sasl-authentication-factory"'
           - '(?i)"key-store"'
           - '(?i)"server-ssl-context"'
 

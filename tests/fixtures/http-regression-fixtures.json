@@ -156,7 +156,15 @@
         "Server": "Apache/2.4.58",
         "Content-Type": "text/html"
       },
-      "body": "<html><title>Server Information</title><body>\nLoaded Modules\nProxyPass /app http://127.0.0.1:8080/app\nProxyPassMatch ^/api/(.*)$ ajp://localhost:8009/api/$1\nProxyPass /ws ws://10.0.0.12:9000/socket\nProxyPassReverse /ws ws://10.0.0.12:9000/socket\nRewriteCond %{HTTP:Upgrade} websocket [NC]\nRewriteRule ^/socket/(.*)$ ws://backend.internal:9100/$1 [P,L]\n</body></html>"
+      "body": "<html><title>Server Information</title><body>\nLoaded Modules\nProxyPass /app http://127.0.0.1:8080/app\nProxyPassMatch ^/api/(.*)$ ajp://localhost:8009/api/$1\nProxyPass /ws ws://10.0.0.12:9000/socket\nProxyPassReverse /ws ws://10.0.0.12:9000/socket\nRewriteCond %{HTTP:Upgrade} websocket [NC]\nRewriteRule ^/socket/(.*)$ ws://backend.internal:9100/$1 [P,L]\nRewriteRule ^/admin/(.*)$ http://backend.internal:8080/admin/$1 [P,L]\n</body></html>"
+    },
+    "GET /server-info?list": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/html"
+      },
+      "body": "<html><title>Server Information</title><body>\nApache Module Information\nLoaded Modules\nServer Built: Jan 01 2025\nServer MPM: event\nproxy_module (shared)\nproxy_http_module (shared)\nproxy_wstunnel_module (shared)\n</body></html>"
     }
   },
   "apache-hidden-server": {
@@ -167,6 +175,107 @@
         "Content-Type": "text/plain"
       },
       "body": "home"
+    }
+  },
+  "apache-admin-positive": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/plain"
+      },
+      "body": "home"
+    },
+    "GET /server-status": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>Apache Server Status for admin.example.internal</h1><table><tr><th>Srv</th><th>PID</th><th>Acc</th><th>M</th><th>CPU</th><th>SS</th><th>Req</th><th>Dur</th><th>Conn</th><th>Child</th><th>Slot</th><th>Client</th><th>VHost</th><th>Request</th></tr><tr><td>0-0</td><td>1234</td><td>0/10/10</td><td>W</td><td>0.1</td><td>1</td><td>0</td><td>12</td><td>0.0</td><td>0.0</td><td>0.0</td><td>10.0.0.10</td><td>admin.example.internal:443</td><td>GET /app/login HTTP/1.1</td></tr></table></body></html>"
+    },
+    "GET /server-status?auto": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/plain"
+      },
+      "body": "ServerVersion: Apache/2.4.58\nTotal Accesses: 42\nBusyWorkers: 3\nIdleWorkers: 7\nScoreboard: ___W_K__\n"
+    },
+    "GET /server-status?json": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "application/json"
+      },
+      "body": "{\"ServerVersion\":\"Apache/2.4.58\",\"BusyWorkers\":3,\"IdleWorkers\":7,\"Scoreboard\":\"___W_K__\"}"
+    },
+    "GET /balancer-manager": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>Balancer Manager</h1><p>LoadBalancer Status for balancer://clusterA</p><table><tr><td>Worker URL</td><td>ajp://10.0.0.21:8009/app</td></tr><tr><td>Route</td><td>node1</td></tr><tr><td>BalancerMember</td><td>http://10.0.0.22:8080/app</td></tr></table></body></html>"
+    },
+    "GET /mod_cluster_manager": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>mod_cluster Manager</h1><p>Balancer: mycluster</p><p>LBGroup: production</p><p>Node Name: node-a.internal:8009</p><p>JVMRoute: nodeA</p><p>Contexts: /app /console</p></body></html>"
+    },
+    "GET /jk-status": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>JK Status Manager</h1><p>Worker list</p><p>worker node1</p><p>type ajp13</p><p>host backend-a.internal</p><p>port 8009</p><p>route node1</p><p>lb_factor 1</p><p>ajp://backend-a.internal:8009</p></body></html>"
+    },
+    "GET /workers.properties": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/plain"
+      },
+      "body": "worker.list=loadbalancer,status\nworker.node1.type=ajp13\nworker.node1.host=backend-a.internal\nworker.node1.port=8009\nworker.node1.route=node1\nworker.node1.secret=s3cr3t\nworker.loadbalancer.type=lb\nworker.loadbalancer.balance_workers=node1\n"
+    },
+    "GET /uriworkermap.properties": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/plain"
+      },
+      "body": "/app/*=loadbalancer\n/manager/*=status\n!/assets/*=loadbalancer\n"
+    },
+    "GET /proxy_ajp.conf": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/plain"
+      },
+      "body": "ProxyPass /app ajp://backend-a.internal:8009/app\nProxyPassReverse /app ajp://backend-a.internal:8009/app\nBalancerMember ajp://backend-b.internal:8009 route=node2\nJkMount /legacy/* loadbalancer\n"
+    }
+  },
+  "apache-backend-disclosure-positive": {
+    "GET /": {
+      "status": 302,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Location": "http://backend.internal:8080/login",
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body>redirecting</body></html>"
+    },
+    "GET /this-path-should-not-exist-nuclei-apache-backend": {
+      "status": 502,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body>Proxy Error: The origin server backend.internal returned an invalid response. Tomcat backend server unavailable.</body></html>"
     }
   },
   "tomcat-positive": {
@@ -479,6 +588,167 @@
         "Server": "Undertow/2"
       },
       "body": "{\"outcome\":\"success\",\"result\":{\"server-one\":{\"group\":\"main-server-group\",\"socket-binding-group\":\"standard-sockets\",\"status\":\"STARTED\"}},\"server-config\":\"server-one\"}"
+    },
+    "GET /management/subsystem=elytron?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"default-authentication-context\":\"application-authentication\",\"providers\":\"combined-providers\"},\"elytron\":\"present\",\"key-store\":\"httpsKS\",\"server-ssl-context\":\"httpsSSC\"}"
+    },
+    "GET /management/subsystem=elytron?operation=read-children-types": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"security-domain\",\"http-authentication-factory\",\"sasl-authentication-factory\",\"key-store\",\"server-ssl-context\"]}"
+    },
+    "GET /management/subsystem=elytron?operation=read-children-names&child-type=security-domain": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"ApplicationDomain\"],\"security-domain\":\"ApplicationDomain\"}"
+    },
+    "GET /management/subsystem=elytron?operation=read-children-names&child-type=http-authentication-factory": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"management-http-authentication\"],\"http-authentication-factory\":\"management-http-authentication\"}"
+    },
+    "GET /management/subsystem=elytron?operation=read-children-names&child-type=sasl-authentication-factory": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"application-sasl\"],\"sasl-authentication-factory\":\"application-sasl\"}"
+    },
+    "GET /management/subsystem=elytron?operation=read-children-names&child-type=key-store": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"httpsKS\"],\"key-store\":\"httpsKS\"}"
+    },
+    "GET /management/subsystem=elytron?operation=read-children-names&child-type=trust-manager": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"httpsTM\"],\"trust-manager\":\"httpsTM\"}"
+    },
+    "GET /management/subsystem=elytron?operation=read-children-names&child-type=key-manager": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"httpsKM\"],\"key-manager\":\"httpsKM\"}"
+    },
+    "GET /management/subsystem=elytron?operation=read-children-names&child-type=server-ssl-context": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"httpsSSC\"],\"server-ssl-context\":\"httpsSSC\"}"
+    },
+    "GET /management/subsystem=elytron?operation=read-children-names&child-type=client-ssl-context": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"clientSSC\"],\"client-ssl-context\":\"clientSSC\"}"
+    },
+    "GET /management/subsystem=elytron/server-ssl-context=httpsSSC?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"key-manager\":\"httpsKM\",\"protocols\":[\"TLSv1.3\"],\"server-ssl-context\":\"httpsSSC\"}}"
+    },
+    "GET /management/subsystem=elytron/key-store=httpsKS?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"path\":\"application.keystore\",\"relative-to\":\"jboss.server.config.dir\",\"type\":\"JKS\"},\"key-store\":\"httpsKS\"}"
+    },
+    "GET /management/subsystem=undertow?operation=read-children-names&child-type=server": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"default-server\"],\"default-server\":\"default-server\"}"
+    },
+    "GET /management/subsystem=undertow/server=default-server?operation=read-children-names&child-type=https-listener": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"https\"],\"https-listener\":\"https\"}"
+    },
+    "GET /management/subsystem=undertow/server=default-server?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"default-host\":\"default-host\",\"https-listener\":{\"https\":{\"socket-binding\":\"https\",\"ssl-context\":\"httpsSSC\"}}},\"default-server\":\"default-server\"}"
+    },
+    "GET /management/subsystem=undertow/server=default-server/https-listener=https?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"name\":\"https\",\"socket-binding\":\"https\",\"ssl-context\":\"httpsSSC\",\"enable-http2\":true,\"secure\":true,\"redirect-socket\":\"https\"},\"https-listener\":\"https\"}"
+    },
+    "GET /management/subsystem=undertow/server=default-server/https-listener=https?operation=read-attribute&name=ssl-context": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":\"httpsSSC\",\"ssl-context\":\"httpsSSC\"}"
+    },
+    "GET /standalone/configuration/application-users.properties": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "Undertow/2"
+      },
+      "body": "#$REALM_NAME=ApplicationRealm$\n#$ALGORITHM=digest-sha-256$\nadmin=2f4c3a1e9d8b7c6f5e4d3c2b1a0f9e8d\noperator=7e6d5c4b3a291817161514131211100f\n"
+    },
+    "GET /standalone/configuration/application-roles.properties": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "Undertow/2"
+      },
+      "body": "admin=SuperUser,Administrator\noperator=Monitor,Deployer\n"
+    },
+    "GET /standalone/configuration/application.keystore": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/octet-stream",
+        "Content-Disposition": "attachment; filename=\"application.keystore\"",
+        "Server": "Undertow/2"
+      },
+      "body_base64": "/u3+7QAB"
     }
   },
   "wildfly-generic": {

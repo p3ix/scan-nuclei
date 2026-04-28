@@ -67,6 +67,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/wildfly-management-users-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/wildfly-management-groups-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/wildfly-elytron-properties-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-keystore-truststore-exposed.yaml
       - template: templates/exposures/sensitive-paths/wildfly-logging-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/wildfly-datasource-descriptors-exposed.yaml
       - template: templates/exposures/sensitive-paths/wildfly-jboss-app-xml-exposed.yaml
@@ -109,6 +110,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/wildfly-ironjacamar-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/wildfly-jboss-web-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/wildfly-jboss-deployment-structure-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-keystore-truststore-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-persistence-xml-exposed.yaml
       - tags: potential
       - template: templates/cves/java/CVE-2020-1745-undertow-ajp-file-read-inclusion-potential.yaml

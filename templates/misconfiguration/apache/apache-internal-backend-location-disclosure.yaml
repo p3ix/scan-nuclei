@@ -29,7 +29,7 @@ http:
       - type: regex
         part: header
         regex:
-          - "(?i)^server:\\s*apache/?[0-9.]*"
+          - "(?im)^server:\\s*apache/?[0-9.]*"
       - type: regex
         part: all
         condition: or

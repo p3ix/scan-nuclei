@@ -25,6 +25,14 @@ http:
       - "{{BaseURL}}/elytron-roles.properties"
       - "{{BaseURL}}/config/application-users.properties"
       - "{{BaseURL}}/config/application-roles.properties"
+      - "{{BaseURL}}/standalone/configuration/application-users.properties"
+      - "{{BaseURL}}/standalone/configuration/application-roles.properties"
+      - "{{BaseURL}}/standalone/configuration/elytron-users.properties"
+      - "{{BaseURL}}/standalone/configuration/elytron-roles.properties"
+      - "{{BaseURL}}/domain/configuration/application-users.properties"
+      - "{{BaseURL}}/domain/configuration/application-roles.properties"
+      - "{{BaseURL}}/domain/configuration/elytron-users.properties"
+      - "{{BaseURL}}/domain/configuration/elytron-roles.properties"
 
     matchers-condition: and
     matchers:
@@ -39,3 +47,11 @@ http:
           - "(?im)^#\\$ALGORITHM="
           - "(?im)^[A-Za-z0-9_.-]+=([A-Fa-f0-9]{16,}|[A-Za-z0-9_, -]{3,})$"
           - "(?im)^(SuperUser|Administrator|Maintainer|Deployer)\\b"
+          - "(?im)^(management|monitor|operator|auditor|admin)[A-Za-z0-9_.-]*="
+          - "(?im)^[A-Za-z0-9_.-]+=([A-Za-z0-9_.-]+,){1,}[A-Za-z0-9_.-]+$"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

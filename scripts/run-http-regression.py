@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import base64
 import json
 import subprocess
 import sys
@@ -101,6 +102,15 @@ CASES = [
         unexpected=set(),
     ),
     Case(
+        name="apache-server-header-fingerprint-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/technologies/apache/apache-httpd-server-header-fingerprint.yaml",
+        expected={"apache-httpd-server-header-fingerprint"},
+        unexpected=set(),
+    ),
+    Case(
         name="apache-server-status-negative-hidden-server",
         family="apache",
         scenario="apache-hidden-server",
@@ -108,6 +118,60 @@ CASES = [
         target="templates/misconfiguration/apache/apache-server-status-exposed.yaml",
         expected=set(),
         unexpected={"apache-server-status-exposed"},
+    ),
+    Case(
+        name="apache-server-status-request-metadata-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-server-status-request-metadata-exposed.yaml",
+        expected={"apache-server-status-request-metadata-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-server-status-auto-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-server-status-auto-exposed.yaml",
+        expected={"apache-server-status-auto-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-status-json-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-status-json-exposed.yaml",
+        expected={"apache-status-json-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-server-info-positive",
+        family="apache",
+        scenario="apache-proxy-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-server-info-exposed.yaml",
+        expected={"apache-server-info-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-info-module-signature-positive",
+        family="apache",
+        scenario="apache-proxy-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-info-module-signature-exposed.yaml",
+        expected={"apache-info-module-signature-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-internal-backend-location-positive",
+        family="apache",
+        scenario="apache-backend-disclosure-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-internal-backend-location-disclosure.yaml",
+        expected={"apache-internal-backend-location-disclosure"},
+        unexpected=set(),
     ),
     Case(
         name="apache-proxy-backend-routing-positive",
@@ -125,6 +189,76 @@ CASES = [
         scan_mode="template",
         target="templates/misconfiguration/apache/apache-proxy-wstunnel-routing-signal-exposed.yaml",
         expected={"apache-proxy-wstunnel-routing-signal-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-balancer-backend-details-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-balancer-manager-backend-details-exposed.yaml",
+        expected={"apache-balancer-manager-backend-details-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-mod-cluster-backend-details-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-mod-cluster-manager-backend-details-exposed.yaml",
+        expected={"apache-mod-cluster-manager-backend-details-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-jk-status-backend-details-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-jk-status-backend-details-exposed.yaml",
+        expected={"apache-jk-status-backend-details-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-workers-properties-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-workers-properties-exposed.yaml",
+        expected={"apache-workers-properties-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-uriworkermap-properties-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-uriworkermap-properties-exposed.yaml",
+        expected={"apache-uriworkermap-properties-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-proxy-ajp-config-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/apache/apache-proxy-ajp-config-exposed.yaml",
+        expected={"apache-proxy-ajp-config-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="apache-proxy-admin-workflow-positive",
+        family="apache",
+        scenario="apache-admin-positive",
+        scan_mode="workflow",
+        target="templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml",
+        expected={
+            "apache-balancer-manager-backend-details-exposed",
+            "apache-mod-cluster-manager-backend-details-exposed",
+            "apache-jk-status-backend-details-exposed",
+            "apache-workers-properties-exposed",
+            "apache-uriworkermap-properties-exposed",
+            "apache-proxy-ajp-config-exposed",
+        },
         unexpected=set(),
     ),
     Case(
@@ -339,6 +473,51 @@ CASES = [
         unexpected=set(),
     ),
     Case(
+        name="wildfly-elytron-management-positive",
+        family="wildfly",
+        scenario="wildfly-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/wildfly/wildfly-elytron-management-unauth.yaml",
+        expected={"wildfly-elytron-management-unauth"},
+        unexpected=set(),
+    ),
+    Case(
+        name="wildfly-elytron-tls-positive",
+        family="wildfly",
+        scenario="wildfly-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/wildfly/wildfly-elytron-tls-management-unauth.yaml",
+        expected={"wildfly-elytron-tls-management-unauth"},
+        unexpected=set(),
+    ),
+    Case(
+        name="wildfly-undertow-https-listener-positive",
+        family="wildfly",
+        scenario="wildfly-positive",
+        scan_mode="template",
+        target="templates/misconfiguration/wildfly/wildfly-undertow-https-listener-management-unauth.yaml",
+        expected={"wildfly-undertow-https-listener-management-unauth"},
+        unexpected=set(),
+    ),
+    Case(
+        name="wildfly-elytron-properties-positive",
+        family="wildfly",
+        scenario="wildfly-positive",
+        scan_mode="template",
+        target="templates/exposures/sensitive-paths/wildfly-elytron-properties-exposed.yaml",
+        expected={"wildfly-elytron-properties-exposed"},
+        unexpected=set(),
+    ),
+    Case(
+        name="wildfly-java-keystore-positive",
+        family="wildfly",
+        scenario="wildfly-positive",
+        scan_mode="template",
+        target="templates/exposures/sensitive-paths/java-keystore-truststore-exposed.yaml",
+        expected={"java-keystore-truststore-exposed"},
+        unexpected=set(),
+    ),
+    Case(
         name="wildfly-domain-topology-positive",
         family="wildfly",
         scenario="wildfly-positive",
@@ -363,6 +542,11 @@ CASES = [
         scan_mode="workflow",
         target="templates/workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml",
         expected={
+            "wildfly-elytron-management-unauth",
+            "wildfly-elytron-properties-exposed",
+            "wildfly-elytron-tls-management-unauth",
+            "wildfly-undertow-https-listener-management-unauth",
+            "java-keystore-truststore-exposed",
             "wildfly-health-endpoints-exposed",
             "wildfly-domain-topology-management-unauth",
             "wildfly-domain-deployment-details-management-unauth",
@@ -471,7 +655,10 @@ class FixtureHandler(BaseHTTPRequestHandler):
             self.send_error(404)
             return
 
-        body = route.get("body", "").encode("utf-8")
+        if "body_base64" in route:
+            body = base64.b64decode(route["body_base64"])
+        else:
+            body = route.get("body", "").encode("utf-8")
         self.send_response(route.get("status", 200))
         for header_name, header_value in route.get("headers", {}).items():
             self.send_header(header_name, header_value)

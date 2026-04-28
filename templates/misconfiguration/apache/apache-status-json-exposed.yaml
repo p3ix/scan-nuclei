@@ -25,9 +25,9 @@ http:
         part: body
         condition: or
         regex:
-          - '(?i)"ServerVersion"\\s*:'
-          - '(?i)"BusyWorkers"\\s*:'
-          - '(?i)"IdleWorkers"\\s*:'
+          - '(?i)"ServerVersion"\s*:'
+          - '(?i)"BusyWorkers"\s*:'
+          - '(?i)"IdleWorkers"\s*:'
 
     extractors:
       - type: dsl

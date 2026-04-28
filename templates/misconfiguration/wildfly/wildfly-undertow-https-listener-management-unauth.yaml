@@ -23,6 +23,8 @@ http:
       - "{{BaseURL}}/management/subsystem=undertow?operation=read-children-names&child-type=server"
       - "{{BaseURL}}/management/subsystem=undertow/server=default-server?operation=read-children-names&child-type=https-listener"
       - "{{BaseURL}}/management/subsystem=undertow/server=default-server?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=undertow/server=default-server/https-listener=https?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=undertow/server=default-server/https-listener=https?operation=read-attribute&name=ssl-context"
 
     matchers-condition: and
     matchers:
@@ -32,7 +34,7 @@ http:
       - type: regex
         part: body
         regex:
-          - '(?i)"outcome"\\s*:\\s*"success"'
+          - '(?i)"outcome"\s*:\s*"success"'
       - type: regex
         part: body
         condition: or
@@ -42,6 +44,8 @@ http:
           - '(?i)"redirect-socket"'
           - '(?i)"socket-binding"'
           - '(?i)"default-server"'
+          - '(?i)"enable-http2"'
+          - '(?i)"secure"'
 
     extractors:
       - type: dsl
