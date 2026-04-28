@@ -45,9 +45,12 @@ http:
         regex:
           - "(?im)^ProxyPass\\s+\\S+\\s+ws://"
           - "(?im)^ProxyPass\\s+\\S+\\s+wss://"
+          - "(?im)^ProxyPassMatch\\s+\\S+\\s+ws://"
+          - "(?im)^ProxyPassMatch\\s+\\S+\\s+wss://"
           - "(?im)^ProxyPassReverse\\s+\\S+\\s+ws://"
           - "(?im)^ProxyPassReverse\\s+\\S+\\s+wss://"
           - "(?im)^RewriteCond\\s+%\\{HTTP:Upgrade\\}\\s+websocket"
+          - "(?im)^RewriteRule\\s+\\S+\\s+(?:ws|wss)://"
           - "(?im)^RewriteRule\\s+.*\\[P"
           - "(?i)proxy_wstunnel"
           - "(?i)Upgrade[:=]\\s*websocket"
@@ -57,3 +60,11 @@ http:
         dsl:
           - path
         name: exposed_path
+      - type: regex
+        part: body
+        name: websocket_route
+        regex:
+          - "(?im)^ProxyPass\\s+\\S+\\s+(?:ws|wss)://[^\\s]+.*$"
+          - "(?im)^ProxyPassMatch\\s+\\S+\\s+(?:ws|wss)://[^\\s]+.*$"
+          - "(?im)^ProxyPassReverse\\s+\\S+\\s+(?:ws|wss)://[^\\s]+.*$"
+          - "(?im)^RewriteRule\\s+\\S+\\s+(?:ws|wss)://[^\\s]+.*$"

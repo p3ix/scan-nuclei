@@ -83,6 +83,10 @@ No contar aparte si ya existe el panel o exposicion base:
 - `apache-proxy-backend-routing-disclosure-exposed`
   - si coincide junto a `server-info`, tratarlo como correlacion mas concreta
     de la misma fuga
+- `apache-proxy-backend-routing-disclosure-exposed` con `ProxyPassMatch` o
+  `RewriteRule` hacia backends internos
+  - tratarlo igual que `ProxyPass` directo: misma fuga de `mod_info`, pero con
+    mas contexto sobre path matching o reglas de rewrite
 
 ### Deduplicacion recomendada
 
@@ -189,6 +193,11 @@ No contar aparte si ya se confirmo lectura no autenticada del management model:
 - si varias `wildfly-*-management-unauth` derivan de la misma ausencia de
   autenticacion en `/management`, contarlas como una misma causa raiz con
   multiples pruebas
+- `wildfly-domain-topology-management-unauth` y
+  `wildfly-domain-deployment-details-management-unauth` suelen describir la
+  misma exposicion de `domain mode`; tratar la segunda como profundidad
+  adicional cuando solo amplie detalle de `server-group`, `deployment`,
+  `deployment-overlay` o `server-config`
 - separar WildFly moderno de JBoss legacy cuando el hallazgo cambia la
   interpretacion o la prioridad de remediacion
 - ficheros expuestos como `standalone.xml`, `domain.xml` o `mgmt-users` pueden

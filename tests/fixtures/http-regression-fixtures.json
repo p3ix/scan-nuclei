@@ -133,6 +133,32 @@
       "body": "Total Accesses: 7\nScoreboard: _W__\n"
     }
   },
+  "apache-proxy-positive": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/plain"
+      },
+      "body": "home"
+    },
+    "GET /server-info": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/html"
+      },
+      "body": "<html><title>Server Information</title><body>\nLoaded Modules\nProxyPass /app http://127.0.0.1:8080/app\nProxyPassMatch ^/api/(.*)$ ajp://localhost:8009/api/$1\nProxyPass /ws ws://10.0.0.12:9000/socket\nProxyPassReverse /ws ws://10.0.0.12:9000/socket\nRewriteCond %{HTTP:Upgrade} websocket [NC]\nRewriteRule ^/socket/(.*)$ ws://backend.internal:9100/$1 [P,L]\n</body></html>"
+    },
+    "GET /server-info?config": {
+      "status": 200,
+      "headers": {
+        "Server": "Apache/2.4.58",
+        "Content-Type": "text/html"
+      },
+      "body": "<html><title>Server Information</title><body>\nLoaded Modules\nProxyPass /app http://127.0.0.1:8080/app\nProxyPassMatch ^/api/(.*)$ ajp://localhost:8009/api/$1\nProxyPass /ws ws://10.0.0.12:9000/socket\nProxyPassReverse /ws ws://10.0.0.12:9000/socket\nRewriteCond %{HTTP:Upgrade} websocket [NC]\nRewriteRule ^/socket/(.*)$ ws://backend.internal:9100/$1 [P,L]\n</body></html>"
+    }
+  },
   "apache-hidden-server": {
     "GET /": {
       "status": 200,
@@ -220,6 +246,94 @@
         "Server": "Undertow/2"
       },
       "body": "{\"status\":\"UP\",\"checks\":[{\"name\":\"microprofile-health\",\"status\":\"UP\"}]}"
+    },
+    "GET /management?operation=read-children-names&child-type=host": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"master\"],\"host\":\"master\"}"
+    },
+    "GET /management?operation=read-children-names&child-type=server-group": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"main-server-group\"],\"server-group\":\"main-server-group\"}"
+    },
+    "GET /management?operation=read-children-names&child-type=deployment": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"app.war\"],\"deployment\":\"app.war\"}"
+    },
+    "GET /management?operation=read-children-names&child-type=deployment-overlay": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"base-overlay\"],\"deployment-overlay\":\"base-overlay\"}"
+    },
+    "GET /management/host=master?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"host\":\"master\",\"name\":\"master\"}}"
+    },
+    "GET /management/host=master?operation=read-children-names&child-type=server-config": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"server-one\"],\"server-config\":\"server-one\"}"
+    },
+    "GET /management/server-group=main-server-group?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"profile\":\"full\",\"server-group\":\"main-server-group\"}}"
+    },
+    "GET /management/server-group=main-server-group?operation=read-children-resources&child-type=deployment": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"app.war\":{\"runtime-name\":\"app.war\",\"enabled\":true,\"content\":[{\"hash\":\"abc123\"}]}}}"
+    },
+    "GET /management/deployment=app.war?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"runtime-name\":\"app.war\",\"content\":[{\"hash\":\"abc123\"}]}}"
+    },
+    "GET /management/deployment-overlay=base-overlay?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"deployment-overlay\":\"base-overlay\",\"content\":[{\"path\":\"WEB-INF/web.xml\"}]}}"
+    },
+    "GET /management/host=master/server-config=server-one?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"server-config\":\"server-one\",\"socket-binding-group\":\"standard-sockets\"}}"
     }
   },
   "wildfly-generic": {

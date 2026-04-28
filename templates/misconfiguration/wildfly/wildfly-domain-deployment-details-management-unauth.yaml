@@ -1,0 +1,54 @@
+id: wildfly-domain-deployment-details-management-unauth
+
+info:
+  name: WildFly Domain Deployment Details Read Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated WildFly or JBoss domain mode management reads that
+    disclose deployment details for server-groups, server-configs, deployments,
+    or deployment overlays. Successful responses can reveal runtime names,
+    content references, overlay names, and distributed deployment topology.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - domain
+    - host-controller
+    - deployment
+    - overlay
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/server-group=main-server-group?operation=read-children-resources&child-type=deployment"
+      - "{{BaseURL}}/management/deployment=app.war?operation=read-resource"
+      - "{{BaseURL}}/management/deployment-overlay=base-overlay?operation=read-resource"
+      - "{{BaseURL}}/management/host=master/server-config=server-one?operation=read-resource"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\s*:\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"runtime-name"'
+          - '(?i)"deployment-overlay"'
+          - '(?i)"content"\s*:'
+          - '(?i)"server-config"'
+          - '(?i)"socket-binding-group"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

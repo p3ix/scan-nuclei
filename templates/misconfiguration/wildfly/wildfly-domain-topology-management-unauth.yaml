@@ -47,7 +47,8 @@ http:
           - '(?i)"server-group"'
           - '(?i)"server-config"'
           - '(?i)"deployment-overlay"'
-          - '(?i)"result"\\s*:\\s*\['
+          - '(?i)"deployment"'
+          - '(?i)"result"\\s*:'
 
     extractors:
       - type: dsl

@@ -11,7 +11,7 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 |---|---|---|
 | Fingerprinting | Fuerte | `apache-httpd-server-header`, default page, reverse proxy, server version, fronting `Tomcat` y `WildFly`. |
 | Admin surface | Fuerte | `server-status`, `status?auto`, `status-json`, `server-info`, `balancer-manager`, `jk-status`, detalle de `request metadata` en `mod_status`, detalle de backends/rutas en `balancer-manager`, detalle de topologia en `mod_cluster` y detalle operativo de workers en `mod_jk`. |
-| Proxy surface | Fuerte | `open-proxy`, `forward-proxy`, trust bypass por `X-Forwarded-*`, fronting `Tomcat`/`WildFly`, señal de routing `proxy_wstunnel`, correlacion backend/path via `mod_info`, CVEs `mod_proxy`. |
+| Proxy surface | Fuerte | `open-proxy`, `forward-proxy`, trust bypass por `X-Forwarded-*`, fronting `Tomcat`/`WildFly`, señal de routing `proxy_wstunnel`, correlacion backend/path via `mod_info` incluyendo `ProxyPassMatch` y reglas WebSocket, CVEs `mod_proxy`. |
 | Config leaks | Fuerte | `httpd.conf`, `apache2.conf`, `vhosts`, `ssl.conf`, backups, `.ht*`, alias/script mappings frecuentes. |
 | Hardening | Fuerte | missing headers, TRACE, unsafe methods, directory listing, redirect HTTP->HTTPS, HSTS, cookies de frontend, redirects inseguros, auth surface y disclosure de backend en `Location`. |
 | CVE potential | Bueno | `CVE-2021-40438`, `CVE-2021-41773`, `CVE-2021-42013`, `CVE-2023-25690`. |
@@ -44,7 +44,7 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 |---|---|---|
 | Fingerprinting | Fuerte | `wildfly server header`, version hint, welcome page, management realm, `undertow` default/error/version. |
 | Admin surface | Fuerte | `management`, console, Hawtio, Jolokia, legacy JBoss consoles/invokers. |
-| Management unauth reads | Fuerte | root/model + `datasources`, `mail`, `elytron`, `elytron TLS`, `mod_cluster`, `undertow https-listener`, `domain topology`. |
+| Management unauth reads | Fuerte | root/model + `datasources`, `mail`, `elytron`, `elytron TLS`, `mod_cluster`, `undertow https-listener`, `domain topology` y detalle de despliegues/overlays en `domain mode`. |
 | Config leaks | Fuerte | `standalone.xml`, `domain.xml`, `host.xml`, `mgmt-users/groups`, `elytron` properties, logging, `jboss-web.xml`, `jboss-app.xml`, `jboss-client.xml`, `jboss-deployment-structure.xml`, `ironjacamar.xml`, `persistence.xml`, `*-ds.xml`. |
 | Defaults / sample apps | Bueno | welcome content, sample apps, health, metrics, OpenAPI. |
 | Hardening | Fuerte | headers, cookies, CORS, verbose errors, stacktraces, TLS/SSL topology via Elytron y Undertow management reads. |
@@ -65,6 +65,7 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 
 - `mod_cluster` / `proxy_ajp` mas finos cuando el frontend encadena backends Java complejos.
 - `proxy_wstunnel` y cadenas WebSocket backend aun mas finas, idealmente con mas correlacion de paths o backends concretos.
+  - estado: **en progreso**; ya hay cobertura inicial para `ProxyPassMatch`, `ProxyPassReverse`, reglas `RewriteRule` hacia `ws://` / `wss://` y correlacion de backend interno desde `mod_info`.
 - TLS posture adicional:
   - redirects canonicos de host/scheme/port
   - politicas de cookies de frontend mas finas
@@ -88,6 +89,7 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
   - surface de realms/factories mas detallada por tipo de auth factory
 - Domain mode / host-controller:
   - ampliar mas alla de hosts, `server-groups` y overlays hacia artefactos y lecturas mas especificas de despliegue distribuido.
+  - estado: **en progreso**; ya hay cobertura inicial para detalles de `server-group`, `deployment`, `deployment-overlay` y `server-config` por management reads no autenticadas.
 
 ### Transversal
 
@@ -114,6 +116,7 @@ priorizado para seguir ampliando el set de plantillas sin crecer a ciegas.
 2. WildFly domain mode / host-controller profundo
    - lecturas y artefactos mas especificos de topologia distribuida
    - profundizar en `host=*`, `server-group=*` y `deployment-overlay=*`
+   - estado: **en progreso**; ya existe una primera capa de detalle para despliegues distribuidos y overlays leidos sin autenticacion
 
 3. Apache reverse-proxy Java profundo
    - cadenas frontend->backend mas finas
