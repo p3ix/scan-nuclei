@@ -256,7 +256,7 @@
         "Server": "Apache/2.4.58",
         "Content-Type": "text/plain"
       },
-      "body": "ProxyPass /app ajp://backend-a.internal:8009/app\nProxyPassReverse /app ajp://backend-a.internal:8009/app\nBalancerMember ajp://backend-b.internal:8009 route=node2\nJkMount /legacy/* loadbalancer\n"
+      "body": "ProxyPass /app ajp://backend-a.internal:8009/app\nProxyPassReverse /app ajp://backend-a.internal:8009/app\nProxyPassReverseCookieDomain backend-a.internal app.example.com\nProxyPassReverseCookiePath /app /\nBalancerMember ajp://backend-b.internal:8009 route=node2\nJkMount /legacy/* loadbalancer\n"
     }
   },
   "apache-backend-disclosure-positive": {
@@ -349,6 +349,13 @@
         "Content-Type": "application/xml"
       },
       "body": "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"><context-param><param-name>spring.profiles.active</param-name><param-value>prod</param-value></context-param><servlet><servlet-name>api</servlet-name><servlet-class>com.example.ApiServlet</servlet-class></servlet><filter><filter-name>AuditFilter</filter-name><filter-class>com.example.AuditFilter</filter-class></filter><security-role><role-name>ops</role-name></security-role></web-app>"
+    },
+    "GET /bin/setenv.sh": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "export CATALINA_OPTS=\"$CATALINA_OPTS -Dspring.profiles.active=prod -Djavax.net.ssl.keyStore=/srv/tomcat/conf/keystore.jks\"\nexport JAVA_OPTS=\"$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005\"\n"
     },
     "GET /conf/Catalina/localhost/app.xml.bak": {
       "status": 200,
@@ -724,6 +731,22 @@
         "Server": "Undertow/2"
       },
       "body": "{\"outcome\":\"success\",\"result\":\"httpsSSC\",\"ssl-context\":\"httpsSSC\"}"
+    },
+    "GET /management/subsystem=undertow?operation=read-children-names&child-type=application-security-domain": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":[\"ApplicationDomain\"],\"application-security-domain\":\"ApplicationDomain\"}"
+    },
+    "GET /management/subsystem=undertow/application-security-domain=ApplicationDomain?operation=read-resource": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Server": "Undertow/2"
+      },
+      "body": "{\"outcome\":\"success\",\"result\":{\"http-authentication-factory\":\"application-http-authentication\",\"security-domain\":\"ApplicationDomain\",\"enable-jacc\":false},\"application-security-domain\":\"ApplicationDomain\"}"
     },
     "GET /standalone/configuration/application-users.properties": {
       "status": 200,

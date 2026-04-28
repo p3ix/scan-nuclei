@@ -37,6 +37,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/tomcat-root-context-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-config-backups-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-catalina-properties-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-setenv-scripts-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-context-defaults-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-catalina-localhost-contexts-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-catalina-localhost-xml-variants-exposed.yaml

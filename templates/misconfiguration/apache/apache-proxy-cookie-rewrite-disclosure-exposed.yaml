@@ -1,0 +1,59 @@
+id: apache-proxy-cookie-rewrite-disclosure-exposed
+
+info:
+  name: Apache Proxy Cookie Rewrite Disclosure Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache proxy cookie rewrite directives exposed through mod_info or
+    configuration snippets. These directives can reveal internal backend
+    domains, path layouts, and frontend-to-backend cookie rewriting behavior.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - mod_info
+    - proxy
+    - cookie
+    - disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/server-info"
+      - "{{BaseURL}}/server-info?config"
+      - "{{BaseURL}}/proxy_ajp.conf"
+      - "{{BaseURL}}/conf/proxy_ajp.conf"
+      - "{{BaseURL}}/conf.d/proxy_ajp.conf"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Server Information</title>"
+          - "(?i)Apache Server Information"
+          - "(?im)^ProxyPassReverseCookie(?:Domain|Path)\\s+"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^ProxyPassReverseCookieDomain\\s+(127\\.0\\.0\\.1|localhost|10\\.|172\\.(1[6-9]|2[0-9]|3[0-1])\\.|192\\.168\\.|[a-z0-9._-]+\\.(local|internal|lan|corp|intra))\\s+"
+          - "(?im)^ProxyPassReverseCookiePath\\s+/\\S*\\s+/\\S*"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+      - type: regex
+        part: body
+        name: cookie_rewrite
+        regex:
+          - "(?im)^ProxyPassReverseCookieDomain\\s+.*$"
+          - "(?im)^ProxyPassReverseCookiePath\\s+.*$"
+

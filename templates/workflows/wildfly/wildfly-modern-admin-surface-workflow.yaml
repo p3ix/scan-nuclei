@@ -20,6 +20,7 @@ workflows:
       - template: templates/misconfiguration/wildfly/wildfly-domain-topology-management-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-domain-deployment-details-management-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-undertow-https-listener-management-unauth.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-undertow-application-security-domain-management-unauth.yaml
       - template: templates/exposures/sensitive-paths/wildfly-management-endpoint-exposed.yaml
       - template: templates/exposures/sensitive-paths/wildfly-hawtio-console-exposed.yaml
       - template: templates/exposures/sensitive-paths/jolokia-endpoint-exposed.yaml
@@ -53,6 +54,7 @@ workflows:
       - template: templates/misconfiguration/wildfly/wildfly-domain-topology-management-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-domain-deployment-details-management-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-undertow-https-listener-management-unauth.yaml
+      - template: templates/misconfiguration/wildfly/wildfly-undertow-application-security-domain-management-unauth.yaml
       - template: templates/misconfiguration/wildfly/wildfly-health-endpoints-exposed.yaml
       - template: templates/misconfiguration/wildfly/wildfly-metrics-endpoints-exposed.yaml
       - template: templates/misconfiguration/wildfly/wildfly-openapi-endpoints-exposed.yaml

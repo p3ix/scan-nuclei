@@ -1,0 +1,61 @@
+id: tomcat-setenv-scripts-exposed
+
+info:
+  name: Tomcat setenv Script Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat setenv startup scripts leaking runtime options,
+    remote debugging flags, Java system properties, or TLS keystore/truststore
+    settings. These files often reveal deployment profiles, internal paths, and
+    sensitive launch parameters.
+  tags:
+    - tomcat
+    - exposure
+    - config
+    - startup
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/bin/setenv.sh"
+      - "{{BaseURL}}/bin/setenv.bat"
+      - "{{BaseURL}}/setenv.sh"
+      - "{{BaseURL}}/setenv.bat"
+      - "{{BaseURL}}/conf/setenv.sh"
+      - "{{BaseURL}}/conf/setenv.bat"
+      - "{{BaseURL}}/bin/setenv.sh.bak"
+      - "{{BaseURL}}/bin/setenv.sh.old"
+      - "{{BaseURL}}/bin/setenv.sh.orig"
+      - "{{BaseURL}}/bin/setenv.sh.save"
+      - "{{BaseURL}}/bin/setenv.sh.tmp"
+      - "{{BaseURL}}/bin/setenv.sh~"
+      - "{{BaseURL}}/bin/setenv.bat.bak"
+      - "{{BaseURL}}/bin/setenv.bat.old"
+      - "{{BaseURL}}/bin/setenv.bat.orig"
+      - "{{BaseURL}}/bin/setenv.bat.save"
+      - "{{BaseURL}}/bin/setenv.bat.tmp"
+      - "{{BaseURL}}/bin/setenv.bat~"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?im)\bCATALINA_OPTS\b'
+          - '(?im)\bJAVA_OPTS\b'
+          - '(?im)\bJPDA_(ADDRESS|TRANSPORT)\b'
+          - '(?im)-agentlib:jdwp'
+          - '(?im)-D(?:spring\.profiles\.active|java\.security\.egd|javax\.net\.ssl\.(?:keyStore|trustStore)|catalina\.base)\b'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+

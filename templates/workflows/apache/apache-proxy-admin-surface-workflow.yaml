@@ -24,5 +24,6 @@ workflows:
       - template: templates/misconfiguration/apache/apache-proxy-wstunnel-module-signal-potential.yaml
       - template: templates/misconfiguration/apache/apache-proxy-wstunnel-routing-signal-exposed.yaml
       - template: templates/misconfiguration/apache/apache-proxy-backend-routing-disclosure-exposed.yaml
+      - template: templates/misconfiguration/apache/apache-proxy-cookie-rewrite-disclosure-exposed.yaml
       - template: templates/cves/apache/CVE-2023-25690-apache-mod-proxy-request-smuggling-potential.yaml
       - template: templates/cves/apache/CVE-2021-40438-apache-mod-proxy-ssrf-potential.yaml

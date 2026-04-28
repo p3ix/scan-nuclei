@@ -1,0 +1,52 @@
+id: wildfly-undertow-application-security-domain-management-unauth
+
+info:
+  name: WildFly Undertow Application Security Domain Management Read Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated management reads against Undertow application
+    security domains. Successful responses can correlate Undertow application
+    security-domain bindings with Elytron security domains and HTTP
+    authentication factories.
+  tags:
+    - misconfig
+    - wildfly
+    - undertow
+    - management
+    - security
+    - elytron
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=undertow?operation=read-children-names&child-type=application-security-domain"
+      - "{{BaseURL}}/management/subsystem=undertow/application-security-domain=ApplicationDomain?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=undertow/application-security-domain=other?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=undertow/application-security-domain=application-security?operation=read-resource"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\s*:\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"application-security-domain"'
+          - '(?i)"http-authentication-factory"'
+          - '(?i)"security-domain"'
+          - '(?i)"enable-jacc"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
+
