@@ -1,0 +1,50 @@
+id: tomcat-bin-scripts-exposed
+
+info:
+  name: Tomcat Bin Scripts Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache Tomcat startup and runtime scripts under `bin/`,
+    which may reveal deployment paths, Java options, service wrappers, and
+    operational details useful for post-exploitation or lateral movement.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - scripts
+    - runtime
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/bin/catalina.sh"
+      - "{{BaseURL}}/bin/catalina.bat"
+      - "{{BaseURL}}/bin/startup.sh"
+      - "{{BaseURL}}/bin/startup.bat"
+      - "{{BaseURL}}/bin/shutdown.sh"
+      - "{{BaseURL}}/bin/shutdown.bat"
+      - "{{BaseURL}}/bin/setclasspath.sh"
+      - "{{BaseURL}}/bin/version.sh"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^CATALINA_HOME="
+          - "(?im)^CATALINA_BASE="
+          - "(?im)^PRGDIR="
+          - "(?i)org\\.apache\\.catalina\\.startup\\.Bootstrap"
+          - "(?i)Using CATALINA_BASE:"
+          - "(?i)Using CATALINA_HOME:"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

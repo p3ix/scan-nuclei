@@ -1,0 +1,30 @@
+id: jsessionid-cookie-samesite-none-without-secure
+
+info:
+  name: JSESSIONID SameSite=None Without Secure
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects insecure session cookie policy where `JSESSIONID` is issued with
+    `SameSite=None` but without the `Secure` flag.
+  tags:
+    - vulnerability
+    - java
+    - servlet
+    - cookie
+    - headers
+    - session
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'set-cookie: jsessionid=')"
+      - type: dsl
+        dsl:
+          - "contains(to_lower(all_headers), 'samesite=none') && !contains(to_lower(all_headers), 'secure')"

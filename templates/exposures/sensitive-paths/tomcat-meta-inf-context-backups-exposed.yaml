@@ -1,0 +1,50 @@
+id: tomcat-meta-inf-context-backups-exposed
+
+info:
+  name: Tomcat META-INF Context Backups Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed backup or editor-temp copies of application
+    `META-INF/context.xml`, which may leak datasource credentials, JNDI
+    resources, environment entries, and deployment internals.
+  tags:
+    - tomcat
+    - exposure
+    - backup
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/META-INF/context.xml.default"
+      - "{{BaseURL}}/META-INF/context.xml.bak"
+      - "{{BaseURL}}/META-INF/context.xml.old"
+      - "{{BaseURL}}/META-INF/context.xml.orig"
+      - "{{BaseURL}}/META-INF/context.xml.save"
+      - "{{BaseURL}}/META-INF/context.xml.tmp"
+      - "{{BaseURL}}/META-INF/context.xml~"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Context\\b"
+          - "(?is)<Resource\\b"
+          - "(?is)<ResourceLink\\b"
+          - "(?is)<Environment\\b"
+          - "(?i)(username|password|driverClassName|jdbc:)"
+          - "(?i)(javax\\.sql\\.DataSource|jakarta\\.mail\\.Session|mail/Session)"
+          - "(?i)java:comp/env"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

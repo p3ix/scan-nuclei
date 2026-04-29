@@ -282,7 +282,8 @@
     "GET /": {
       "status": 200,
       "headers": {
-        "Content-Type": "text/plain"
+        "Content-Type": "text/plain",
+        "Set-Cookie": "JSESSIONID=abc123; Path=/; HttpOnly; SameSite=None"
       },
       "body": "home"
     },
@@ -307,6 +308,13 @@
         "Content-Type": "application/xml"
       },
       "body": "<Context><Environment name=\"featureFlag\" value=\"true\" type=\"java.lang.String\"/><Resource name=\"jdbc/app\" type=\"javax.sql.DataSource\"/><ResourceLink name=\"mail/Session\" global=\"mail/Session\" type=\"jakarta.mail.Session\"/></Context>"
+    },
+    "GET /META-INF/context.xml.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context><Resource name=\"jdbc/app\" username=\"appuser\" password=\"apppass\" type=\"javax.sql.DataSource\"/><Environment name=\"featureFlag\" value=\"true\" type=\"java.lang.String\"/></Context>"
     },
     "GET /conf/server.xml": {
       "status": 200,
@@ -356,6 +364,20 @@
         "Content-Type": "text/plain"
       },
       "body": "export CATALINA_OPTS=\"$CATALINA_OPTS -Dspring.profiles.active=prod -Djavax.net.ssl.keyStore=/srv/tomcat/conf/keystore.jks\"\nexport JAVA_OPTS=\"$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005\"\n"
+    },
+    "GET /bin/catalina.sh": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "PRGDIR=`dirname \"$PRG\"`\nCATALINA_HOME=`cd \"$PRGDIR/..\" >/dev/null; pwd`\nCATALINA_BASE=`cd \"$PRGDIR/..\" >/dev/null; pwd`\n_BOOTSTRAP=org.apache.catalina.startup.Bootstrap\n"
+    },
+    "GET /RELEASE-NOTES.txt": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "Apache Tomcat Version 9.0.85 Release Notes\nThe Apache Software Foundation\n"
     },
     "GET /conf/Catalina/localhost/app.xml.bak": {
       "status": 200,

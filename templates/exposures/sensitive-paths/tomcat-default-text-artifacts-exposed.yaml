@@ -1,0 +1,46 @@
+id: tomcat-default-text-artifacts-exposed
+
+info:
+  name: Tomcat Default Text Artifacts Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects default Apache Tomcat text artifacts such as release notes,
+    runtime notes, and licensing files that often remain reachable in
+    uncustomized deployments and reinforce default-content exposure.
+  tags:
+    - tomcat
+    - exposure
+    - default-content
+    - docs
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/RELEASE-NOTES.txt"
+      - "{{BaseURL}}/RUNNING.txt"
+      - "{{BaseURL}}/BUILDING.txt"
+      - "{{BaseURL}}/NOTICE.txt"
+      - "{{BaseURL}}/LICENSE.txt"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Apache Tomcat"
+          - "(?i)Release Notes"
+          - "(?i)Running The Apache Tomcat"
+          - "(?i)Building Apache Tomcat"
+          - "(?i)The Apache Software Foundation"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
