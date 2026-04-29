@@ -16,6 +16,8 @@ workflows:
       - template: templates/exposures/sensitive-paths/tomcat-deployed-artifacts-listing-exposed.yaml
       - template: templates/misconfiguration/tomcat/tomcat-manager-html-exposed.yaml
       - template: templates/misconfiguration/tomcat/tomcat-host-manager-html-exposed.yaml
+      - template: templates/misconfiguration/tomcat/tomcat-manager-localhost-restriction-signal.yaml
+      - template: templates/misconfiguration/tomcat/tomcat-host-manager-localhost-restriction-signal.yaml
       - template: templates/misconfiguration/tomcat/tomcat-manager-script-endpoint-exposed.yaml
       - template: templates/misconfiguration/tomcat/tomcat-manager-jmxproxy-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-manager-help-exposed.yaml
@@ -33,5 +35,6 @@ workflows:
       - template: templates/vulnerabilities/generic-servlets/jsessionid-missing-secure-httponly.yaml
       - template: templates/vulnerabilities/generic-servlets/jsessionid-cookie-samesite-none-without-secure.yaml
       - template: templates/exposures/error-pages/java-tomcat-stacktrace-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-runtime-logs-exposed.yaml
       - template: templates/technologies/java-web/x-powered-by-disclosure.yaml
       - template: templates/technologies/java-web/framework-version-headers-disclosure.yaml

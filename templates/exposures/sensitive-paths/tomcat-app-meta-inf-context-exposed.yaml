@@ -1,0 +1,69 @@
+id: tomcat-app-meta-inf-context-exposed
+
+info:
+  name: Tomcat App META-INF Context Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed `META-INF/context.xml` files inside common non-default
+    Tomcat application contexts, including backup variants. These descriptors
+    may leak datasource credentials, JNDI resources, mail sessions, and app
+    deployment internals.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - config
+    - context
+    - application
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/app/META-INF/context.xml"
+      - "{{BaseURL}}/api/META-INF/context.xml"
+      - "{{BaseURL}}/admin/META-INF/context.xml"
+      - "{{BaseURL}}/portal/META-INF/context.xml"
+      - "{{BaseURL}}/service/META-INF/context.xml"
+      - "{{BaseURL}}/auth/META-INF/context.xml"
+      - "{{BaseURL}}/console/META-INF/context.xml"
+      - "{{BaseURL}}/gateway/META-INF/context.xml"
+      - "{{BaseURL}}/internal/META-INF/context.xml"
+      - "{{BaseURL}}/backoffice/META-INF/context.xml"
+      - "{{BaseURL}}/customer/META-INF/context.xml"
+      - "{{BaseURL}}/billing/META-INF/context.xml"
+      - "{{BaseURL}}/app/META-INF/context.xml.bak"
+      - "{{BaseURL}}/api/META-INF/context.xml.bak"
+      - "{{BaseURL}}/admin/META-INF/context.xml.bak"
+      - "{{BaseURL}}/portal/META-INF/context.xml.bak"
+      - "{{BaseURL}}/service/META-INF/context.xml.bak"
+      - "{{BaseURL}}/auth/META-INF/context.xml.bak"
+      - "{{BaseURL}}/console/META-INF/context.xml.bak"
+      - "{{BaseURL}}/gateway/META-INF/context.xml.bak"
+      - "{{BaseURL}}/internal/META-INF/context.xml.bak"
+      - "{{BaseURL}}/backoffice/META-INF/context.xml.bak"
+      - "{{BaseURL}}/customer/META-INF/context.xml.bak"
+      - "{{BaseURL}}/billing/META-INF/context.xml.bak"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Context\\b"
+          - "(?is)<Resource\\b"
+          - "(?is)<ResourceLink\\b"
+          - "(?is)<Environment\\b"
+          - "(?i)(username|password|driverClassName|jdbc:)"
+          - "(?i)(javax\\.sql\\.DataSource|jakarta\\.mail\\.Session|mail/Session)"
+          - "(?i)java:comp/env"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -316,6 +316,13 @@
       },
       "body": "<Context><Resource name=\"jdbc/app\" username=\"appuser\" password=\"apppass\" type=\"javax.sql.DataSource\"/><Environment name=\"featureFlag\" value=\"true\" type=\"java.lang.String\"/></Context>"
     },
+    "GET /app/META-INF/context.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context><Resource name=\"jdbc/app\" type=\"javax.sql.DataSource\" username=\"appuser\" password=\"apppass\"/><ResourceLink name=\"mail/Session\" global=\"mail/Session\" type=\"jakarta.mail.Session\"/></Context>"
+    },
     "GET /conf/server.xml": {
       "status": 200,
       "headers": {
@@ -358,6 +365,13 @@
       },
       "body": "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"><context-param><param-name>spring.profiles.active</param-name><param-value>prod</param-value></context-param><servlet><servlet-name>api</servlet-name><servlet-class>com.example.ApiServlet</servlet-class></servlet><filter><filter-name>AuditFilter</filter-name><filter-class>com.example.AuditFilter</filter-class></filter><security-role><role-name>ops</role-name></security-role></web-app>"
     },
+    "GET /app/WEB-INF/web.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"><servlet><servlet-name>app</servlet-name><servlet-class>com.example.AppServlet</servlet-class></servlet><filter><filter-name>AuthFilter</filter-name><filter-class>com.example.AuthFilter</filter-class></filter><security-constraint><web-resource-collection><url-pattern>/admin/*</url-pattern></web-resource-collection></security-constraint></web-app>"
+    },
     "GET /bin/setenv.sh": {
       "status": 200,
       "headers": {
@@ -378,6 +392,13 @@
         "Content-Type": "text/plain"
       },
       "body": "Apache Tomcat Version 9.0.85 Release Notes\nThe Apache Software Foundation\n"
+    },
+    "GET /logs/catalina.out": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "29-Apr-2026 09:12:01.123 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in 1843 ms\n29-Apr-2026 09:12:00.111 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler [\\\"http-nio-8443\\\"]\nApache Tomcat/9.0.85\n"
     },
     "GET /conf/Catalina/localhost/app.xml.bak": {
       "status": 200,
@@ -467,6 +488,20 @@
       },
       "body": "<Context path=\"/internal\" docBase=\"/srv/tomcat/webapps/internal.war\"><Resource name=\"jdbc/internal\" type=\"javax.sql.DataSource\"/></Context>"
     },
+    "GET /internal/WEB-INF/web.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"><servlet><servlet-name>internal</servlet-name><servlet-class>com.example.InternalServlet</servlet-class></servlet><security-role><role-name>ops</role-name></security-role></web-app>"
+    },
+    "GET /backoffice/META-INF/context.xml.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<Context><ResourceLink name=\"jdbc/backoffice\" global=\"jdbc/backoffice\" type=\"javax.sql.DataSource\"/><Environment name=\"region\" value=\"eu-west\" type=\"java.lang.String\"/></Context>"
+    },
     "GET /conf/Catalina/localhost/backoffice.xml.bak": {
       "status": 200,
       "headers": {
@@ -487,6 +522,64 @@
         "Content-Type": "application/java-archive"
       },
       "body": "PK\u0003\u0004fakejar"
+    }
+  },
+  "tomcat-admin-blocked": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "home"
+    },
+    "GET /this-path-should-not-exist-nuclei-tomcat-version": {
+      "status": 404,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>Apache Tomcat/9.0.85</h1></body></html>"
+    },
+    "GET /manager/html": {
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><head><title>Apache Tomcat/9.0.85 - Error report</title></head><body><h1>HTTP Status 403 - Access to the requested resource has been denied</h1><p>You are not authorized to view this page.</p></body></html>"
+    },
+    "GET /manager/": {
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>HTTP Status 403 - Access to the requested resource has been denied</h1></body></html>"
+    },
+    "GET /manager/status": {
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>HTTP Status 403 - Access to the requested resource has been denied</h1></body></html>"
+    },
+    "GET /host-manager/html": {
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><head><title>Apache Tomcat/9.0.85 - Error report</title></head><body><h1>HTTP Status 403 - Access to the requested resource has been denied</h1><p>You are not authorized to view this page.</p></body></html>"
+    },
+    "GET /host-manager/": {
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>HTTP Status 403 - Access to the requested resource has been denied</h1></body></html>"
+    },
+    "GET /host-manager/text/list": {
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "FAIL - Access to the requested resource has been denied"
     }
   },
   "wildfly-positive": {

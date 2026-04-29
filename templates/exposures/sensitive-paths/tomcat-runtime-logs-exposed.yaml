@@ -1,0 +1,48 @@
+id: tomcat-runtime-logs-exposed
+
+info:
+  name: Tomcat Runtime Logs Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat runtime log files such as `catalina.out` or common
+    Tomcat logs, which may leak stack traces, internal paths, deployed
+    applications, usernames, connector details, and operational telemetry.
+  tags:
+    - tomcat
+    - exposure
+    - logs
+    - sensitive
+    - runtime
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/logs/catalina.out"
+      - "{{BaseURL}}/logs/catalina.log"
+      - "{{BaseURL}}/logs/localhost.log"
+      - "{{BaseURL}}/logs/manager.log"
+      - "{{BaseURL}}/logs/host-manager.log"
+      - "{{BaseURL}}/logs/localhost_access_log.txt"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)org\\.apache\\.catalina\\.startup\\.Catalina"
+          - "(?i)Server startup in [0-9]+ ms"
+          - "(?i)Initializing ProtocolHandler"
+          - "(?i)INFO \\[[^\\]]+\\] org\\.apache\\.catalina"
+          - "(?i)Apache Tomcat/[0-9.]+"
+          - "(?i)localhost_access_log\\."
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

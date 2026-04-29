@@ -1,0 +1,48 @@
+id: tomcat-host-manager-localhost-restriction-signal
+
+info:
+  name: Tomcat Host Manager Localhost Restriction Signal
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Tomcat Host Manager endpoints that exist but answer with
+    Tomcat-specific `403` responses, usually indicating localhost/IP
+    restriction rather than absence. Treat as administrative surface context.
+  tags:
+    - tomcat
+    - host-manager
+    - localhost
+    - restriction
+    - signal
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/host-manager/html"
+      - "{{BaseURL}}/host-manager/"
+      - "{{BaseURL}}/host-manager/text/list"
+
+    redirects: false
+    stop-at-first-match: true
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 403
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Apache Tomcat/[0-9.]+"
+          - "(?i)Access to the requested resource has been denied"
+          - "(?i)You are not authorized to view this page"
+          - "(?i)HTTP Status 403"
+          - "(?i)Tomcat Host Manager Application"
+          - "(?i)Tomcat Virtual Host Manager"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

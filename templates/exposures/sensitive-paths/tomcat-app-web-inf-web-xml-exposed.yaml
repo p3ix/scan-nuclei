@@ -1,0 +1,78 @@
+id: tomcat-app-web-inf-web-xml-exposed
+
+info:
+  name: Tomcat App WEB-INF web.xml Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects readable access to `WEB-INF/web.xml` inside common non-default
+    Tomcat application contexts such as `app`, `api`, `admin`, `portal`, or
+    `gateway`, exposing servlets, filters, roles, constraints, and app-level
+    deployment metadata.
+  tags:
+    - tomcat
+    - exposure
+    - sensitive
+    - config
+    - webxml
+    - application
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/app/WEB-INF/web.xml"
+      - "{{BaseURL}}/api/WEB-INF/web.xml"
+      - "{{BaseURL}}/admin/WEB-INF/web.xml"
+      - "{{BaseURL}}/portal/WEB-INF/web.xml"
+      - "{{BaseURL}}/service/WEB-INF/web.xml"
+      - "{{BaseURL}}/auth/WEB-INF/web.xml"
+      - "{{BaseURL}}/console/WEB-INF/web.xml"
+      - "{{BaseURL}}/gateway/WEB-INF/web.xml"
+      - "{{BaseURL}}/internal/WEB-INF/web.xml"
+      - "{{BaseURL}}/backoffice/WEB-INF/web.xml"
+      - "{{BaseURL}}/customer/WEB-INF/web.xml"
+      - "{{BaseURL}}/billing/WEB-INF/web.xml"
+      - "{{BaseURL}}/app/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/api/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/admin/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/portal/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/service/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/auth/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/console/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/gateway/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/internal/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/backoffice/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/customer/WEB-INF/web.xml.bak"
+      - "{{BaseURL}}/billing/WEB-INF/web.xml.bak"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - "(?is)<web-app(\\s|>|/)[^>]*>"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<servlet\\b"
+          - "(?is)<servlet-mapping\\b"
+          - "(?is)<filter\\b"
+          - "(?is)<filter-mapping\\b"
+          - "(?is)<context-param\\b"
+          - "(?is)<security-constraint\\b"
+          - "(?is)<security-role\\b"
+          - "(?is)<login-config\\b"
+          - "(?is)<init-param\\b"
+          - "(?is)<url-pattern\\b"
+          - "(?i)xmlns=\"http://java\\.sun\\.com/xml/ns/javaee\""
+          - "(?i)xmlns=\"https://jakarta\\.ee/xml/ns/jakartaee\""
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

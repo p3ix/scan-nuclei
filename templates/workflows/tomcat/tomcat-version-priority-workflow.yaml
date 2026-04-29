@@ -10,6 +10,8 @@ workflows:
     subtemplates:
       - template: templates/misconfiguration/tomcat/tomcat-manager-html-exposed.yaml
       - template: templates/misconfiguration/tomcat/tomcat-host-manager-html-exposed.yaml
+      - template: templates/misconfiguration/tomcat/tomcat-manager-localhost-restriction-signal.yaml
+      - template: templates/misconfiguration/tomcat/tomcat-host-manager-localhost-restriction-signal.yaml
       - template: templates/misconfiguration/tomcat/tomcat-manager-script-endpoint-exposed.yaml
       - template: templates/misconfiguration/tomcat/tomcat-manager-jmxproxy-exposed.yaml
       - template: templates/misconfiguration/tomcat/tomcat-manager-text-deploy-surface-exposed.yaml
@@ -29,6 +31,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/tomcat-users-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-context-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-meta-inf-context-backups-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-app-meta-inf-context-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-jndi-resources-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-context-resource-backups-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-server-xml-exposed.yaml
@@ -41,6 +44,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/tomcat-catalina-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-setenv-scripts-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-bin-scripts-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-runtime-logs-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-context-defaults-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-catalina-localhost-contexts-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-catalina-localhost-xml-variants-exposed.yaml
@@ -48,6 +52,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/tomcat-webapps-root-listing-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-war-artifacts-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-app-archive-temp-artifacts-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-app-web-inf-web-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/web-inf-web-xml-exposed.yaml
       - tags: potential
       - template: templates/cves/tomcat/CVE-2017-12617-tomcat-put-jsp-upload-potential.yaml
