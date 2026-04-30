@@ -1,0 +1,48 @@
+id: micronaut-beans-endpoint-exposed
+
+info:
+  name: Micronaut Beans Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated exposure of Micronaut beans endpoint, which reveals
+    internal component names, framework classes, and dependency graph details.
+  tags:
+    - vulnerability
+    - micronaut
+    - java
+    - beans
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/beans"
+      - "{{BaseURL}}/admin/beans"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/(json|problem\\+json)"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"beans"\s*:\s*\['
+          - '(?i)"type"\s*:\s*"io\.micronaut'
+          - '(?i)DefaultBeanContext'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), '<!doctype')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

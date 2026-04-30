@@ -1,0 +1,49 @@
+id: spring-actuator-auditevents-unauth
+
+info:
+  name: Spring Actuator Audit Events Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Actuator auditevents endpoint,
+    which can disclose authentication, authorization, and user activity events.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - audit
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/auditevents"
+      - "{{BaseURL}}/auditevents"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"events"\s*:\s*\['
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"principal"\s*:'
+          - '(?i)"type"\s*:\s*"(AUTHENTICATION|AUTHORIZATION|SESSION)_'
+          - '(?i)"timestamp"\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

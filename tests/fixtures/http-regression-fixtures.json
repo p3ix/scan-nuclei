@@ -7,6 +7,20 @@
       },
       "body": "{\"status\":\"UP\",\"checks\":[{\"name\":\"io.quarkus.agroal.runtime.health.DataSourceHealthCheck\",\"status\":\"UP\"}]}"
     },
+    "GET /q/health/live": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"status\":\"UP\",\"checks\":[{\"name\":\"smallrye-health-live\",\"status\":\"UP\"}]}"
+    },
+    "GET /q/health/ready": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"status\":\"UP\",\"checks\":[{\"name\":\"microprofile-readiness\",\"status\":\"UP\"}]}"
+    },
     "GET /q/openapi": {
       "status": 200,
       "headers": {
@@ -59,21 +73,21 @@
       "headers": {
         "Content-Type": "application/json"
       },
-      "body": "{\"activeEnvironments\":[\"prod\"],\"propertySources\":[{\"name\":\"applicationConfig\"}],\"packages\":[\"io.micronaut.runtime\"]}"
+      "body": "{\"activeEnvironments\":[\"prod\"],\"propertySources\":[{\"name\":\"applicationConfig\",\"properties\":{\"datasources.default.password\":{\"value\":\"S3cr3tPass!\"},\"datasources.default.url\":{\"value\":\"jdbc:postgresql://db.internal/prod\"},\"api.token\":{\"value\":\"ghp_exampletoken\"}}}],\"packages\":[\"io.micronaut.runtime\"]}"
     },
     "GET /routes": {
       "status": 200,
       "headers": {
         "Content-Type": "application/json"
       },
-      "body": "{\"routes\":[{\"uri\":\"/api/customers\"}],\"io.micronaut\":\"present\"}"
+      "body": "{\"routes\":[{\"uri\":\"/api/customers\",\"method\":\"GET\"},{\"uri\":\"/admin/health\",\"method\":\"GET\"}],\"io.micronaut\":\"present\"}"
     },
     "GET /beans": {
       "status": 200,
       "headers": {
         "Content-Type": "application/json"
       },
-      "body": "{\"beans\":[\"io.micronaut.context.DefaultBeanContext\"]}"
+      "body": "{\"beans\":[{\"type\":\"io.micronaut.context.DefaultBeanContext\",\"disabled\":false},{\"type\":\"com.example.CustomerService\",\"disabled\":false}]}"
     },
     "GET /loggers": {
       "status": 200,
@@ -95,6 +109,14 @@
         "Content-Type": "application/json"
       },
       "body": "{\"refresh\":\"accepted\",\"refreshed\":[\"applicationConfig\"]}"
+    },
+    "GET /stop": {
+      "status": 405,
+      "headers": {
+        "Content-Type": "application/json",
+        "Allow": "POST"
+      },
+      "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/stop\"}"
     }
   },
   "micronaut-hidden-server": {
@@ -427,6 +449,20 @@
         "Content-Type": "text/plain"
       },
       "body": "10.0.0.10 - - [29/Apr/2026:09:12:11 +0200] \"GET /app/login HTTP/1.1\" 200 1234\n"
+    },
+    "GET /actuator/loggers": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"levels\":[\"OFF\",\"ERROR\",\"WARN\",\"INFO\",\"DEBUG\"],\"loggers\":{\"ROOT\":{\"configuredLevel\":\"INFO\",\"effectiveLevel\":\"INFO\"},\"com.example\":{\"configuredLevel\":\"DEBUG\",\"effectiveLevel\":\"DEBUG\"}}}"
+    },
+    "GET /actuator/scheduledtasks": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"cron\":[{\"runnable\":{\"target\":\"com.example.jobs.ReconcileJob.run\"},\"expression\":\"0 */5 * * * *\"}],\"fixedDelay\":[{\"runnable\":{\"target\":\"com.example.jobs.CacheWarmJob.run\"},\"interval\":60000}]}"
     },
     "GET /app.war.bak": {
       "status": 200,
@@ -976,6 +1012,64 @@
         "Content-Type": "text/plain"
       },
       "body": "# HELP jvm_memory_used_bytes The amount of used memory\n# TYPE jvm_memory_used_bytes gauge\njvm_memory_used_bytes 42\n"
+    },
+    "GET /actuator/loggers": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"levels\":[\"OFF\",\"ERROR\",\"WARN\",\"INFO\",\"DEBUG\"],\"loggers\":{\"ROOT\":{\"configuredLevel\":\"INFO\",\"effectiveLevel\":\"INFO\"},\"org.springframework\":{\"configuredLevel\":\"WARN\",\"effectiveLevel\":\"WARN\"}}}"
+    },
+    "GET /actuator/scheduledtasks": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"cron\":[{\"runnable\":{\"target\":\"com.example.jobs.InvoiceJob.run\"},\"expression\":\"0 0/15 * * * *\"}],\"fixedDelay\":[{\"runnable\":{\"target\":\"com.example.jobs.CleanupJob.run\"},\"interval\":300000}]}"
+    },
+    "GET /actuator/auditevents": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"events\":[{\"timestamp\":\"2026-04-30T10:15:00Z\",\"principal\":\"alice\",\"type\":\"AUTHENTICATION_SUCCESS\",\"data\":{\"remoteAddress\":\"10.0.0.10\"}}]}"
+    },
+    "GET /actuator/flyway": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"contexts\":{\"application\":{\"flywayBeans\":{\"flyway\":{\"migrations\":[{\"type\":\"SQL\",\"checksum\":123456,\"version\":\"1\",\"description\":\"init schema\",\"script\":\"V1__init_schema.sql\",\"state\":\"SUCCESS\"}]}}}}}"
+    },
+    "GET /actuator/liquibase": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"contexts\":{\"application\":{\"liquibaseBeans\":{\"liquibase\":{\"changeSets\":[{\"author\":\"ops\",\"id\":\"001\",\"changeLog\":\"classpath:/db/changelog.xml\",\"execType\":\"EXECUTED\"}]}}}}}"
+    },
+    "GET /actuator/quartz": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"jobs\":{\"groups\":[\"DEFAULT\"]},\"triggers\":{\"groups\":[\"DEFAULT\"]}}"
+    },
+    "GET /actuator/gateway/refresh": {
+      "status": 405,
+      "headers": {
+        "Content-Type": "application/json",
+        "Allow": "POST"
+      },
+      "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/actuator/gateway/refresh\"}"
+    },
+    "GET /actuator/shutdown": {
+      "status": 405,
+      "headers": {
+        "Content-Type": "application/json",
+        "Allow": "POST"
+      },
+      "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/actuator/shutdown\"}"
     }
   },
   "spring-generic": {

@@ -1,0 +1,46 @@
+id: micronaut-stop-write-surface-potential
+
+info:
+  name: Micronaut Stop Write Surface Potentially Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects a likely exposed Micronaut stop endpoint without invoking the stop
+    action. A 405 response with POST allowed indicates the administrative surface
+    exists and should be protected or disabled.
+  tags:
+    - misconfig
+    - micronaut
+    - java
+    - stop
+    - write-surface
+    - potential
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/stop"
+      - "{{BaseURL}}/admin/stop"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 405
+      - type: regex
+        part: header
+        regex:
+          - "(?i)allow:\\s*(?:[^\\r\\n,]+,\\s*)*POST\\b"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)application/(json|problem\\+json)"
+          - '(?i)"(method|path|error|status|timestamp)"\s*:'
+          - "(?i)method not allowed"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

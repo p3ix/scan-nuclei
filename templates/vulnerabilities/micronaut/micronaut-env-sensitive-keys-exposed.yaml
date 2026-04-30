@@ -1,0 +1,51 @@
+id: micronaut-env-sensitive-keys-exposed
+
+info:
+  name: Micronaut Env Sensitive Keys Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Micronaut env endpoints that appear to disclose sensitive
+    configuration keys such as passwords, tokens, secrets, JDBC URLs, or cloud
+    credentials.
+  tags:
+    - vulnerability
+    - micronaut
+    - java
+    - env
+    - secrets
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/env"
+      - "{{BaseURL}}/admin/env"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"(activeEnvironments|propertySources|packages)"\s*:'
+          - '(?i)io\.micronaut'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"[^"]*(password|passwd|secret|token|api[-_]?key|client[-_]?secret|access[-_]?key|jdbc:url|aws\.secretAccessKey)[^"]*"\s*:'
+          - '(?i)"value"\s*:\s*"[^"]*(jdbc:|AKIA|AIza|ghp_|xoxb-)'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

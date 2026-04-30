@@ -10,6 +10,7 @@ info:
 workflows:
   - template: templates/technologies/quarkus/quarkus-stack-fingerprint.yaml
     subtemplates:
+      - template: templates/misconfiguration/quarkus/quarkus-health-endpoints-exposed.yaml
       - template: templates/misconfiguration/java-apps/quarkus-dev-ui-surface-exposed.yaml
       - template: templates/misconfiguration/quarkus/quarkus-openapi-surface-exposed.yaml
       - template: templates/misconfiguration/quarkus/quarkus-metrics-endpoint-exposed.yaml
@@ -19,4 +20,8 @@ workflows:
       - template: templates/misconfiguration/micronaut/micronaut-management-endpoints-exposed.yaml
       - template: templates/misconfiguration/micronaut/micronaut-loggers-write-surface-exposed.yaml
       - template: templates/misconfiguration/micronaut/micronaut-refresh-write-surface-exposed.yaml
+      - template: templates/misconfiguration/micronaut/micronaut-stop-write-surface-potential.yaml
       - template: templates/exposures/sensitive-paths/java-env-files-exposed.yaml
+      - template: templates/vulnerabilities/micronaut/micronaut-beans-endpoint-exposed.yaml
+      - template: templates/vulnerabilities/micronaut/micronaut-env-sensitive-keys-exposed.yaml
+      - template: templates/vulnerabilities/micronaut/micronaut-routes-endpoint-exposed.yaml

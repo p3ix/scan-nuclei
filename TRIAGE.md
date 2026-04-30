@@ -241,6 +241,16 @@ No contar aparte si solo amplian la misma documentacion:
 - si hay assets, source maps o artefactos de una misma UI, tratarlos como
   profundidad adicional salvo que revelen algo distinto y mas sensible
 
+## Java generico
+
+- `java-loggers-endpoint-exposed` y `java-scheduledtasks-endpoint-exposed`
+  son hoy la via recomendada para diagnosticos Java genericos porque separan
+  mejor inventario de loggers y tareas programadas
+- si coinciden junto a templates especificos de Spring Actuator, evitar doble
+  conteo salvo que el template especifico revele detalles mas sensibles
+- `java-debug-endpoints-exposed` queda mejor como snapshot residual/manual que
+  como finding principal cuando ya existen matches mas especificos
+
 ## Quarkus / Micronaut
 
 ### Quarkus
@@ -250,6 +260,9 @@ No contar aparte si solo amplian la misma documentacion:
   protegido, remapeado o escondido por proxy
 - `quarkus-dev-ui-surface-exposed` debe priorizarse alto porque expone una
   superficie propia de desarrollo
+- `quarkus-health-endpoints-exposed` suele ser una exposicion operativa; si
+  coincide junto a `quarkus-stack-fingerprint`, tratar el fingerprint como
+  contexto y el endpoint como la evidencia accionable
 - `quarkus-openapi-surface-exposed` y `quarkus-metrics-endpoint-exposed`
   suelen ser exposicion operativa/documental; separarlas del fingerprint y
   no tratarlas como vulnerabilidad critica por defecto
@@ -261,9 +274,19 @@ No contar aparte si solo amplian la misma documentacion:
   hardening de headers
 - `micronaut-management-endpoints-exposed` puede devolver varias rutas de la
   misma causa raiz; deduplicar por superficie de management
+- `micronaut-routes-endpoint-exposed` aporta mas valor cuando revela rutas
+  internas, paths administrativos o inventario de APIs no documentadas; si no,
+  tratarlo como profundidad de la misma superficie de management
+- `micronaut-beans-endpoint-exposed` aporta mas valor cuando revela clases
+  internas, nombres de servicios o dependencias no evidentes; si coincide junto
+  a `management` o `env`, no contarlo aparte salvo que cambie la sensibilidad
+- `micronaut-env-sensitive-keys-exposed` debe priorizarse por encima del
+  `env` generico cuando ambos disparan sobre la misma respuesta
 - `micronaut-loggers-write-surface-exposed` y
   `micronaut-refresh-write-surface-exposed` deben interpretarse como
   write surface potencial o semiconfirmada, no como cambio de estado probado
+- `micronaut-stop-write-surface-potential` debe tratarse igual: superficie
+  administrativa probable, no parada confirmada
 
 ### Regla practica
 

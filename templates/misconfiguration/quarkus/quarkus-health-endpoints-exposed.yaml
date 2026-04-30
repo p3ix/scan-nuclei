@@ -1,0 +1,54 @@
+id: quarkus-health-endpoints-exposed
+
+info:
+  name: Quarkus Health Endpoints Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Quarkus health endpoints under /q/ that expose
+    runtime liveness, readiness, or startup state and can help map internal
+    components and deployment posture.
+  tags:
+    - misconfig
+    - quarkus
+    - health
+    - smallrye
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/q/health"
+      - "{{BaseURL}}/q/health/live"
+      - "{{BaseURL}}/q/health/ready"
+      - "{{BaseURL}}/q/health/started"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"status"\s*:\s*"(UP|DOWN)"'
+          - '(?i)"checks"\s*:\s*\['
+          - '(?i)"outcome"\s*:\s*"(UP|DOWN)"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)io\.quarkus'
+          - '(?i)smallrye'
+          - '(?i)microprofile'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

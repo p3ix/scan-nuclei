@@ -1,0 +1,49 @@
+id: micronaut-routes-endpoint-exposed
+
+info:
+  name: Micronaut Routes Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Micronaut routes endpoint, disclosing
+    internal route inventory, URI patterns, and framework metadata useful for
+    attack surface mapping.
+  tags:
+    - vulnerability
+    - micronaut
+    - java
+    - routes
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/routes"
+      - "{{BaseURL}}/admin/routes"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/(json|problem\\+json)"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"routes"\s*:\s*\['
+          - '(?i)"uri"\s*:\s*"/'
+          - '(?i)io\.micronaut'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), '<!doctype')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

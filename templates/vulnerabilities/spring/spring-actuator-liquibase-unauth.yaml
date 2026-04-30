@@ -1,0 +1,53 @@
+id: spring-actuator-liquibase-unauth
+
+info:
+  name: Spring Actuator Liquibase Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Actuator liquibase endpoint,
+    exposing database changelog metadata, authors, change IDs, and execution
+    state.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - liquibase
+    - database
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/liquibase"
+      - "{{BaseURL}}/liquibase"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"liquibaseBeans"\s*:'
+          - '(?i)"changeSets"\s*:\s*\['
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"changeLog"\s*:'
+          - '(?i)"execType"\s*:'
+          - '(?i)"author"\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

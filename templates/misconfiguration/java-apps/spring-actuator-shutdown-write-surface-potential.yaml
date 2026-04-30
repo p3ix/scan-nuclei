@@ -1,0 +1,47 @@
+id: spring-actuator-shutdown-write-surface-potential
+
+info:
+  name: Spring Actuator Shutdown Write Surface Potentially Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects a likely exposed Spring Actuator shutdown write surface without
+    invoking the shutdown operation. A 405 response with POST allowed indicates
+    the endpoint exists and should be disabled or strongly authenticated.
+  tags:
+    - misconfig
+    - spring
+    - spring-boot
+    - actuator
+    - shutdown
+    - write-surface
+    - potential
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/shutdown"
+      - "{{BaseURL}}/shutdown"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 405
+      - type: regex
+        part: header
+        regex:
+          - "(?i)allow:\\s*(?:[^\\r\\n,]+,\\s*)*POST\\b"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)request method '?GET'? not supported"
+          - '(?i)"method"\s*:\s*"GET"'
+          - '(?i)"path"\s*:\s*".*/shutdown"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

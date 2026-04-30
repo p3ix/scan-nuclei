@@ -1,0 +1,52 @@
+id: spring-actuator-flyway-unauth
+
+info:
+  name: Spring Actuator Flyway Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Actuator flyway endpoint, disclosing
+    database migration history, schema names, scripts, and deployment metadata.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - flyway
+    - database
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/flyway"
+      - "{{BaseURL}}/flyway"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"flywayBeans"\s*:'
+          - '(?i)"migrations"\s*:\s*\['
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"script"\s*:'
+          - '(?i)"checksum"\s*:'
+          - '(?i)"state"\s*:\s*"(SUCCESS|FAILED|PENDING|MISSING)"'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,49 @@
+id: java-scheduledtasks-endpoint-exposed
+
+info:
+  name: Java Scheduled Tasks Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable scheduled tasks endpoints in Java applications,
+    disclosing cron schedules, fixed delays, and task implementation metadata.
+  tags:
+    - misconfig
+    - java
+    - diagnostics
+    - scheduledtasks
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/scheduledtasks"
+      - "{{BaseURL}}/scheduledtasks"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/(json|problem\\+json)"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"scheduledTasks"\s*:'
+          - '(?i)"cron"\s*:\s*\['
+          - '(?i)"fixedDelay"\s*:\s*\['
+          - '(?i)"runnable"\s*:'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), '<!doctype')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

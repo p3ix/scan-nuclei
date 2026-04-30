@@ -1,0 +1,50 @@
+id: java-loggers-endpoint-exposed
+
+info:
+  name: Java Loggers Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable logger inventory endpoints in Java applications,
+    exposing runtime logger names and effective levels that help map internal
+    packages and operational behavior.
+  tags:
+    - misconfig
+    - java
+    - diagnostics
+    - loggers
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/loggers"
+      - "{{BaseURL}}/loggers"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/(json|problem\\+json)"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"loggers"\s*:'
+          - '(?i)"availableLoggers"\s*:'
+          - '(?i)"configuredLevel"\s*:'
+          - '(?i)"effectiveLevel"\s*:'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), '<!doctype')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,54 @@
+id: spring-actuator-quartz-unauth
+
+info:
+  name: Spring Actuator Quartz Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated access to Spring Actuator quartz endpoint, exposing
+    scheduled job and trigger inventory that can reveal internal task names and
+    operational timing.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - quartz
+    - scheduler
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/quartz"
+      - "{{BaseURL}}/actuator/quartz/jobs"
+      - "{{BaseURL}}/quartz"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"jobs"\s*:'
+          - '(?i)"triggers"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"groups"\s*:\s*\['
+          - '(?i)"jobName"\s*:'
+          - '(?i)"triggerName"\s*:'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
