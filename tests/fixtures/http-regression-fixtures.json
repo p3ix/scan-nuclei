@@ -478,6 +478,20 @@
       },
       "body": "JAVA PROFILE 1.0.2fakeheap"
     },
+    "GET /actuator/env": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"activeProfiles\":[\"prod\"],\"propertySources\":[{\"name\":\"systemProperties\"}],\"systemEnvironment\":{\"JAVA_HOME\":\"/usr/lib/jvm/java-17\"}}"
+    },
+    "GET /actuator/logfile": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "2026-04-29 09:12:01 INFO com.example.Startup - Application started\n2026-04-29 09:12:05 WARN com.example.AuthFilter - Invalid token for /admin\n"
+    },
     "GET /app.war.bak": {
       "status": 200,
       "headers": {

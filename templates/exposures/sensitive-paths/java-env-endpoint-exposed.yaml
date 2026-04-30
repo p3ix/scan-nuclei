@@ -1,0 +1,48 @@
+id: java-env-endpoint-exposed
+
+info:
+  name: Java Env Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly reachable Java environment/config endpoints exposing active
+    profiles, property sources, system environment data, or runtime properties.
+  tags:
+    - exposure
+    - java
+    - config
+    - env
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/env"
+      - "{{BaseURL}}/env"
+      - "{{BaseURL}}/environment"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/(json|problem\\+json)"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"(activeProfiles|activeEnvironments|propertySources|systemEnvironment|systemProperties|packages)"'
+          - '(?i)io\.micronaut'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), '<!doctype')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

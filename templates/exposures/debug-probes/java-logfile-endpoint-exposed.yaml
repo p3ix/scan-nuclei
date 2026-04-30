@@ -1,0 +1,40 @@
+id: java-logfile-endpoint-exposed
+
+info:
+  name: Java Logfile Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly reachable Java logfile endpoints that may disclose stack
+    traces, tokens, internal paths, application names, and operational details.
+  tags:
+    - exposure
+    - java
+    - diagnostics
+    - logfile
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/logfile"
+      - "{{BaseURL}}/logfile"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)\\b(ERROR|WARN|INFO)\\b"
+          - "(?m)\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}"
+          - "(?i)(exception|stacktrace|trace)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
