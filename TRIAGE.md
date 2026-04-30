@@ -246,6 +246,9 @@ No contar aparte si solo amplian la misma documentacion:
 - `java-loggers-endpoint-exposed` y `java-scheduledtasks-endpoint-exposed`
   son hoy la via recomendada para diagnosticos Java genericos porque separan
   mejor inventario de loggers y tareas programadas
+- `java-threaddump-endpoint-exposed` y `java-heapdump-endpoint-exposed`
+  deben priorizarse por encima de señales operativas de menor impacto porque
+  exponen internals y potencialmente secretos en memoria
 - si coinciden junto a templates especificos de Spring Actuator, evitar doble
   conteo salvo que el template especifico revele detalles mas sensibles
 - `java-debug-endpoints-exposed` queda mejor como snapshot residual/manual que

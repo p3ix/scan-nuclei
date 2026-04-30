@@ -32,7 +32,7 @@ Hoy el repo ya tiene:
 - criterio de deduplicacion y triage por familia
 - linea `Quarkus/Micronaut` estable en su alcance actual
 - guia de uso por escenario en `README.md`
-- regresion HTTP con `93` casos distribuidos entre `Apache`, `Tomcat`,
+- regresion HTTP con `95` casos distribuidos entre `Apache`, `Tomcat`,
   `WildFly`, `Spring`, `Quarkus` y `Micronaut`
 
 ## Prioridades actuales

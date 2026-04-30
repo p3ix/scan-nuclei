@@ -464,6 +464,20 @@
       },
       "body": "{\"cron\":[{\"runnable\":{\"target\":\"com.example.jobs.ReconcileJob.run\"},\"expression\":\"0 */5 * * * *\"}],\"fixedDelay\":[{\"runnable\":{\"target\":\"com.example.jobs.CacheWarmJob.run\"},\"interval\":60000}]}"
     },
+    "GET /actuator/threaddump": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"threads\":[{\"threadName\":\"http-nio-8080-exec-1\",\"threadState\":\"RUNNABLE\",\"stackTrace\":[{\"className\":\"java.lang.Thread\",\"methodName\":\"run\"}]}]}"
+    },
+    "GET /actuator/heapdump": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/octet-stream"
+      },
+      "body": "JAVA PROFILE 1.0.2fakeheap"
+    },
     "GET /app.war.bak": {
       "status": 200,
       "headers": {

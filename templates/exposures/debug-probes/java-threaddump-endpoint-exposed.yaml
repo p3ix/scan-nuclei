@@ -1,0 +1,41 @@
+id: java-threaddump-endpoint-exposed
+
+info:
+  name: Java Threaddump Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly reachable Java thread dump endpoints exposing thread names,
+    stack traces, and runtime internals useful for reconnaissance and debugging.
+  tags:
+    - exposure
+    - java
+    - diagnostics
+    - threaddump
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/threaddump"
+      - "{{BaseURL}}/threaddump"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"threads"\s*:\s*\['
+          - '(?i)"threadName"\s*:'
+          - '(?i)"stackTrace"\s*:'
+          - '(?i)java\.lang\.Thread\.State'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

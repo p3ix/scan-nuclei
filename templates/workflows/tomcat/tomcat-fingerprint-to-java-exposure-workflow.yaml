@@ -12,12 +12,13 @@ workflows:
       - template: templates/exposures/openapi-yaml-exposed.yaml
       - template: templates/exposures/wadl-exposed.yaml
       - template: templates/exposures/wsdl-xsd-exposed.yaml
+      - template: templates/exposures/debug-probes/java-threaddump-endpoint-exposed.yaml
+      - template: templates/exposures/debug-probes/java-heapdump-endpoint-exposed.yaml
       - template: templates/exposures/error-pages/java-tomcat-stacktrace-exposed.yaml
       - template: templates/misconfiguration/java-apps/http-missing-security-headers-summary.yaml
       - template: templates/misconfiguration/java-apps/java-loggers-endpoint-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-scheduledtasks-endpoint-exposed.yaml
       - template: templates/exposures/sensitive-paths/actuator-env-exposed.yaml
-      - template: templates/exposures/sensitive-paths/actuator-heapdump-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-yaml-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
@@ -36,12 +37,13 @@ workflows:
       - template: templates/exposures/openapi-yaml-exposed.yaml
       - template: templates/exposures/wadl-exposed.yaml
       - template: templates/exposures/wsdl-xsd-exposed.yaml
+      - template: templates/exposures/debug-probes/java-threaddump-endpoint-exposed.yaml
+      - template: templates/exposures/debug-probes/java-heapdump-endpoint-exposed.yaml
       - template: templates/exposures/error-pages/java-tomcat-stacktrace-exposed.yaml
       - template: templates/misconfiguration/java-apps/http-missing-security-headers-summary.yaml
       - template: templates/misconfiguration/java-apps/java-loggers-endpoint-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-scheduledtasks-endpoint-exposed.yaml
       - template: templates/exposures/sensitive-paths/actuator-env-exposed.yaml
-      - template: templates/exposures/sensitive-paths/actuator-heapdump-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-yaml-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
