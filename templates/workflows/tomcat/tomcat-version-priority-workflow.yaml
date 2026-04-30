@@ -25,6 +25,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/tomcat-examples-docs-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-default-artifacts-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-default-text-artifacts-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-app-directory-listing-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-host-manager-help-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-directory-listing-common-paths-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-deployed-artifacts-listing-exposed.yaml
@@ -41,6 +42,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/tomcat-logging-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-root-context-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-config-backups-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-config-archive-backups-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-catalina-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-setenv-scripts-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-bin-scripts-exposed.yaml
@@ -52,6 +54,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/tomcat-webapps-root-listing-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-war-artifacts-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-app-archive-temp-artifacts-exposed.yaml
+      - template: templates/exposures/sensitive-paths/tomcat-app-direct-archive-artifacts-exposed.yaml
       - template: templates/exposures/sensitive-paths/tomcat-app-web-inf-web-xml-exposed.yaml
       - template: templates/exposures/sensitive-paths/web-inf-web-xml-exposed.yaml
       - tags: potential

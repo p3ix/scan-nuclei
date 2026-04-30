@@ -1,0 +1,90 @@
+id: tomcat-app-direct-archive-artifacts-exposed
+
+info:
+  name: Tomcat App Direct Archive Artifacts Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects directly downloadable WAR or JAR artifacts for common non-default
+    Tomcat application names outside `webapps/`, including backup and temporary
+    variants. These files can leak proprietary code and embedded secrets.
+  tags:
+    - tomcat
+    - exposure
+    - artifacts
+    - archive
+    - war
+    - jar
+    - application
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/app.war"
+      - "{{BaseURL}}/api.war"
+      - "{{BaseURL}}/admin.war"
+      - "{{BaseURL}}/portal.war"
+      - "{{BaseURL}}/service.war"
+      - "{{BaseURL}}/auth.war"
+      - "{{BaseURL}}/console.war"
+      - "{{BaseURL}}/gateway.war"
+      - "{{BaseURL}}/internal.war"
+      - "{{BaseURL}}/backoffice.war"
+      - "{{BaseURL}}/customer.war"
+      - "{{BaseURL}}/billing.war"
+      - "{{BaseURL}}/app.jar"
+      - "{{BaseURL}}/api.jar"
+      - "{{BaseURL}}/admin.jar"
+      - "{{BaseURL}}/portal.jar"
+      - "{{BaseURL}}/service.jar"
+      - "{{BaseURL}}/auth.jar"
+      - "{{BaseURL}}/console.jar"
+      - "{{BaseURL}}/gateway.jar"
+      - "{{BaseURL}}/internal.jar"
+      - "{{BaseURL}}/backoffice.jar"
+      - "{{BaseURL}}/customer.jar"
+      - "{{BaseURL}}/billing.jar"
+      - "{{BaseURL}}/app.war.bak"
+      - "{{BaseURL}}/api.war.bak"
+      - "{{BaseURL}}/admin.war.bak"
+      - "{{BaseURL}}/portal.war.bak"
+      - "{{BaseURL}}/service.war.bak"
+      - "{{BaseURL}}/auth.war.bak"
+      - "{{BaseURL}}/console.war.bak"
+      - "{{BaseURL}}/gateway.war.bak"
+      - "{{BaseURL}}/internal.war.bak"
+      - "{{BaseURL}}/backoffice.war.bak"
+      - "{{BaseURL}}/customer.war.bak"
+      - "{{BaseURL}}/billing.war.bak"
+      - "{{BaseURL}}/app.jar.bak"
+      - "{{BaseURL}}/api.jar.bak"
+      - "{{BaseURL}}/admin.jar.bak"
+      - "{{BaseURL}}/portal.jar.bak"
+      - "{{BaseURL}}/service.jar.bak"
+      - "{{BaseURL}}/auth.jar.bak"
+      - "{{BaseURL}}/console.jar.bak"
+      - "{{BaseURL}}/gateway.jar.bak"
+      - "{{BaseURL}}/internal.jar.bak"
+      - "{{BaseURL}}/backoffice.jar.bak"
+      - "{{BaseURL}}/customer.jar.bak"
+      - "{{BaseURL}}/billing.jar.bak"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?s)PK\\x03\\x04"
+          - "(?i)application/java-archive"
+          - "(?i)application/zip"
+          - "(?i)application/octet-stream"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,63 @@
+id: tomcat-config-archive-backups-exposed
+
+info:
+  name: Tomcat Config Archive Backups Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed archive backups of sensitive Tomcat configuration files
+    such as `server.xml`, `context.xml`, `tomcat-users.xml`, and related
+    descriptors. Compressed backups can leak the same secrets as the live
+    config while being easier to miss during reviews.
+  tags:
+    - tomcat
+    - exposure
+    - backup
+    - archive
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/conf/server.xml.zip"
+      - "{{BaseURL}}/conf/server.xml.gz"
+      - "{{BaseURL}}/conf/server.xml.tar"
+      - "{{BaseURL}}/conf/server.xml.tgz"
+      - "{{BaseURL}}/conf/context.xml.zip"
+      - "{{BaseURL}}/conf/context.xml.gz"
+      - "{{BaseURL}}/conf/context.xml.tar"
+      - "{{BaseURL}}/conf/context.xml.tgz"
+      - "{{BaseURL}}/conf/tomcat-users.xml.zip"
+      - "{{BaseURL}}/conf/tomcat-users.xml.gz"
+      - "{{BaseURL}}/conf/tomcat-users.xml.tar"
+      - "{{BaseURL}}/conf/tomcat-users.xml.tgz"
+      - "{{BaseURL}}/conf/web.xml.zip"
+      - "{{BaseURL}}/conf/web.xml.gz"
+      - "{{BaseURL}}/conf/web.xml.tar"
+      - "{{BaseURL}}/conf/web.xml.tgz"
+      - "{{BaseURL}}/conf/logging.properties.zip"
+      - "{{BaseURL}}/conf/logging.properties.gz"
+      - "{{BaseURL}}/conf/catalina.properties.zip"
+      - "{{BaseURL}}/conf/catalina.properties.gz"
+      - "{{BaseURL}}/conf/catalina.policy.zip"
+      - "{{BaseURL}}/conf/catalina.policy.gz"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?s)PK\\x03\\x04"
+          - "(?i)content-type:\\s*application/(zip|x-zip-compressed|gzip|x-gzip|x-tar|octet-stream)"
+          - "(?i)content-encoding:\\s*gzip"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

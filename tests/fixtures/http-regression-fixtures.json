@@ -337,6 +337,13 @@
       },
       "body": "<Server port=\"8005\" shutdown=\"SHUTDOWN\"><Service name=\"Catalina\"><Connector port=\"8009\" protocol=\"AJP/1.3\" secretRequired=\"false\"/></Service><GlobalNamingResources><Resource name=\"jdbc/legacy\" auth=\"Container\" type=\"javax.sql.DataSource\" username=\"legacy\" password=\"legacypass\" factory=\"org.apache.tomcat.jdbc.pool.DataSourceFactory\"/></GlobalNamingResources></Server>"
     },
+    "GET /conf/server.xml.zip": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/zip"
+      },
+      "body": "PK\u0003\u0004fakezip"
+    },
     "GET /conf/tomcat-users.xml": {
       "status": 200,
       "headers": {
@@ -372,6 +379,20 @@
       },
       "body": "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"><servlet><servlet-name>app</servlet-name><servlet-class>com.example.AppServlet</servlet-class></servlet><filter><filter-name>AuthFilter</filter-name><filter-class>com.example.AuthFilter</filter-class></filter><security-constraint><web-resource-collection><url-pattern>/admin/*</url-pattern></web-resource-collection></security-constraint></web-app>"
     },
+    "GET /app/": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><head><title>Index of /app/</title></head><body><h1>Index of /app/</h1><a href=\"../\">Parent Directory</a><a href=\"WEB-INF/\">WEB-INF/</a><a href=\"META-INF/\">META-INF/</a><a href=\"application.properties\">application.properties</a></body></html>"
+    },
+    "GET /app": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><head><title>Index of /app/</title></head><body><h1>Index of /app/</h1><a href=\"../\">Parent Directory</a><a href=\"WEB-INF/\">WEB-INF/</a><a href=\"META-INF/\">META-INF/</a><a href=\"application.properties\">application.properties</a></body></html>"
+    },
     "GET /bin/setenv.sh": {
       "status": 200,
       "headers": {
@@ -399,6 +420,20 @@
         "Content-Type": "text/plain"
       },
       "body": "29-Apr-2026 09:12:01.123 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in 1843 ms\n29-Apr-2026 09:12:00.111 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler [\\\"http-nio-8443\\\"]\nApache Tomcat/9.0.85\n"
+    },
+    "GET /logs/localhost_access_log.2026-04-29.txt": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": "10.0.0.10 - - [29/Apr/2026:09:12:11 +0200] \"GET /app/login HTTP/1.1\" 200 1234\n"
+    },
+    "GET /app.war.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/octet-stream"
+      },
+      "body": "PK\u0003\u0004fakewar"
     },
     "GET /conf/Catalina/localhost/app.xml.bak": {
       "status": 200,
@@ -495,12 +530,33 @@
       },
       "body": "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"><servlet><servlet-name>internal</servlet-name><servlet-class>com.example.InternalServlet</servlet-class></servlet><security-role><role-name>ops</role-name></security-role></web-app>"
     },
+    "GET /internal/": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><head><title>Index of /internal/</title></head><body><h1>Index of /internal/</h1><a href=\"WEB-INF/\">WEB-INF/</a><a href=\"META-INF/\">META-INF/</a><a href=\"app.log\">app.log</a></body></html>"
+    },
+    "GET /internal": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><head><title>Index of /internal/</title></head><body><h1>Index of /internal/</h1><a href=\"WEB-INF/\">WEB-INF/</a><a href=\"META-INF/\">META-INF/</a><a href=\"app.log\">app.log</a></body></html>"
+    },
     "GET /backoffice/META-INF/context.xml.bak": {
       "status": 200,
       "headers": {
         "Content-Type": "application/xml"
       },
       "body": "<Context><ResourceLink name=\"jdbc/backoffice\" global=\"jdbc/backoffice\" type=\"javax.sql.DataSource\"/><Environment name=\"region\" value=\"eu-west\" type=\"java.lang.String\"/></Context>"
+    },
+    "GET /customer.war.bak": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/octet-stream"
+      },
+      "body": "PK\u0003\u0004fakewar"
     },
     "GET /conf/Catalina/localhost/backoffice.xml.bak": {
       "status": 200,

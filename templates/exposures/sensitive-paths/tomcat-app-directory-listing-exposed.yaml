@@ -1,0 +1,76 @@
+id: tomcat-app-directory-listing-exposed
+
+info:
+  name: Tomcat App Directory Listing Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects directory listing exposure inside common non-default Tomcat
+    application contexts such as `app`, `api`, `admin`, `portal`, or
+    `gateway`. These listings may reveal `WEB-INF`, `META-INF`, classes,
+    config files, logs, or downloadable archives from real business apps.
+  tags:
+    - tomcat
+    - exposure
+    - directory-listing
+    - application
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/app"
+      - "{{BaseURL}}/app/"
+      - "{{BaseURL}}/api"
+      - "{{BaseURL}}/api/"
+      - "{{BaseURL}}/admin"
+      - "{{BaseURL}}/admin/"
+      - "{{BaseURL}}/portal"
+      - "{{BaseURL}}/portal/"
+      - "{{BaseURL}}/service"
+      - "{{BaseURL}}/service/"
+      - "{{BaseURL}}/auth"
+      - "{{BaseURL}}/auth/"
+      - "{{BaseURL}}/console"
+      - "{{BaseURL}}/console/"
+      - "{{BaseURL}}/gateway"
+      - "{{BaseURL}}/gateway/"
+      - "{{BaseURL}}/internal"
+      - "{{BaseURL}}/internal/"
+      - "{{BaseURL}}/backoffice"
+      - "{{BaseURL}}/backoffice/"
+      - "{{BaseURL}}/customer"
+      - "{{BaseURL}}/customer/"
+      - "{{BaseURL}}/billing"
+      - "{{BaseURL}}/billing/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: body
+        condition: or
+        words:
+          - "Index of /"
+          - "Parent Directory"
+      - type: word
+        part: body
+        condition: or
+        words:
+          - "WEB-INF/"
+          - "META-INF/"
+          - "classes/"
+          - "lib/"
+          - ".war"
+          - ".jar"
+          - ".xml"
+          - ".properties"
+          - ".log"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
