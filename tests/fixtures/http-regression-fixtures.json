@@ -316,6 +316,13 @@
       },
       "body": "<html><body><h1>Apache Tomcat/9.0.85</h1></body></html>"
     },
+    "GET /this-path-should-not-exist-nuclei-404": {
+      "status": 404,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>Apache Tomcat/9.0.85</h1><p>javax.servlet.ServletException</p></body></html>"
+    },
     "GET /manager/html": {
       "status": 401,
       "headers": {

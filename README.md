@@ -219,6 +219,30 @@ nuclei -w templates/workflows/spring/spring-fingerprint-to-risk-workflow.yaml -u
 
 ## Workflow Java (Quarkus / Micronaut)
 
+## Workflow Java (diagnostics generic)
+
+Para aplicaciones Java servlet-based donde aun no sabes si detras hay Spring,
+Tomcat customizado u otra app Java clasica, hay un workflow corto centrado en
+diagnostics y configuracion expuesta:
+
+- `templates/workflows/java/java-diagnostics-exposure-workflow.yaml`
+
+Encadena fingerprints genericos (`JSESSIONID`, firmas servlet en errores) con
+checks reutilizables de:
+
+- `env`
+- `logfile`
+- `threaddump`
+- `heapdump`
+- `loggers`
+- `scheduledtasks`
+
+Ejemplo:
+
+```bash
+nuclei -w templates/workflows/java/java-diagnostics-exposure-workflow.yaml -u https://objetivo
+```
+
 Para stacks reactivos o ligeros con señales distintas a Spring Boot, el workflow encadena fingerprint **Quarkus** (`/q/health` con check `io.quarkus`) y **Micronaut** (cabecera `Server: ...micronaut...`) con comprobaciones de riesgo acotadas (Dev UI Quarkus, fugas de env para Micronaut).
 
 - `templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml`

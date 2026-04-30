@@ -740,6 +740,22 @@ CASES = [
         unexpected=set(),
     ),
     Case(
+        name="java-diagnostics-exposure-workflow-positive",
+        family="tomcat",
+        scenario="tomcat-positive",
+        scan_mode="workflow",
+        target="templates/workflows/java/java-diagnostics-exposure-workflow.yaml",
+        expected={
+            "java-env-endpoint-exposed",
+            "java-heapdump-endpoint-exposed",
+            "java-logfile-endpoint-exposed",
+            "java-loggers-endpoint-exposed",
+            "java-scheduledtasks-endpoint-exposed",
+            "java-threaddump-endpoint-exposed",
+        },
+        unexpected=set(),
+    ),
+    Case(
         name="wildfly-fingerprint-positive",
         family="wildfly",
         scenario="wildfly-positive",

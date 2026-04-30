@@ -32,4 +32,4 @@ http:
       - type: regex
         part: header
         regex:
-          - "(?i)^set-cookie:\\s*JSESSIONID="
+          - "(?i)set-cookie:\\s*JSESSIONID="
