@@ -16,6 +16,9 @@ workflows:
       - template: templates/exposures/debug-probes/java-logfile-endpoint-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-env-endpoint-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-build-metadata-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-loggers-endpoint-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-scheduledtasks-endpoint-exposed.yaml
   - template: templates/technologies/java-web/servlet-error-signature-fingerprint.yaml
@@ -25,5 +28,8 @@ workflows:
       - template: templates/exposures/debug-probes/java-logfile-endpoint-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-env-endpoint-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-build-metadata-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-loggers-endpoint-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-scheduledtasks-endpoint-exposed.yaml

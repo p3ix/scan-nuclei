@@ -1,0 +1,42 @@
+id: jetty-fingerprint-to-java-exposure-workflow
+
+info:
+  name: Jetty Fingerprint to Java Exposure Workflow
+  author: scan-nuclei
+  description: |
+    Chains Jetty-specific configuration checks and reusable Java exposure checks
+    after detecting Eclipse Jetty via headers or default error pages.
+
+workflows:
+  - template: templates/technologies/jetty/jetty-server-header-fingerprint.yaml
+    subtemplates:
+      - template: templates/exposures/sensitive-paths/jetty-config-files-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jetty-realm-properties-exposed.yaml
+      - template: templates/exposures/sensitive-paths/web-inf-web-xml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-persistence-xml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-build-metadata-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
+      - template: templates/exposures/debug-probes/java-threaddump-endpoint-exposed.yaml
+      - template: templates/exposures/debug-probes/java-heapdump-endpoint-exposed.yaml
+      - template: templates/exposures/debug-probes/java-logfile-endpoint-exposed.yaml
+      - template: templates/vulnerabilities/generic-servlets/java-servlet-trace-echo-enabled.yaml
+      - template: templates/vulnerabilities/generic-servlets/java-servlet-verbose-error-disclosure.yaml
+  - template: templates/technologies/jetty/jetty-default-error-page-fingerprint.yaml
+    subtemplates:
+      - template: templates/exposures/sensitive-paths/jetty-config-files-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jetty-realm-properties-exposed.yaml
+      - template: templates/exposures/sensitive-paths/web-inf-web-xml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-persistence-xml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-build-metadata-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
+      - template: templates/exposures/debug-probes/java-threaddump-endpoint-exposed.yaml
+      - template: templates/exposures/debug-probes/java-heapdump-endpoint-exposed.yaml
+      - template: templates/exposures/debug-probes/java-logfile-endpoint-exposed.yaml
+      - template: templates/vulnerabilities/generic-servlets/java-servlet-trace-echo-enabled.yaml
+      - template: templates/vulnerabilities/generic-servlets/java-servlet-verbose-error-disclosure.yaml

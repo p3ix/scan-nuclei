@@ -57,6 +57,15 @@ La guia operativa completa vive en `../TRIAGE.md`.
 - `workflows/tomcat/tomcat-hardening-workflow.yaml`:
   - orientado a posture review, headers, cookies, TRACE, errores verbosos y surface admin.
 
+## Nota de workflows Java
+
+- `workflows/java/java-modern-stacks-snapshot-workflow.yaml`:
+  - orientado a Quarkus/Micronaut, health, metrics, OpenAPI y management endpoints.
+- `workflows/java/java-diagnostics-exposure-workflow.yaml`:
+  - orientado a diagnostico reutilizable Java tras senales servlet genericas.
+- `workflows/java/jetty-fingerprint-to-java-exposure-workflow.yaml`:
+  - orientado a Jetty, configuracion `jetty.xml/start.ini`, realms y exposiciones Java comunes.
+
 ## Nota de workflows Apache
 
 - `workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml`:

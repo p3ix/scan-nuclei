@@ -1,0 +1,70 @@
+id: java-cache-config-exposed
+
+info:
+  name: Java Cache Configuration Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed cache and clustering configuration files for Java
+    applications. These can disclose internal node names, multicast settings,
+    discovery mechanisms, cache names, serializers, and occasionally credentials.
+  tags:
+    - exposure
+    - java
+    - cache
+    - config
+    - hazelcast
+    - ehcache
+    - infinispan
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/ehcache.xml"
+      - "{{BaseURL}}/cache.xml"
+      - "{{BaseURL}}/hazelcast.xml"
+      - "{{BaseURL}}/hazelcast.yaml"
+      - "{{BaseURL}}/hazelcast.yml"
+      - "{{BaseURL}}/infinispan.xml"
+      - "{{BaseURL}}/redisson.yaml"
+      - "{{BaseURL}}/redisson.yml"
+      - "{{BaseURL}}/ignite.xml"
+      - "{{BaseURL}}/WEB-INF/classes/ehcache.xml"
+      - "{{BaseURL}}/WEB-INF/classes/hazelcast.xml"
+      - "{{BaseURL}}/WEB-INF/classes/hazelcast.yaml"
+      - "{{BaseURL}}/WEB-INF/classes/infinispan.xml"
+      - "{{BaseURL}}/WEB-INF/classes/redisson.yaml"
+      - "{{BaseURL}}/WEB-INF/classes/ignite.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<ehcache\\b"
+          - "(?is)<hazelcast\\b"
+          - "(?is)<infinispan\\b"
+          - "(?is)<igniteConfiguration\\b"
+          - "(?im)^hazelcast\\s*:"
+          - "(?im)^singleServerConfig\\s*:"
+          - "(?im)^clusterServersConfig\\s*:"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(cache|cluster|network|join|multicast|tcp-ip|discovery|serializer)"
+          - "(?i)(password|secret|token|username|credential)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/xml|text/xml|text/plain|application/x-yaml|text/yaml|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,68 @@
+id: java-messaging-config-exposed
+
+info:
+  name: Java Messaging Configuration Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed messaging configuration files for Kafka, RabbitMQ, ActiveMQ,
+    Artemis, and JMS clients. These often disclose broker addresses, usernames,
+    SASL/Jaas configuration, TLS material paths, and sometimes credentials.
+  tags:
+    - exposure
+    - java
+    - messaging
+    - kafka
+    - rabbitmq
+    - activemq
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/kafka.properties"
+      - "{{BaseURL}}/producer.properties"
+      - "{{BaseURL}}/consumer.properties"
+      - "{{BaseURL}}/rabbitmq.properties"
+      - "{{BaseURL}}/jms.properties"
+      - "{{BaseURL}}/activemq.xml"
+      - "{{BaseURL}}/artemis.xml"
+      - "{{BaseURL}}/WEB-INF/classes/kafka.properties"
+      - "{{BaseURL}}/WEB-INF/classes/producer.properties"
+      - "{{BaseURL}}/WEB-INF/classes/consumer.properties"
+      - "{{BaseURL}}/WEB-INF/classes/rabbitmq.properties"
+      - "{{BaseURL}}/WEB-INF/classes/jms.properties"
+      - "{{BaseURL}}/WEB-INF/classes/activemq.xml"
+      - "{{BaseURL}}/WEB-INF/classes/artemis.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^bootstrap\\.servers\\s*="
+          - "(?im)^sasl\\.jaas\\.config\\s*="
+          - "(?im)^(spring\\.)?rabbitmq\\.(host|username|password)\\s*="
+          - "(?im)^broker(URL|Url|url)\\s*="
+          - "(?is)<(broker|transportConnector|acceptor|connectors?)\\b"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(kafka|rabbit|jms|activemq|artemis|broker|bootstrap\\.servers|sasl)"
+          - "(?i)(password|passwd|secret|token|jaas|username)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/xml|text/xml|text/plain|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

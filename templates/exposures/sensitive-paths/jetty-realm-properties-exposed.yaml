@@ -1,0 +1,56 @@
+id: jetty-realm-properties-exposed
+
+info:
+  name: Jetty Realm Properties Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Jetty realm property files. These files may contain users,
+    password hashes or cleartext passwords, and role assignments used by Jetty
+    security handlers.
+  tags:
+    - exposure
+    - jetty
+    - java
+    - realm
+    - credentials
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/realm.properties"
+      - "{{BaseURL}}/jetty-realm.properties"
+      - "{{BaseURL}}/etc/realm.properties"
+      - "{{BaseURL}}/etc/jetty-realm.properties"
+      - "{{BaseURL}}/WEB-INF/realm.properties"
+      - "{{BaseURL}}/WEB-INF/classes/realm.properties"
+      - "{{BaseURL}}/WEB-INF/classes/jetty-realm.properties"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - "(?im)^[a-z0-9_.@-]{2,}\\s*[:=]\\s*[^\\s,#:][^\\r\\n,]*(?:,\\s*[a-z0-9_.-]+)+\\s*$"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)CRYPT:"
+          - "(?i)MD5:"
+          - "(?i)OBF:"
+          - "(?i)admin|manager|user|role"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/plain|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

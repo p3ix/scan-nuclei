@@ -1128,6 +1128,22 @@
       },
       "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/actuator/restart\"}"
     },
+    "GET /actuator/busrefresh": {
+      "status": 405,
+      "headers": {
+        "Content-Type": "application/json",
+        "Allow": "POST"
+      },
+      "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/actuator/busrefresh\"}"
+    },
+    "GET /actuator/busenv": {
+      "status": 405,
+      "headers": {
+        "Content-Type": "application/json",
+        "Allow": "POST"
+      },
+      "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/actuator/busenv\"}"
+    },
     "GET /actuator/shutdown": {
       "status": 405,
       "headers": {
@@ -1169,6 +1185,46 @@
         "Server": "Jetty(9.4.53.v20231009)"
       },
       "body": "<html><head><title>Error 404 Not Found</title></head><body><h2>HTTP ERROR 404 Not Found</h2><hr/><a href=\"https://eclipse.org/jetty\">Powered by Jetty:// 9.4.53</a></body></html>"
+    },
+    "GET /jetty.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml",
+        "Server": "Jetty(9.4.53.v20231009)"
+      },
+      "body": "<Configure id=\"Server\" class=\"org.eclipse.jetty.server.Server\"><New id=\"httpConfig\" class=\"org.eclipse.jetty.server.HttpConfiguration\"/><Set name=\"stopAtShutdown\">true</Set></Configure>"
+    },
+    "GET /realm.properties": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "Jetty(9.4.53.v20231009)"
+      },
+      "body": "admin: OBF:1xmk1w261u9r1w1c1xmq,admin,manager\noperator: MD5:6f1ed002ab5595859014ebf0951522d9,user\n"
+    },
+    "GET /WEB-INF/classes/ehcache.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml",
+        "Server": "Jetty(9.4.53.v20231009)"
+      },
+      "body": "<ehcache><cache name=\"sessions\" maxEntriesLocalHeap=\"10000\"/><diskStore path=\"/srv/app/cache\"/></ehcache>"
+    },
+    "GET /WEB-INF/classes/kafka.properties": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "Jetty(9.4.53.v20231009)"
+      },
+      "body": "bootstrap.servers=kafka01.internal:9092,kafka02.internal:9092\nsecurity.protocol=SASL_SSL\nsasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"billing\" password=\"S3cr3t\";\n"
+    },
+    "GET /WEB-INF/classes/shiro.ini": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "Jetty(9.4.53.v20231009)"
+      },
+      "body": "[main]\nldapRealm = org.apache.shiro.realm.ldap.JndiLdapRealm\nsecurityManager.realms = $ldapRealm\n[users]\nadmin = $2a$10$abcdefghijklmnopqrstuu, admin\n[roles]\nadmin = *\n"
     }
   }
 }

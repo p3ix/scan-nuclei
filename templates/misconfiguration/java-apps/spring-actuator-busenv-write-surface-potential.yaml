@@ -1,0 +1,47 @@
+id: spring-actuator-busenv-write-surface-potential
+
+info:
+  name: Spring Actuator Bus Env Write Surface Potentially Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects a likely exposed Spring Cloud Bus env actuator write surface without
+    invoking the operation. A 405 response with POST allowed indicates the
+    endpoint exists and should be disabled or strongly authenticated.
+  tags:
+    - misconfig
+    - spring
+    - spring-cloud
+    - actuator
+    - busenv
+    - write-surface
+    - potential
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/busenv"
+      - "{{BaseURL}}/busenv"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 405
+      - type: regex
+        part: header
+        regex:
+          - "(?i)allow:\\s*(?:[^\\r\\n,]+,\\s*)*POST\\b"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)request method '?GET'? not supported"
+          - '(?i)"method"\s*:\s*"GET"'
+          - '(?i)"path"\s*:\s*".*/busenv"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

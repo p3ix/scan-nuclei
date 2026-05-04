@@ -1,0 +1,61 @@
+id: jetty-config-files-exposed
+
+info:
+  name: Jetty Configuration Files Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Eclipse Jetty configuration files such as jetty.xml,
+    start.ini, start.d modules, and per-application Jetty descriptors. These can
+    disclose connectors, TLS settings, thread pools, handlers, paths, and
+    occasionally secrets or internal upstreams.
+  tags:
+    - exposure
+    - jetty
+    - java
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/jetty.xml"
+      - "{{BaseURL}}/etc/jetty.xml"
+      - "{{BaseURL}}/jetty-http.xml"
+      - "{{BaseURL}}/jetty-https.xml"
+      - "{{BaseURL}}/jetty-ssl.xml"
+      - "{{BaseURL}}/etc/jetty-http.xml"
+      - "{{BaseURL}}/etc/jetty-https.xml"
+      - "{{BaseURL}}/etc/jetty-ssl.xml"
+      - "{{BaseURL}}/start.ini"
+      - "{{BaseURL}}/start.d/http.ini"
+      - "{{BaseURL}}/start.d/https.ini"
+      - "{{BaseURL}}/start.d/ssl.ini"
+      - "{{BaseURL}}/WEB-INF/jetty-env.xml"
+      - "{{BaseURL}}/WEB-INF/jetty-web.xml"
+      - "{{BaseURL}}/WEB-INF/web-jetty.xml"
+      - "{{BaseURL}}/WEB-INF/classes/jetty-env.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<Configure\\b[^>]*(org\\.eclipse\\.jetty|jetty)"
+          - "(?is)<New\\b[^>]*class=\"org\\.eclipse\\.jetty\\."
+          - "(?im)^--module=(server|http|https|ssl|deploy|webapp|jmx)\\b"
+          - "(?im)^jetty\\.(http|https|ssl|deploy|webapp|threadPool)\\."
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/xml|text/xml|text/plain|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,66 @@
+id: java-security-config-exposed
+
+info:
+  name: Java Security Configuration Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Java application security configuration such as Shiro INI
+    files, users/roles properties, and JAAS descriptors. These may disclose
+    realms, LDAP settings, password hashes, cleartext credentials, and role
+    mappings.
+  tags:
+    - exposure
+    - java
+    - security
+    - shiro
+    - jaas
+    - credentials
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/shiro.ini"
+      - "{{BaseURL}}/security.properties"
+      - "{{BaseURL}}/users.properties"
+      - "{{BaseURL}}/roles.properties"
+      - "{{BaseURL}}/jaas.conf"
+      - "{{BaseURL}}/login.conf"
+      - "{{BaseURL}}/WEB-INF/classes/shiro.ini"
+      - "{{BaseURL}}/WEB-INF/classes/security.properties"
+      - "{{BaseURL}}/WEB-INF/classes/users.properties"
+      - "{{BaseURL}}/WEB-INF/classes/roles.properties"
+      - "{{BaseURL}}/WEB-INF/classes/jaas.conf"
+      - "{{BaseURL}}/WEB-INF/classes/login.conf"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^\\[(main|users|roles|urls)\\]\\s*$"
+          - "(?im)^securityManager\\."
+          - "(?im)^authc\\."
+          - "(?im)^[a-z0-9_.@-]+\\s*=\\s*[^\\r\\n,]+,\\s*[a-z0-9_.:-]+"
+          - "(?is)LoginModule\\s+(required|requisite|sufficient|optional)"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(shiro|realm|roles|users|LoginModule|ldap|bcrypt|sha-256|password|credential)"
+          - "(?i)(admin|manager|operator)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/plain|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
