@@ -1,0 +1,40 @@
+id: jetty-default-error-page-fingerprint
+
+info:
+  name: Eclipse Jetty Default Error Page Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Eclipse Jetty default error pages. Informational only; useful for
+    routing follow-up Java web checks when headers are hidden or normalized.
+  tags:
+    - tech
+    - jetty
+    - java
+    - fingerprint
+    - error-page
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei-jetty"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 404
+          - 500
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)powered\\s+by\\s+jetty"
+          - "(?i)<title>error\\s+[0-9]{3}\\s+[^<]*</title>"
+          - "(?i)org\\.eclipse\\.jetty\\."
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)jetty"
+          - "(?i)org\\.eclipse\\.jetty\\."

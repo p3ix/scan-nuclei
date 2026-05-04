@@ -1,0 +1,62 @@
+id: java-build-metadata-exposed
+
+info:
+  name: Java Build Metadata Files Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Maven or Gradle build metadata. These files can reveal
+    dependency versions, internal package names, repositories, plugins, and
+    occasionally credentials or deployment endpoints.
+  tags:
+    - exposure
+    - java
+    - maven
+    - gradle
+    - build
+    - metadata
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/pom.xml"
+      - "{{BaseURL}}/build.gradle"
+      - "{{BaseURL}}/build.gradle.kts"
+      - "{{BaseURL}}/settings.gradle"
+      - "{{BaseURL}}/settings.gradle.kts"
+      - "{{BaseURL}}/gradle.properties"
+      - "{{BaseURL}}/mvnw"
+      - "{{BaseURL}}/gradlew"
+      - "{{BaseURL}}/WEB-INF/classes/META-INF/maven/pom.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<project\\b[^>]*>.*<(groupId|artifactId|version)>"
+          - "(?im)^plugins\\s*\\{"
+          - "(?im)^dependencies\\s*\\{"
+          - "(?im)^rootProject\\.name\\s*="
+          - "(?im)^(systemProp\\.|org\\.gradle\\.|maven\\.)"
+          - "(?im)^#!/bin/sh\\s*$"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(maven|gradle|artifactId|groupId|dependencies|plugins)"
+          - "(?i)(password|passwd|secret|token|api[-_]?key)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/xml|text/xml|text/plain|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

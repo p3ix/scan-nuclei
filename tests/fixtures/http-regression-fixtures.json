@@ -1041,6 +1041,20 @@
       },
       "body": "{\"_links\":{\"self\":{\"href\":\"/actuator\"},\"health\":{\"href\":\"/actuator/health\"}}}"
     },
+    "GET /actuator/health": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"status\":\"UP\",\"components\":{\"db\":{\"status\":\"UP\",\"details\":{\"database\":\"PostgreSQL\",\"validationQuery\":\"isValid()\"}},\"diskSpace\":{\"status\":\"UP\",\"details\":{\"total\":1024,\"free\":512}}}}"
+    },
+    "GET /actuator/info": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"git\":{\"branch\":\"main\",\"commit\":{\"id\":\"abc1234\",\"time\":\"2026-04-30T10:15:00Z\"}},\"build\":{\"artifact\":\"billing-api\",\"version\":\"1.2.3\",\"time\":\"2026-04-30T10:00:00Z\"}}"
+    },
     "GET /actuator/prometheus": {
       "status": 200,
       "headers": {
@@ -1098,6 +1112,22 @@
       },
       "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/actuator/gateway/refresh\"}"
     },
+    "GET /actuator/refresh": {
+      "status": 405,
+      "headers": {
+        "Content-Type": "application/json",
+        "Allow": "POST"
+      },
+      "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/actuator/refresh\"}"
+    },
+    "GET /actuator/restart": {
+      "status": 405,
+      "headers": {
+        "Content-Type": "application/json",
+        "Allow": "POST"
+      },
+      "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/actuator/restart\"}"
+    },
     "GET /actuator/shutdown": {
       "status": 405,
       "headers": {
@@ -1105,6 +1135,13 @@
         "Allow": "POST"
       },
       "body": "{\"timestamp\":\"2026-04-30T10:15:00Z\",\"status\":405,\"error\":\"Method Not Allowed\",\"method\":\"GET\",\"path\":\"/actuator/shutdown\"}"
+    },
+    "GET /pom.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<project><modelVersion>4.0.0</modelVersion><groupId>com.example</groupId><artifactId>billing-api</artifactId><version>1.2.3</version><dependencies><dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-web</artifactId></dependency></dependencies></project>"
     }
   },
   "spring-generic": {
@@ -1114,6 +1151,24 @@
         "Content-Type": "text/html"
       },
       "body": "<html><body><h1>Error</h1><p>not found</p></body></html>"
+    }
+  },
+  "jetty-positive": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/plain",
+        "Server": "Jetty(9.4.53.v20231009)"
+      },
+      "body": "ok"
+    },
+    "GET /this-path-should-not-exist-nuclei-jetty": {
+      "status": 404,
+      "headers": {
+        "Content-Type": "text/html",
+        "Server": "Jetty(9.4.53.v20231009)"
+      },
+      "body": "<html><head><title>Error 404 Not Found</title></head><body><h2>HTTP ERROR 404 Not Found</h2><hr/><a href=\"https://eclipse.org/jetty\">Powered by Jetty:// 9.4.53</a></body></html>"
     }
   }
 }

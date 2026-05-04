@@ -1,0 +1,52 @@
+id: spring-actuator-info-build-git-exposed
+
+info:
+  name: Spring Actuator Build or Git Info Exposed
+  author: scan-nuclei
+  severity: low
+  description: |
+    Detects unauthenticated Spring Actuator info output containing build or Git
+    metadata. This commonly discloses artifact names, versions, branches, commit
+    ids, and build timestamps.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - info-disclosure
+    - build
+    - git
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/info"
+      - "{{BaseURL}}/info"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"git"\s*:\s*\{'
+          - '(?i)"build"\s*:\s*\{'
+          - '(?i)"commit"\s*:\s*\{'
+          - '(?i)"branch"\s*:\s*"[^"]+"'
+      - type: dsl
+        dsl:
+          - 'len(body) > 8'
+          - 'body != "{}"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

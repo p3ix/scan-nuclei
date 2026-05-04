@@ -1,0 +1,42 @@
+id: jetty-server-header-fingerprint
+
+info:
+  name: Eclipse Jetty Server Header Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects Eclipse Jetty technology via explicit server header signatures.
+  tags:
+    - tech
+    - jetty
+    - java
+    - fingerprint
+    - header
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 301
+          - 302
+          - 401
+          - 403
+          - 404
+          - 500
+      - type: regex
+        part: header
+        regex:
+          - "(?i)server:\\s*(?:[^\\r\\n]*\\s+)?jetty(?:\\([0-9.]+[^)]*\\)|/[0-9.]+)?"
+
+    extractors:
+      - type: regex
+        name: jetty_version
+        part: header
+        regex:
+          - "(?i)server:\\s*(?:[^\\r\\n]*\\s+)?(jetty(?:\\([0-9.]+[^)]*\\)|/[0-9.]+)?)"

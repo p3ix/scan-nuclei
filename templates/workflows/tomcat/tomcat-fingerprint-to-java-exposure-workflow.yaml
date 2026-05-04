@@ -22,6 +22,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/java-env-endpoint-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-yaml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-build-metadata-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
       - template: templates/vulnerabilities/generic-servlets/java-servlet-trace-echo-enabled.yaml
       - template: templates/vulnerabilities/generic-servlets/java-servlet-verbose-error-disclosure.yaml
@@ -48,6 +49,7 @@ workflows:
       - template: templates/exposures/sensitive-paths/java-env-endpoint-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-properties-exposed.yaml
       - template: templates/exposures/sensitive-paths/application-yaml-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-build-metadata-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
       - template: templates/vulnerabilities/generic-servlets/java-servlet-trace-echo-enabled.yaml
       - template: templates/vulnerabilities/generic-servlets/java-servlet-verbose-error-disclosure.yaml

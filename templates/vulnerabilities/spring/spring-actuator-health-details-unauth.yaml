@@ -1,0 +1,50 @@
+id: spring-actuator-health-details-unauth
+
+info:
+  name: Spring Actuator Health Details Exposed Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated Spring Actuator health endpoints that expose detailed
+    component status. Detailed health output can disclose database, disk, broker,
+    cache, and dependency names useful for attack surface mapping.
+  tags:
+    - vulnerability
+    - spring
+    - spring-boot
+    - actuator
+    - health
+    - info-disclosure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/health"
+      - "{{BaseURL}}/health"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"status"\s*:\s*"(UP|DOWN|OUT_OF_SERVICE|UNKNOWN)"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"components"\s*:\s*\{'
+          - '(?i)"details"\s*:\s*\{'
+          - '(?i)"(db|diskSpace|redis|rabbit|mongo|elasticsearch|cassandra|ldap|mail)"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

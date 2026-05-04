@@ -13,6 +13,8 @@ workflows:
       - template: templates/misconfiguration/java-apps/java-loggers-endpoint-exposed.yaml
       - template: templates/misconfiguration/java-apps/spring-actuator-loggers-write-surface-exposed.yaml
       - template: templates/misconfiguration/java-apps/spring-actuator-gateway-refresh-write-surface-potential.yaml
+      - template: templates/misconfiguration/java-apps/spring-actuator-refresh-write-surface-potential.yaml
+      - template: templates/misconfiguration/java-apps/spring-actuator-restart-write-surface-potential.yaml
       - template: templates/misconfiguration/java-apps/spring-actuator-shutdown-write-surface-potential.yaml
       - template: templates/exposures/error-pages/java-tomcat-stacktrace-exposed.yaml
       - template: templates/exposures/sensitive-paths/actuator-env-exposed.yaml
@@ -31,8 +33,11 @@ workflows:
       - template: templates/exposures/sensitive-paths/spring-actuator-caches-unauth.yaml
       - template: templates/exposures/sensitive-paths/spring-actuator-integrationgraph-unauth.yaml
       - template: templates/exposures/sensitive-paths/java-env-files-exposed.yaml
+      - template: templates/exposures/sensitive-paths/java-build-metadata-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-logging-archives-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-backups-exposed.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-health-details-unauth.yaml
+      - template: templates/vulnerabilities/spring/spring-actuator-info-build-git-exposed.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-beans-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-auditevents-unauth.yaml
       - template: templates/vulnerabilities/spring/spring-actuator-conditions-unauth.yaml
