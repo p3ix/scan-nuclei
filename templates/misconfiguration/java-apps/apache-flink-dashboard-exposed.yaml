@@ -1,0 +1,55 @@
+id: apache-flink-dashboard-exposed
+
+info:
+  name: Apache Flink Dashboard Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache Flink web dashboards or REST APIs. Public Flink access
+    can reveal jobs, task managers, cluster configuration, and runtime metrics.
+  tags:
+    - misconfig
+    - flink
+    - java
+    - dashboard
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/overview"
+      - "{{BaseURL}}/config"
+      - "{{BaseURL}}/taskmanagers"
+      - "{{BaseURL}}/jobs/overview"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Apache Flink"
+          - "(?i)Flink Dashboard"
+          - '(?i)"flink-version"\s*:'
+          - '(?i)"taskmanagers"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"jobs"\s*:'
+          - '(?i)"slots-total"\s*:'
+          - '(?i)"jobs-running"\s*:'
+          - "(?i)Job Manager"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

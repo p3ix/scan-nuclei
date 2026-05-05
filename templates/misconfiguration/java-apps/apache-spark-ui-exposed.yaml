@@ -1,0 +1,55 @@
+id: apache-spark-ui-exposed
+
+info:
+  name: Apache Spark UI Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Apache Spark web UIs or REST APIs. Public Spark interfaces
+    can disclose applications, executors, environment variables, and job details.
+  tags:
+    - misconfig
+    - spark
+    - java
+    - dashboard
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/json"
+      - "{{BaseURL}}/api/v1/applications"
+      - "{{BaseURL}}/applications/"
+      - "{{BaseURL}}/jobs/"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Spark Master"
+          - "(?i)Spark Jobs"
+          - "(?i)Spark UI"
+          - '(?i)"attempts"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Workers"
+          - "(?i)Executors"
+          - "(?i)Applications"
+          - '(?i)"appId"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,56 @@
+id: nginx-autoindex-exposed
+
+info:
+  name: Nginx Autoindex Directory Listing Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Nginx autoindex directory listings on common paths. Directory
+    listings can expose backups, uploads, static assets, logs, and source files.
+  tags:
+    - misconfig
+    - nginx
+    - autoindex
+    - listing
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/uploads/"
+      - "{{BaseURL}}/files/"
+      - "{{BaseURL}}/backup/"
+      - "{{BaseURL}}/static/"
+      - "{{BaseURL}}/logs/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Index of /"
+          - "(?i)<h1>Index of /"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)>../</a>"
+          - "(?i)>Parent Directory</a>"
+          - "(?i)Last modified"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)server:\\s*nginx"
+          - "(?i)<hr><address>nginx"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

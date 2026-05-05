@@ -1,0 +1,54 @@
+id: jenkins-dashboard-exposed
+
+info:
+  name: Jenkins Dashboard or API Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly reachable Jenkins dashboards or unauthenticated API output.
+    Exposed Jenkins often leaks jobs, build metadata, users, plugins, and SCM data.
+  tags:
+    - misconfig
+    - jenkins
+    - cicd
+    - java
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/jenkins/"
+      - "{{BaseURL}}/api/json"
+      - "{{BaseURL}}/jenkins/api/json"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)x-jenkins:"
+          - "(?i)X-Jenkins-Session"
+          - "(?i)Jenkins"
+          - '(?i)"nodeDescription"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Dashboard \\[Jenkins\\]"
+          - "(?i)Jenkins-Agent-Protocols"
+          - '(?i)"jobs"\s*:\s*\['
+          - '(?i)"views"\s*:\s*\['
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

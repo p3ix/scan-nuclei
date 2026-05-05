@@ -1,0 +1,52 @@
+id: nginx-vts-status-exposed
+
+info:
+  name: Nginx VTS Status Dashboard Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Nginx virtual host traffic status dashboards or JSON APIs.
+    These endpoints can reveal upstreams, cache zones, server zones, and traffic
+    statistics.
+  tags:
+    - misconfig
+    - nginx
+    - vts
+    - status
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/status"
+      - "{{BaseURL}}/status/"
+      - "{{BaseURL}}/status/format/json"
+      - "{{BaseURL}}/nginx_status/format/json"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)nginx\\s+virtual\\s+host\\s+traffic\\s+status"
+          - '(?i)"nginxVersion"\s*:'
+          - '(?i)"serverZones"\s*:'
+          - '(?i)"upstreamZones"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"connections"\s*:'
+          - '(?i)"requestCounter"\s*:'
+          - '(?i)"inBytes"\s*:'
+          - '(?i)"outBytes"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

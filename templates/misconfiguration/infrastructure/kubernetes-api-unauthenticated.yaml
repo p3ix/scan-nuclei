@@ -1,0 +1,53 @@
+id: kubernetes-api-unauthenticated
+
+info:
+  name: Kubernetes API Unauthenticated
+  author: scan-nuclei
+  severity: critical
+  description: |
+    Detects Kubernetes API server endpoints that respond without authentication.
+    Unauthenticated API access can disclose cluster version, API groups, and in
+    severe cases cluster resources.
+  tags:
+    - misconfig
+    - kubernetes
+    - k8s
+    - api
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/version"
+      - "{{BaseURL}}/api"
+      - "{{BaseURL}}/apis"
+
+    headers:
+      Accept: application/json
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"gitVersion"\s*:\s*"v[0-9]'
+          - '(?i)"kind"\s*:\s*"APIVersions"'
+          - '(?i)"kind"\s*:\s*"APIGroupList"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"serverAddressByClientCIDRs"\s*:'
+          - '(?i)"versions"\s*:\s*\['
+          - '(?i)"groups"\s*:\s*\['
+          - '(?i)"major"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

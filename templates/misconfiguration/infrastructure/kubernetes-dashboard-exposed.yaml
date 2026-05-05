@@ -1,0 +1,52 @@
+id: kubernetes-dashboard-exposed
+
+info:
+  name: Kubernetes Dashboard Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects publicly reachable Kubernetes Dashboard interfaces or API routes.
+    Exposed dashboards increase the risk of cluster reconnaissance and account
+    takeover when authentication is weak or misconfigured.
+  tags:
+    - misconfig
+    - kubernetes
+    - dashboard
+    - k8s
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/api/v1/login/status"
+      - "{{BaseURL}}/api/v1/settings/global"
+      - "{{BaseURL}}/api/v1/csrftoken/login"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)kubernetes-dashboard"
+          - "(?i)Kubernetes Dashboard"
+          - '(?i)"tokenPresent"\s*:'
+          - '(?i)"itemsPerPage"\s*:'
+          - '(?i)"csrf"\s*:'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'not found')"
+          - "!contains(to_lower(body), '<title>404')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

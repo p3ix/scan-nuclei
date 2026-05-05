@@ -1,0 +1,56 @@
+id: jenkins-script-console-exposed
+
+info:
+  name: Jenkins Script Console Exposed
+  author: scan-nuclei
+  severity: critical
+  description: |
+    Detects Jenkins Script Console pages reachable with HTTP 200. The script
+    console is an administrative execution surface and should never be public.
+  tags:
+    - misconfig
+    - jenkins
+    - cicd
+    - rce
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/script"
+      - "{{BaseURL}}/jenkins/script"
+      - "{{BaseURL}}/scriptText"
+      - "{{BaseURL}}/jenkins/scriptText"
+
+    headers:
+      Accept: text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)x-jenkins:"
+          - "(?i)Jenkins"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Script Console"
+          - "(?i)Groovy script"
+          - "(?i)Result"
+          - "(?i)println"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'access denied')"
+          - "!contains(to_lower(body), 'login')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

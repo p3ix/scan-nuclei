@@ -1,0 +1,47 @@
+id: docker-registry-catalog-exposed
+
+info:
+  name: Docker Registry Catalog Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Docker Registry v2 catalog endpoints. Public catalog access
+    can reveal private image names, deployment structure, and repository metadata.
+  tags:
+    - misconfig
+    - docker
+    - registry
+    - containers
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/v2/"
+      - "{{BaseURL}}/v2/_catalog"
+
+    headers:
+      Accept: application/json
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"repositories"\s*:\s*\['
+          - '(?i)docker-distribution-api-version'
+          - '(?i)registry/2\.0'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), '<html')"
+          - "!contains(to_lower(body), 'not found')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

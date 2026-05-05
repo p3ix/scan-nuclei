@@ -1,0 +1,58 @@
+id: elasticsearch-unauthenticated-api-exposed
+
+info:
+  name: Elasticsearch API Unauthenticated
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated Elasticsearch HTTP APIs. Public access can expose
+    cluster names, node details, index names, mappings, and potentially data.
+  tags:
+    - misconfig
+    - elasticsearch
+    - search
+    - api
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/_cluster/health"
+      - "{{BaseURL}}/_cat/indices?format=json"
+      - "{{BaseURL}}/_nodes/http"
+
+    headers:
+      Accept: application/json
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"cluster_name"\s*:'
+          - '(?i)"tagline"\s*:\s*"You Know, for Search"'
+          - '(?i)"number_of_nodes"\s*:'
+          - '(?i)"indices"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"version"\s*:'
+          - '(?i)"cluster_uuid"\s*:'
+          - '(?i)"nodes"\s*:'
+          - '(?i)"status"\s*:'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), '<html')"
+          - "!contains(to_lower(body), 'not found')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

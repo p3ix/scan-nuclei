@@ -1,0 +1,55 @@
+id: spring-actuator-env-write-surface-potential
+
+info:
+  name: Spring Actuator Env Write Surface Potential
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Spring Actuator env write surfaces by sending invalid JSON
+    and matching endpoint-specific parser behavior. Writable env endpoints can
+    change runtime configuration in older or explicitly enabled deployments.
+  tags:
+    - misconfig
+    - spring
+    - actuator
+    - env
+    - write
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/actuator/env"
+      - "{{BaseURL}}/env"
+      - "{{BaseURL}}/manage/env"
+      - "{{BaseURL}}/management/env"
+
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+
+    body: "{"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 400 || status_code == 405 || status_code == 415"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)application/(json|problem\\+json)"
+          - "(?i)http\\s+message\\s+not\\s+readable"
+          - "(?i)json\\s+parse\\s+error"
+          - '(?i)"(timestamp|status|error|path|message)"'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'status 404')"
+          - "!contains(to_lower(body), 'not found')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

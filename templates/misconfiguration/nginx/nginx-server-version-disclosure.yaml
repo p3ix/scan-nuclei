@@ -1,0 +1,41 @@
+id: nginx-server-version-disclosure
+
+info:
+  name: Nginx Server Version Disclosure
+  author: scan-nuclei
+  severity: low
+  description: |
+    Detects Nginx version disclosure in headers or default error pages. Exposed
+    versions improve fingerprinting and vulnerability prioritization for attackers.
+  tags:
+    - misconfig
+    - nginx
+    - disclosure
+    - version
+    - hardening
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/scan-nuclei-missing-path"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code >= 200 && status_code < 600"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)server:\\s*nginx/[0-9][0-9A-Za-z._~-]*"
+          - "(?i)<center>nginx/[0-9][0-9A-Za-z._~-]*</center>"
+          - "(?i)<hr><center>nginx/[0-9][0-9A-Za-z._~-]*</center>"
+
+    extractors:
+      - type: regex
+        part: all
+        regex:
+          - "(?i)nginx/[0-9][0-9A-Za-z._~-]*"
+        name: nginx_version

@@ -1,0 +1,50 @@
+id: vault-health-endpoint-exposed
+
+info:
+  name: HashiCorp Vault Health Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Vault health/status endpoints. These endpoints can disclose
+    initialization, seal, standby, performance standby, and version state.
+  tags:
+    - misconfig
+    - vault
+    - hashicorp
+    - status
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/v1/sys/health"
+      - "{{BaseURL}}/v1/sys/seal-status"
+      - "{{BaseURL}}/ui/"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 429 || status_code == 472 || status_code == 473 || status_code == 501 || status_code == 503"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"sealed"\s*:'
+          - '(?i)"initialized"\s*:'
+          - '(?i)"standby"\s*:'
+          - '(?i)"cluster_name"\s*:'
+          - "(?i)HashiCorp Vault"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'not found')"
+          - "!contains(to_lower(body), '<title>404')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

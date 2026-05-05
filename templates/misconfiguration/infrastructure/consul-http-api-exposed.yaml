@@ -1,0 +1,52 @@
+id: consul-http-api-exposed
+
+info:
+  name: Consul HTTP API Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed HashiCorp Consul HTTP API endpoints. Public Consul access can
+    disclose service discovery data, node names, datacenters, and health checks.
+  tags:
+    - misconfig
+    - consul
+    - service-discovery
+    - api
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/v1/status/leader"
+      - "{{BaseURL}}/v1/status/peers"
+      - "{{BaseURL}}/v1/catalog/services"
+      - "{{BaseURL}}/v1/agent/self"
+      - "{{BaseURL}}/ui/"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)consul"
+          - '(?i)"Config"\s*:'
+          - '(?i)"Member"\s*:'
+          - '(?i)"Datacenter"\s*:'
+          - '(?i)"consul"\s*:'
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'not found')"
+          - "!contains(to_lower(body), '<title>404')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

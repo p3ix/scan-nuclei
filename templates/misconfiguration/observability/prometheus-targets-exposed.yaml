@@ -1,0 +1,54 @@
+id: prometheus-targets-exposed
+
+info:
+  name: Prometheus Targets or Configuration Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Prometheus operational endpoints that disclose scrape targets,
+    labels, service names, file paths, external labels, and runtime configuration.
+  tags:
+    - misconfig
+    - prometheus
+    - monitoring
+    - targets
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/targets"
+      - "{{BaseURL}}/config"
+      - "{{BaseURL}}/api/v1/targets"
+      - "{{BaseURL}}/api/v1/status/config"
+      - "{{BaseURL}}/api/v1/status/runtimeinfo"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)prometheus"
+          - '(?i)"activeTargets"\s*:'
+          - '(?i)"scrapeUrl"\s*:'
+          - '(?i)"yaml"\s*:'
+          - "(?i)scrape_configs"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"globalUrl"\s*:'
+          - '(?i)"labels"\s*:'
+          - '(?i)"health"\s*:'
+          - '(?i)"lastScrape"\s*:'
+          - "(?i)evaluation_interval"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

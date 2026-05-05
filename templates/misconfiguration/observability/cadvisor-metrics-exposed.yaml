@@ -1,0 +1,53 @@
+id: cadvisor-metrics-exposed
+
+info:
+  name: cAdvisor Metrics Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed cAdvisor metrics or UI endpoints. Public cAdvisor access can
+    reveal container names, image names, host paths, labels, and runtime metrics.
+  tags:
+    - misconfig
+    - cadvisor
+    - containers
+    - metrics
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/metrics"
+      - "{{BaseURL}}/containers/"
+      - "{{BaseURL}}/docker/"
+
+    headers:
+      Accept: text/plain,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^container_cpu_usage_seconds_total"
+          - "(?m)^container_memory_usage_bytes"
+          - "(?i)cAdvisor"
+          - "(?i)google/cadvisor"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^#\\s+HELP\\s+container_"
+          - "(?i)container_label_"
+          - "(?i)machine_cpu_cores"
+          - "(?i)filesystem"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

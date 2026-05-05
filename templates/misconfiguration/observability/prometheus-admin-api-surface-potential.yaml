@@ -1,0 +1,51 @@
+id: prometheus-admin-api-surface-potential
+
+info:
+  name: Prometheus Admin API Surface Potential
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects Prometheus administrative API routes using safe GET probes that
+    look for method handling or disabled-admin responses. When enabled, these
+    endpoints can allow snapshots or TSDB changes through POST requests.
+  tags:
+    - misconfig
+    - prometheus
+    - admin
+    - monitoring
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/-/reload"
+      - "{{BaseURL}}/api/v1/admin/tsdb/snapshot"
+      - "{{BaseURL}}/api/v1/admin/tsdb/delete_series"
+
+    headers:
+      Accept: application/json
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 403 || status_code == 405"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"status"\s*:\s*"(success|error)"'
+          - "(?i)admin\\s+apis"
+          - "(?i)lifecycle\\s+API"
+          - "(?i)method\\s+not\\s+allowed"
+          - "(?i)disabled"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), '<html')"
+          - "!contains(to_lower(body), 'not found')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

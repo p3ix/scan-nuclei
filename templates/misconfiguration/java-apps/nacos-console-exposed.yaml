@@ -1,0 +1,51 @@
+id: nacos-console-exposed
+
+info:
+  name: Nacos Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Nacos console or API endpoints. Nacos often contains service
+    discovery and configuration data and should not be publicly reachable.
+  tags:
+    - misconfig
+    - java
+    - nacos
+    - spring-cloud
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/nacos/"
+      - "{{BaseURL}}/nacos/index.html"
+      - "{{BaseURL}}/nacos/v1/console/server/state"
+      - "{{BaseURL}}/nacos/v1/ns/operator/metrics"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)nacos"
+          - "(?i)Nacos"
+          - '(?i)"standalone_mode"\s*:'
+          - '(?i)"version"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)service\\s+management"
+          - "(?i)configuration\\s+management"
+          - '(?i)"serverPort"\s*:'
+          - "(?i)naming"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

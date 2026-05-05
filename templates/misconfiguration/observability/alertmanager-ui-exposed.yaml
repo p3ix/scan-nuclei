@@ -1,0 +1,51 @@
+id: alertmanager-ui-exposed
+
+info:
+  name: Prometheus Alertmanager UI Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Prometheus Alertmanager interfaces. Exposure can
+    reveal alert names, routing structure, labels, receivers, and silence state.
+  tags:
+    - misconfig
+    - alertmanager
+    - prometheus
+    - monitoring
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/alerts"
+      - "{{BaseURL}}/api/v2/status"
+      - "{{BaseURL}}/api/v2/alerts"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)alertmanager"
+          - '(?i)"versionInfo"\s*:'
+          - '(?i)"cluster"\s*:'
+          - '(?i)"receiver"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)prometheus"
+          - '(?i)"status"\s*:'
+          - '(?i)"alerts"\s*:'
+          - '(?i)"silences"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

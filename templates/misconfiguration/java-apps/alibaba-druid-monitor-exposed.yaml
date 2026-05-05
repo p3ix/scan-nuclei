@@ -1,0 +1,52 @@
+id: alibaba-druid-monitor-exposed
+
+info:
+  name: Alibaba Druid Monitor Console Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Alibaba Druid monitoring consoles. Exposed Druid
+    monitors can reveal JDBC URLs, SQL metrics, web URI statistics, and session data.
+  tags:
+    - misconfig
+    - java
+    - druid
+    - database
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/druid/"
+      - "{{BaseURL}}/druid/index.html"
+      - "{{BaseURL}}/druid/login.html"
+      - "{{BaseURL}}/druid/weburi.html"
+      - "{{BaseURL}}/druid/datasource.html"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Druid Stat Index"
+          - "(?i)Druid Monitor"
+          - "(?i)Druid Stat"
+          - "(?i)com\\.alibaba\\.druid"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)DataSource"
+          - "(?i)SQL Stat"
+          - "(?i)Web URI"
+          - "(?i)Session Stat"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

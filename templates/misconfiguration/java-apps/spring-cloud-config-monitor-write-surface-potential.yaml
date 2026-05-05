@@ -1,0 +1,55 @@
+id: spring-cloud-config-monitor-write-surface-potential
+
+info:
+  name: Spring Cloud Config Monitor Write Surface Potential
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Spring Cloud Config monitor webhook surfaces by probing with
+    invalid JSON. Public monitor endpoints can trigger refresh workflows when
+    message bus integration is enabled.
+  tags:
+    - misconfig
+    - spring
+    - spring-cloud
+    - config
+    - write
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/monitor"
+      - "{{BaseURL}}/actuator/monitor"
+      - "{{BaseURL}}/config/monitor"
+
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+
+    body: "{"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 400 || status_code == 415 || status_code == 500"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)application/(json|problem\\+json)"
+          - "(?i)monitor"
+          - "(?i)property\\s+path"
+          - "(?i)http\\s+message\\s+not\\s+readable"
+          - "(?i)json\\s+parse\\s+error"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'status 404')"
+          - "!contains(to_lower(body), 'not found')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

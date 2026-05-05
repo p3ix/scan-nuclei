@@ -1,0 +1,53 @@
+id: etcd-metrics-exposed
+
+info:
+  name: etcd Metrics Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed etcd metrics endpoints. Public etcd telemetry can disclose
+    cluster role, peer/client traffic, storage metrics, and operational state.
+  tags:
+    - misconfig
+    - etcd
+    - metrics
+    - kubernetes
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/metrics"
+      - "{{BaseURL}}/health"
+      - "{{BaseURL}}/version"
+
+    headers:
+      Accept: application/json,text/plain
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^etcd_server_has_leader"
+          - "(?m)^etcd_debugging_"
+          - "(?m)^etcd_network_"
+          - '(?i)"etcdserver"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^#\\s+HELP\\s+etcd_"
+          - "(?m)^grpc_server_"
+          - '(?i)"health"\s*:'
+          - '(?i)"etcdcluster"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

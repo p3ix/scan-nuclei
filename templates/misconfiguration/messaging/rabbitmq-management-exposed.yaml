@@ -1,0 +1,54 @@
+id: rabbitmq-management-exposed
+
+info:
+  name: RabbitMQ Management Interface Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed RabbitMQ Management UI or API endpoints. Public management
+    exposure can reveal queues, exchanges, users, cluster nodes, and broker state.
+  tags:
+    - misconfig
+    - rabbitmq
+    - messaging
+    - management
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/#/"
+      - "{{BaseURL}}/api/overview"
+      - "{{BaseURL}}/api/whoami"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)RabbitMQ Management"
+          - "(?i)realm=\"RabbitMQ Management\""
+          - '(?i)"rabbitmq_version"\s*:'
+          - '(?i)"management_version"\s*:'
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)rabbitmq"
+          - '(?i)"cluster_name"\s*:'
+          - '(?i)"queue_totals"\s*:'
+          - '(?i)"object_totals"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,41 @@
+id: grafana-login-public-signup-enabled
+
+info:
+  name: Grafana Public Signup Enabled
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Grafana login pages that advertise public user signup. Open signup
+    can allow untrusted users to create accounts when not intentionally enabled.
+  tags:
+    - misconfig
+    - grafana
+    - signup
+    - monitoring
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/frontend/settings"
+      - "{{BaseURL}}/grafana/api/frontend/settings"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"appUrl"\s*:'
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"allowSignUp"\s*:\s*true'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

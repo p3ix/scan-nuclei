@@ -1,0 +1,54 @@
+id: kibana-status-exposed
+
+info:
+  name: Kibana Status or UI Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Kibana status or UI endpoints. Public Kibana exposure can
+    reveal stack versions, plugin state, index patterns, and dashboards.
+  tags:
+    - misconfig
+    - kibana
+    - elastic
+    - dashboard
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/app/kibana"
+      - "{{BaseURL}}/app/home"
+      - "{{BaseURL}}/status"
+      - "{{BaseURL}}/api/status"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)kibana"
+          - "(?i)elastic"
+          - '(?i)"name"\s*:\s*"Kibana"'
+          - '(?i)"statuses"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"overall"\s*:'
+          - '(?i)"version"\s*:'
+          - "(?i)kbn-version"
+          - "(?i)core"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

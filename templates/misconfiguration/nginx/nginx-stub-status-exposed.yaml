@@ -1,0 +1,47 @@
+id: nginx-stub-status-exposed
+
+info:
+  name: Nginx Stub Status Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Nginx stub_status pages. These endpoints disclose live
+    connection counters and request handling metrics that are usually internal.
+  tags:
+    - misconfig
+    - nginx
+    - status
+    - metrics
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/nginx_status"
+      - "{{BaseURL}}/stub_status"
+      - "{{BaseURL}}/status"
+      - "{{BaseURL}}/server-status"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - "(?im)^Active connections:\\s*\\d+"
+      - type: regex
+        part: body
+        regex:
+          - "(?im)^\\s*server\\s+accepts\\s+handled\\s+requests"
+      - type: regex
+        part: body
+        regex:
+          - "(?im)^Reading:\\s*\\d+\\s+Writing:\\s*\\d+\\s+Waiting:\\s*\\d+"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,51 @@
+id: solr-admin-console-exposed
+
+info:
+  name: Apache Solr Admin Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache Solr administration endpoints. Public Solr admin
+    access can disclose collections, cores, plugins, JVM details, and cluster state.
+  tags:
+    - misconfig
+    - java
+    - solr
+    - admin
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/solr/"
+      - "{{BaseURL}}/solr/#/"
+      - "{{BaseURL}}/solr/admin/info/system?wt=json"
+      - "{{BaseURL}}/solr/admin/cores?action=STATUS&wt=json"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Solr Admin"
+          - "(?i)Apache Solr"
+          - '(?i)"solr_home"\s*:'
+          - '(?i)"lucene"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"responseHeader"\s*:'
+          - '(?i)"system"\s*:'
+          - '(?i)"status"\s*:'
+          - "(?i)collections"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
