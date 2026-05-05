@@ -1,0 +1,68 @@
+id: graphql-ui-exposed
+
+info:
+  name: GraphQL Interactive UI Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed GraphQL interactive clients such as GraphiQL, Playground,
+    Altair, and Voyager. These interfaces make schema and query exploration
+    easier when reachable without authentication.
+  tags:
+    - exposure
+    - graphql
+    - api
+    - ui
+    - java
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/graphiql"
+      - "{{BaseURL}}/graphiql/"
+      - "{{BaseURL}}/graphql"
+      - "{{BaseURL}}/graphql/"
+      - "{{BaseURL}}/graphql-ui"
+      - "{{BaseURL}}/graphql-ui/"
+      - "{{BaseURL}}/graphql-playground"
+      - "{{BaseURL}}/graphql-playground/"
+      - "{{BaseURL}}/playground"
+      - "{{BaseURL}}/playground/"
+      - "{{BaseURL}}/altair"
+      - "{{BaseURL}}/altair/"
+      - "{{BaseURL}}/voyager"
+      - "{{BaseURL}}/voyager/"
+      - "{{BaseURL}}/api/graphiql"
+      - "{{BaseURL}}/api/graphql"
+      - "{{BaseURL}}/api/graphql-ui"
+      - "{{BaseURL}}/api/graphql-playground"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)GraphiQL"
+          - "(?i)GraphQL\\s+Playground"
+          - "(?i)graphql-playground"
+          - "(?i)Altair\\s+GraphQL"
+          - "(?i)GraphQL\\s+Voyager"
+          - "(?i)__schema"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/html|application/javascript|text/javascript|text/plain)"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

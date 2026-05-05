@@ -1,0 +1,68 @@
+id: jakarta-ee-descriptors-exposed
+
+info:
+  name: Java EE or Jakarta EE Deployment Descriptors Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Java EE / Jakarta EE descriptors such as beans.xml,
+    ejb-jar.xml, application.xml, ra.xml, and application-client.xml. These can
+    disclose CDI configuration, EJB names, interceptors, resource adapters,
+    roles, JNDI references, and deployment topology.
+  tags:
+    - exposure
+    - java
+    - jakarta
+    - java-ee
+    - descriptor
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/WEB-INF/beans.xml"
+      - "{{BaseURL}}/WEB-INF/ejb-jar.xml"
+      - "{{BaseURL}}/WEB-INF/application.xml"
+      - "{{BaseURL}}/WEB-INF/application-client.xml"
+      - "{{BaseURL}}/WEB-INF/ra.xml"
+      - "{{BaseURL}}/META-INF/beans.xml"
+      - "{{BaseURL}}/META-INF/ejb-jar.xml"
+      - "{{BaseURL}}/META-INF/application.xml"
+      - "{{BaseURL}}/META-INF/application-client.xml"
+      - "{{BaseURL}}/META-INF/ra.xml"
+      - "{{BaseURL}}/WEB-INF/classes/META-INF/beans.xml"
+      - "{{BaseURL}}/WEB-INF/classes/META-INF/ejb-jar.xml"
+      - "{{BaseURL}}/WEB-INF/classes/META-INF/application.xml"
+      - "{{BaseURL}}/WEB-INF/classes/META-INF/ra.xml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<beans\\b[^>]*(jakarta\\.ee|java\\.sun\\.com/xml/ns/javaee)"
+          - "(?is)<ejb-jar\\b"
+          - "(?is)<application\\b[^>]*(jakarta\\.ee|java\\.sun\\.com/xml/ns/javaee)"
+          - "(?is)<connector\\b"
+          - "(?is)<application-client\\b"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(interceptors|alternatives|decorators|enterprise-beans|session|message-driven|resourceadapter|security-role)"
+          - "(?i)(jndi-name|resource-ref|env-entry|mapped-name)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/xml|text/xml|text/plain|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -17,13 +17,28 @@ info:
 http:
   - method: GET
     path:
+      - "{{BaseURL}}/swagger"
+      - "{{BaseURL}}/swagger/"
+      - "{{BaseURL}}/swagger/index.html"
       - "{{BaseURL}}/swagger-ui.html"
+      - "{{BaseURL}}/swagger-ui"
       - "{{BaseURL}}/swagger-ui/index.html"
       - "{{BaseURL}}/swagger-ui/"
+      - "{{BaseURL}}/api/swagger"
+      - "{{BaseURL}}/api/swagger/"
+      - "{{BaseURL}}/api/swagger/index.html"
       - "{{BaseURL}}/swagger-api/"
       - "{{BaseURL}}/swagger-api/index.html"
+      - "{{BaseURL}}/api-docs"
       - "{{BaseURL}}/api-docs/"
+      - "{{BaseURL}}/docs"
       - "{{BaseURL}}/docs/"
+      - "{{BaseURL}}/api/docs"
+      - "{{BaseURL}}/api/docs/"
+      - "{{BaseURL}}/redoc"
+      - "{{BaseURL}}/redoc/"
+      - "{{BaseURL}}/api/redoc"
+      - "{{BaseURL}}/api/redoc/"
 
     matchers-condition: and
     matchers:
@@ -33,7 +48,7 @@ http:
       - type: regex
         part: body
         regex:
-          - "(?i)(swagger ui|swagger-ui-bundle\\.js|swagger-ui-standalone-preset\\.js)"
+          - "(?i)(swagger ui|swagger-ui-bundle\\.js|swagger-ui-standalone-preset\\.js|SwaggerUIBundle|redoc(?:\\.standalone)?\\.js|<redoc\\b)"
       - type: regex
         part: header
         regex:

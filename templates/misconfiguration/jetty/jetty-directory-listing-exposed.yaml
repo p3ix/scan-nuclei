@@ -1,0 +1,56 @@
+id: jetty-directory-listing-exposed
+
+info:
+  name: Eclipse Jetty Directory Listing Enabled
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Jetty-backed directory listings on common paths. Directory listings
+    can expose deployable artifacts, logs, backups, and other internal files.
+  tags:
+    - misconfig
+    - jetty
+    - java
+    - listing
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/files/"
+      - "{{BaseURL}}/downloads/"
+      - "{{BaseURL}}/static/"
+      - "{{BaseURL}}/resources/"
+      - "{{BaseURL}}/logs/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Directory: /"
+          - "(?i)<h1>Directory: /"
+          - "(?i)>Parent Directory<"
+          - "(?i)Last Modified</a>"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)server:\\s*.*jetty"
+          - "(?i)powered by jetty"
+          - "(?i)org\\.eclipse\\.jetty"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*text/html"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

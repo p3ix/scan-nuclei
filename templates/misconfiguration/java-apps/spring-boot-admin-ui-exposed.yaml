@@ -1,0 +1,62 @@
+id: spring-boot-admin-ui-exposed
+
+info:
+  name: Spring Boot Admin UI Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Spring Boot Admin dashboards or API endpoints. Public access
+    can disclose registered applications, actuator links, health state, versions,
+    and operational metadata across multiple services.
+  tags:
+    - misconfig
+    - spring
+    - spring-boot
+    - admin
+    - dashboard
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/applications"
+      - "{{BaseURL}}/instances"
+      - "{{BaseURL}}/wallboard"
+      - "{{BaseURL}}/admin"
+      - "{{BaseURL}}/admin/"
+      - "{{BaseURL}}/boot-admin"
+      - "{{BaseURL}}/boot-admin/"
+      - "{{BaseURL}}/spring-boot-admin"
+      - "{{BaseURL}}/spring-boot-admin/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Spring\\s+Boot\\s+Admin"
+          - "(?i)spring-boot-admin"
+          - '(?i)"instances"\s*:\s*\['
+          - '(?i)"applications"\s*:\s*\['
+          - '(?i)"statusInfo"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(wallboard|instances|applications|actuator|health)"
+          - "(?i)(de\\.codecentric|spring boot admin)"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

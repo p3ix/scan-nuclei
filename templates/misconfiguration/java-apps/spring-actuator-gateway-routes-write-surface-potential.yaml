@@ -1,0 +1,55 @@
+id: spring-actuator-gateway-routes-write-surface-potential
+
+info:
+  name: Spring Actuator Gateway Routes Write Surface Potential
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Spring Cloud Gateway route mutation surfaces by sending an
+    invalid JSON POST and matching endpoint-specific parser behavior. A writable
+    gateway route endpoint can allow traffic redirection or route manipulation.
+  tags:
+    - misconfig
+    - spring
+    - actuator
+    - gateway
+    - write
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/actuator/gateway/routes/scan-nuclei-probe"
+      - "{{BaseURL}}/gateway/routes/scan-nuclei-probe"
+      - "{{BaseURL}}/manage/gateway/routes/scan-nuclei-probe"
+
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+
+    body: "{"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 400 || status_code == 415 || status_code == 500"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)application/(json|problem\\+json)"
+          - "(?i)route(definition|Definition)"
+          - "(?i)gateway"
+          - "(?i)http\\s+message\\s+not\\s+readable"
+          - "(?i)json\\s+parse\\s+error"
+      - type: dsl
+        dsl:
+          - "!contains(to_lower(body), 'status 404')"
+          - "!contains(to_lower(body), 'not found')"
+          - "!contains(to_lower(body), '<html')"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

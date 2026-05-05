@@ -1,0 +1,54 @@
+id: micronaut-threaddump-endpoint-exposed
+
+info:
+  name: Micronaut Threaddump Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Micronaut thread dump endpoints. Thread dumps can disclose
+    class names, package names, thread roles, and live execution paths.
+  tags:
+    - misconfig
+    - micronaut
+    - java
+    - threaddump
+    - diagnostics
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/threaddump"
+      - "{{BaseURL}}/thread-dump"
+      - "{{BaseURL}}/management/threaddump"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"threads"\s*:'
+          - '(?i)"threadName"\s*:'
+          - '(?i)"threadState"\s*:'
+          - "(?i)java\\.lang\\.Thread\\.State"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)RUNNABLE"
+          - "(?i)WAITING"
+          - "(?i)BLOCKED"
+          - "(?i)stackTrace"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<html")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

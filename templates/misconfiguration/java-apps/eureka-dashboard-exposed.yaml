@@ -1,0 +1,57 @@
+id: eureka-dashboard-exposed
+
+info:
+  name: Eureka Dashboard or Registry Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Netflix Eureka dashboards or registry APIs. Public access can
+    disclose service names, instance IDs, hostnames, ports, health URLs, and
+    internal topology.
+  tags:
+    - misconfig
+    - java
+    - spring-cloud
+    - eureka
+    - registry
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/eureka"
+      - "{{BaseURL}}/eureka/"
+      - "{{BaseURL}}/eureka/apps"
+      - "{{BaseURL}}/eureka/apps/"
+      - "{{BaseURL}}/eureka/v2/apps"
+      - "{{BaseURL}}/discovery"
+      - "{{BaseURL}}/discovery/"
+      - "{{BaseURL}}/registry"
+      - "{{BaseURL}}/registry/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Eureka"
+          - "(?i)System\\s+Status"
+          - "(?is)<applications>.*<application>"
+          - '(?i)"applications"\s*:\s*\{'
+          - '(?i)"instanceId"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(instances currently registered|DS Replicas|available-replicas|serviceUrl)"
+          - "(?i)(statusPageUrl|healthCheckUrl|vipAddress|secureVipAddress)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

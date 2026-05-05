@@ -65,6 +65,8 @@ La guia operativa completa vive en `../TRIAGE.md`.
   - orientado a diagnostico reutilizable Java tras senales servlet genericas.
 - `workflows/java/jetty-fingerprint-to-java-exposure-workflow.yaml`:
   - orientado a Jetty, configuracion `jetty.xml/start.ini`, realms y exposiciones Java comunes.
+- `workflows/java/jsf-jakarta-faces-workflow.yaml`:
+  - orientado a JSF/Jakarta Faces, ViewState, PrimeFaces, `faces-config.xml`, descriptors Jakarta EE y errores Faces verbosos.
 
 ## Nota de workflows Apache
 

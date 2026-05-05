@@ -18,7 +18,12 @@ workflows:
       - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jsf-faces-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jakarta-ee-descriptors-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
+      - template: templates/exposures/error-pages/jakarta-faces-stacktrace-exposed.yaml
+      - template: templates/exposures/swagger-config-exposed.yaml
+      - template: templates/exposures/apis/graphql-ui-exposed.yaml
       - template: templates/exposures/debug-probes/java-threaddump-endpoint-exposed.yaml
       - template: templates/exposures/debug-probes/java-heapdump-endpoint-exposed.yaml
       - template: templates/exposures/debug-probes/java-logfile-endpoint-exposed.yaml
@@ -34,7 +39,12 @@ workflows:
       - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jsf-faces-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jakarta-ee-descriptors-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
+      - template: templates/exposures/error-pages/jakarta-faces-stacktrace-exposed.yaml
+      - template: templates/exposures/swagger-config-exposed.yaml
+      - template: templates/exposures/apis/graphql-ui-exposed.yaml
       - template: templates/exposures/debug-probes/java-threaddump-endpoint-exposed.yaml
       - template: templates/exposures/debug-probes/java-heapdump-endpoint-exposed.yaml
       - template: templates/exposures/debug-probes/java-logfile-endpoint-exposed.yaml

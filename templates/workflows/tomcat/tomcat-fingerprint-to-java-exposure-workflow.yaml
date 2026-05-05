@@ -10,8 +10,10 @@ workflows:
     subtemplates:
       - template: templates/exposures/openapi-json-exposed.yaml
       - template: templates/exposures/openapi-yaml-exposed.yaml
+      - template: templates/exposures/swagger-config-exposed.yaml
       - template: templates/exposures/wadl-exposed.yaml
       - template: templates/exposures/wsdl-xsd-exposed.yaml
+      - template: templates/exposures/apis/graphql-ui-exposed.yaml
       - template: templates/exposures/debug-probes/java-threaddump-endpoint-exposed.yaml
       - template: templates/exposures/debug-probes/java-heapdump-endpoint-exposed.yaml
       - template: templates/exposures/debug-probes/java-logfile-endpoint-exposed.yaml
@@ -26,7 +28,10 @@ workflows:
       - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jsf-faces-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jakarta-ee-descriptors-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
+      - template: templates/exposures/error-pages/jakarta-faces-stacktrace-exposed.yaml
       - template: templates/vulnerabilities/generic-servlets/java-servlet-trace-echo-enabled.yaml
       - template: templates/vulnerabilities/generic-servlets/java-servlet-verbose-error-disclosure.yaml
       - template: templates/vulnerabilities/generic-servlets/hsts-weak-max-age-or-missing-subdomains.yaml
@@ -40,8 +45,10 @@ workflows:
     subtemplates:
       - template: templates/exposures/openapi-json-exposed.yaml
       - template: templates/exposures/openapi-yaml-exposed.yaml
+      - template: templates/exposures/swagger-config-exposed.yaml
       - template: templates/exposures/wadl-exposed.yaml
       - template: templates/exposures/wsdl-xsd-exposed.yaml
+      - template: templates/exposures/apis/graphql-ui-exposed.yaml
       - template: templates/exposures/debug-probes/java-threaddump-endpoint-exposed.yaml
       - template: templates/exposures/debug-probes/java-heapdump-endpoint-exposed.yaml
       - template: templates/exposures/debug-probes/java-logfile-endpoint-exposed.yaml
@@ -56,7 +63,10 @@ workflows:
       - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jsf-faces-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jakarta-ee-descriptors-exposed.yaml
       - template: templates/exposures/sensitive-paths/log-config-exposed.yaml
+      - template: templates/exposures/error-pages/jakarta-faces-stacktrace-exposed.yaml
       - template: templates/vulnerabilities/generic-servlets/java-servlet-trace-echo-enabled.yaml
       - template: templates/vulnerabilities/generic-servlets/java-servlet-verbose-error-disclosure.yaml
       - template: templates/vulnerabilities/generic-servlets/hsts-weak-max-age-or-missing-subdomains.yaml

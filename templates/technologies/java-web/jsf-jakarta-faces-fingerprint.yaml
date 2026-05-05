@@ -1,0 +1,54 @@
+id: jsf-jakarta-faces-fingerprint
+
+info:
+  name: JSF or Jakarta Faces Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects JavaServer Faces / Jakarta Faces applications through ViewState
+    markers, Faces resource handlers, XHTML pages, and common JSF form output.
+    Informational only; useful for routing follow-up Java/Jakarta checks.
+  tags:
+    - tech
+    - java
+    - jakarta
+    - jsf
+    - faces
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/index.xhtml"
+      - "{{BaseURL}}/login.xhtml"
+      - "{{BaseURL}}/home.xhtml"
+      - "{{BaseURL}}/faces/index.xhtml"
+      - "{{BaseURL}}/faces/login.xhtml"
+      - "{{BaseURL}}/javax.faces.resource/jsf.js.xhtml?ln=javax.faces"
+      - "{{BaseURL}}/jakarta.faces.resource/jsf.js.xhtml?ln=jakarta.faces"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)name=["''](?:javax|jakarta)\.faces\.ViewState["'']'
+          - '(?i)id=["''](?:javax|jakarta)\.faces\.ViewState["'']'
+          - '(?i)/(?:javax|jakarta)\.faces\.resource/'
+          - '(?i)jsf\.js'
+          - '(?i)FacesContext'
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: matched_path

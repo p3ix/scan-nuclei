@@ -1,0 +1,49 @@
+id: zipkin-ui-exposed
+
+info:
+  name: Zipkin UI or API Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Zipkin tracing UI or API endpoints. Public access can leak
+    service names, trace metadata, endpoint paths, timing, tags, and internal
+    dependency relationships.
+  tags:
+    - misconfig
+    - java
+    - tracing
+    - zipkin
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/zipkin"
+      - "{{BaseURL}}/zipkin/"
+      - "{{BaseURL}}/zipkin/index.html"
+      - "{{BaseURL}}/zipkin/api/v2/services"
+      - "{{BaseURL}}/api/v2/services"
+      - "{{BaseURL}}/api/v2/spans"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Zipkin"
+          - "(?i)zipkin-lens"
+          - '(?i)^\s*\[\s*"[^"]+"\s*(?:,\s*"[^"]+"\s*)*\]\s*$'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/html|application/json|text/plain)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

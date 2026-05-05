@@ -1,0 +1,48 @@
+id: hawtio-console-exposed
+
+info:
+  name: Hawtio Management Console Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Hawtio management console paths across Java deployments.
+    A reachable console increases management attack surface and can pair with
+    Jolokia exposure for sensitive runtime access.
+  tags:
+    - misconfig
+    - java
+    - hawtio
+    - management
+    - console
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/hawtio"
+      - "{{BaseURL}}/hawtio/"
+      - "{{BaseURL}}/hawtio/login"
+      - "{{BaseURL}}/actuator/hawtio"
+      - "{{BaseURL}}/management/hawtio"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)hawtio"
+          - "(?i)jolokia"
+          - "(?i)management console"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

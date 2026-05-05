@@ -1169,6 +1169,73 @@
       "body": "<html><body><h1>Error</h1><p>not found</p></body></html>"
     }
   },
+  "swagger-common-positive": {
+    "GET /swagger": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><head><title>Swagger UI</title><script src=\"/swagger-ui/swagger-ui-bundle.js\"></script><script>window.ui = SwaggerUIBundle({url: '/api/openapi.json'});</script></head><body><div id=\"swagger-ui\"></div></body></html>"
+    },
+    "GET /api/openapi.json": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"openapi\":\"3.0.1\",\"info\":{\"title\":\"Internal API\",\"version\":\"1.0.0\"},\"paths\":{\"/health\":{\"get\":{\"responses\":{\"200\":{\"description\":\"ok\"}}}}}}"
+    },
+    "GET /api/openapi.yaml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/yaml"
+      },
+      "body": "openapi: 3.0.1\ninfo:\n  title: Internal API\n  version: 1.0.0\npaths:\n  /health:\n    get:\n      responses:\n        '200':\n          description: ok\n"
+    }
+  },
+  "exposed-surfaces-positive": {
+    "GET /v3/api-docs/swagger-config": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"configUrl\":\"/v3/api-docs/swagger-config\",\"url\":\"/api/openapi.json\",\"urls\":[{\"url\":\"/api/openapi.json\",\"name\":\"internal\"}],\"oauth2RedirectUrl\":\"http://example.local/swagger-ui/oauth2-redirect.html\",\"validatorUrl\":\"\"}"
+    },
+    "GET /graphiql": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><head><title>GraphiQL</title></head><body><div id=\"graphiql\">GraphiQL</div><script>fetch('/graphql',{method:'POST',body:'{__schema{queryType{name}}}'})</script></body></html>"
+    },
+    "GET /applications": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"applications\":[{\"name\":\"billing-service\",\"instances\":[{\"id\":\"billing:8080\",\"statusInfo\":{\"status\":\"UP\"},\"actuatorUrl\":\"http://billing.internal/actuator\"}]}]}"
+    },
+    "GET /eureka/apps": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<applications><versions__delta>1</versions__delta><application><name>BILLING-SERVICE</name><instance><instanceId>billing:8080</instanceId><status>UP</status><healthCheckUrl>http://billing.internal/actuator/health</healthCheckUrl><statusPageUrl>http://billing.internal/info</statusPageUrl><vipAddress>billing-service</vipAddress></instance></application></applications>"
+    },
+    "GET /zipkin/api/v2/services": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "[\"billing-service\",\"orders-service\"]"
+    },
+    "GET /application/default": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"name\":\"application\",\"profiles\":[\"default\"],\"label\":\"main\",\"propertySources\":[{\"name\":\"git:file:/srv/config/application.yml\",\"source\":{\"spring.datasource.url\":\"jdbc:postgresql://db.internal/app\",\"feature.enabled\":\"true\"}}]}"
+    }
+  },
   "jetty-positive": {
     "GET /": {
       "status": 200,
@@ -1225,6 +1292,59 @@
         "Server": "Jetty(9.4.53.v20231009)"
       },
       "body": "[main]\nldapRealm = org.apache.shiro.realm.ldap.JndiLdapRealm\nsecurityManager.realms = $ldapRealm\n[users]\nadmin = $2a$10$abcdefghijklmnopqrstuu, admin\n[roles]\nadmin = *\n"
+    }
+  },
+  "jsf-positive": {
+    "GET /": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/html",
+        "Set-Cookie": "JSESSIONID=faces123; Path=/; HttpOnly"
+      },
+      "body": "<html><head><script src=\"/jakarta.faces.resource/jsf.js.xhtml?ln=jakarta.faces\"></script></head><body><form id=\"login\" action=\"/login.xhtml\" method=\"post\"><input type=\"hidden\" name=\"jakarta.faces.ViewState\" id=\"jakarta.faces.ViewState\" value=\"-1234567890123456789:987654321098765432\"/><input name=\"login:user\"/></form></body></html>"
+    },
+    "GET /login.xhtml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "text/html",
+        "Set-Cookie": "JSESSIONID=faces123; Path=/; HttpOnly"
+      },
+      "body": "<html><body><form id=\"login\" action=\"/login.xhtml\" method=\"post\"><input type=\"hidden\" name=\"jakarta.faces.ViewState\" id=\"jakarta.faces.ViewState\" value=\"stateless\"/><script src=\"/jakarta.faces.resource/primefaces.js.xhtml?ln=primefaces\"></script></form></body></html>"
+    },
+    "GET /jakarta.faces.resource/jsf.js.xhtml?ln=jakarta.faces": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/javascript"
+      },
+      "body": "var faces={ajax:{request:function(){}}}; // jakarta.faces resource jsf.js"
+    },
+    "GET /jakarta.faces.resource/primefaces.js.xhtml?ln=primefaces": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/javascript"
+      },
+      "body": "window.PrimeFaces={widgets:{},ajax:{Queue:{}}}; PrimeFaces.widget = PrimeFaces.widget || {};"
+    },
+    "GET /WEB-INF/faces-config.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<faces-config xmlns=\"https://jakarta.ee/xml/ns/jakartaee\" version=\"4.0\"><application><resource-bundle><base-name>com.example.messages</base-name><var>msg</var></resource-bundle></application><managed-bean><managed-bean-name>loginBean</managed-bean-name><managed-bean-class>com.example.faces.LoginBean</managed-bean-class><managed-bean-scope>view</managed-bean-scope></managed-bean><navigation-rule><from-view-id>/login.xhtml</from-view-id><navigation-case><from-outcome>success</from-outcome><to-view-id>/home.xhtml</to-view-id></navigation-case></navigation-rule></faces-config>"
+    },
+    "GET /WEB-INF/beans.xml": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<beans xmlns=\"https://jakarta.ee/xml/ns/jakartaee\" bean-discovery-mode=\"annotated\"><interceptors><class>com.example.security.AuditInterceptor</class></interceptors><alternatives><class>com.example.MockPaymentGateway</class></alternatives></beans>"
+    },
+    "GET /login.xhtml?jakarta.faces.ViewState=invalid": {
+      "status": 500,
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": "<html><body><h1>jakarta.faces.FacesException</h1><pre>jakarta.faces.application.ViewExpiredException: viewId:/login.xhtml - View could not be restored\n\tat com.sun.faces.lifecycle.RestoreViewPhase.execute(RestoreViewPhase.java:178)\n\tat com.sun.faces.lifecycle.LifecycleImpl.execute(LifecycleImpl.java:198)\n\tat jakarta.faces.context.FacesContext.getCurrentInstance(FacesContext.java:1)</pre></body></html>"
     }
   }
 }

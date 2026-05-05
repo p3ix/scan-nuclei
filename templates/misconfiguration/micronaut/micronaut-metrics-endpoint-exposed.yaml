@@ -1,0 +1,54 @@
+id: micronaut-metrics-endpoint-exposed
+
+info:
+  name: Micronaut Metrics Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Micronaut/Micrometer metrics endpoints that can
+    disclose JVM internals, request names, and operational measurements.
+  tags:
+    - misconfig
+    - micronaut
+    - java
+    - metrics
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/metrics"
+      - "{{BaseURL}}/metrics/jvm.memory.used"
+      - "{{BaseURL}}/metrics/process.uptime"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"names"\s*:\s*\['
+          - '(?i)"name"\s*:\s*"jvm\.'
+          - '(?i)"measurements"\s*:\s*\['
+          - '(?i)"availableTags"\s*:\s*\['
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)jvm\\.memory"
+          - "(?i)process\\.uptime"
+          - "(?i)http\\.server\\.requests"
+          - "(?i)executor\\."
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<html")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

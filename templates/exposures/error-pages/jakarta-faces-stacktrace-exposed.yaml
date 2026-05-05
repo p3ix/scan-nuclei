@@ -1,0 +1,60 @@
+id: jakarta-faces-stacktrace-exposed
+
+info:
+  name: Jakarta Faces Stacktrace Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects verbose JSF/Jakarta Faces error pages exposing FacesException,
+    FacesContext, lifecycle, component tree, EL, or renderer stack details.
+  tags:
+    - exposure
+    - java
+    - jakarta
+    - jsf
+    - faces
+    - stacktrace
+    - error
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/faces/this-path-should-not-exist-nuclei.xhtml"
+      - "{{BaseURL}}/this-path-should-not-exist-nuclei.xhtml"
+      - "{{BaseURL}}/index.xhtml?javax.faces.ViewState=invalid"
+      - "{{BaseURL}}/login.xhtml?javax.faces.ViewState=invalid"
+      - "{{BaseURL}}/index.xhtml?jakarta.faces.ViewState=invalid"
+      - "{{BaseURL}}/login.xhtml?jakarta.faces.ViewState=invalid"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 400
+          - 404
+          - 500
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(javax|jakarta)\\.faces\\.FacesException"
+          - "(?i)(javax|jakarta)\\.faces\\.context\\.FacesContext"
+          - "(?i)(javax|jakarta)\\.faces\\.component\\."
+          - "(?i)(javax|jakarta)\\.faces\\.view\\."
+          - "(?i)com\\.sun\\.faces\\."
+          - "(?i)org\\.apache\\.myfaces\\."
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)at\\s+(com\\.sun\\.faces|org\\.apache\\.myfaces|javax\\.faces|jakarta\\.faces)\\."
+          - "(?i)(UIViewRoot|LifecycleImpl|RestoreViewPhase|RenderResponsePhase|ViewExpiredException|ELException)"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404") || contains(to_lower(body), "faces")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

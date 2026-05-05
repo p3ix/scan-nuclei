@@ -1,0 +1,56 @@
+id: java-prometheus-metrics-endpoint-exposed
+
+info:
+  name: Java Prometheus Metrics Endpoint Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Prometheus-style Java metrics endpoints. Metrics can reveal
+    framework details, JVM internals, endpoint traffic, and backend health.
+  tags:
+    - misconfig
+    - java
+    - prometheus
+    - metrics
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/metrics"
+      - "{{BaseURL}}/prometheus"
+      - "{{BaseURL}}/actuator/prometheus"
+      - "{{BaseURL}}/q/metrics"
+      - "{{BaseURL}}/manage/prometheus"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^jvm_[a-z0-9_:]+"
+          - "(?m)^process_[a-z0-9_:]+"
+          - "(?m)^http_server_requests"
+          - "(?m)^vendor_"
+          - "(?m)^base_"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?m)^#\\s+HELP\\s+"
+          - "(?m)^#\\s+TYPE\\s+"
+          - "(?m)^jvm_memory_"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<html")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

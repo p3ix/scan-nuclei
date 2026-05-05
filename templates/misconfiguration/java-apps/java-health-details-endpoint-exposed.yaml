@@ -1,0 +1,54 @@
+id: java-health-details-endpoint-exposed
+
+info:
+  name: Java Health Endpoint Detailed Output Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects detailed Java health endpoints that expose component names,
+    dependency checks, or operational internals beyond a simple up/down status.
+  tags:
+    - misconfig
+    - java
+    - health
+    - diagnostics
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/health"
+      - "{{BaseURL}}/health/"
+      - "{{BaseURL}}/health/liveness"
+      - "{{BaseURL}}/health/readiness"
+      - "{{BaseURL}}/actuator/health"
+      - "{{BaseURL}}/q/health"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"status"\s*:\s*"(UP|DOWN|DEGRADED|OUT_OF_SERVICE)"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"components"\s*:'
+          - '(?i)"details"\s*:'
+          - '(?i)"diskSpace"\s*:'
+          - '(?i)"db"\s*:'
+          - '(?i)"checks"\s*:'
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<html")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

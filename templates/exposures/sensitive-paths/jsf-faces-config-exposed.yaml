@@ -1,0 +1,62 @@
+id: jsf-faces-config-exposed
+
+info:
+  name: JSF or Jakarta Faces Configuration Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed JSF/Jakarta Faces configuration files. These descriptors can
+    disclose managed beans, navigation rules, converters, validators, resource
+    bundles, EL resolvers, exception handlers, and application internals.
+  tags:
+    - exposure
+    - java
+    - jakarta
+    - jsf
+    - faces
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/faces-config.xml"
+      - "{{BaseURL}}/WEB-INF/faces-config.xml"
+      - "{{BaseURL}}/WEB-INF/classes/META-INF/faces-config.xml"
+      - "{{BaseURL}}/META-INF/faces-config.xml"
+      - "{{BaseURL}}/WEB-INF/faces-config.xml.bak"
+      - "{{BaseURL}}/WEB-INF/faces-config.xml.old"
+      - "{{BaseURL}}/WEB-INF/faces-config.xml.orig"
+      - "{{BaseURL}}/WEB-INF/faces-config.xml.save"
+      - "{{BaseURL}}/WEB-INF/faces-config.xml.tmp"
+      - "{{BaseURL}}/WEB-INF/faces-config.xml~"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?is)<faces-config\\b"
+          - "(?is)<managed-bean\\b"
+          - "(?is)<navigation-rule\\b"
+          - "(?is)<application\\b.*<(el-resolver|resource-bundle|message-bundle)>"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(javax|jakarta)\\.faces"
+          - "(?i)(managed-bean|navigation-case|converter|validator|phase-listener|exception-handler)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/xml|text/xml|text/plain|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

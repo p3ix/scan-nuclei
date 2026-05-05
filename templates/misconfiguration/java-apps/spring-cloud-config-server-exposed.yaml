@@ -1,0 +1,58 @@
+id: spring-cloud-config-server-exposed
+
+info:
+  name: Spring Cloud Config Server Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Spring Cloud Config Server endpoints. Public access can leak
+    application configuration, profile names, Git labels, property source names,
+    and occasionally secrets if server-side sanitization is incomplete.
+  tags:
+    - misconfig
+    - spring
+    - spring-cloud
+    - config
+    - secrets
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/application/default"
+      - "{{BaseURL}}/application/default/main"
+      - "{{BaseURL}}/application/default/master"
+      - "{{BaseURL}}/application/prod"
+      - "{{BaseURL}}/application/dev"
+      - "{{BaseURL}}/actuator/default"
+      - "{{BaseURL}}/config/application/default"
+      - "{{BaseURL}}/config/application/prod"
+      - "{{BaseURL}}/api/application/default"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"propertySources"\s*:\s*\['
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"name"\s*:\s*"application"'
+          - '(?i)"profiles"\s*:\s*\['
+          - '(?i)"label"\s*:'
+          - '(?i)"source"\s*:\s*\{'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

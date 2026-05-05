@@ -1,0 +1,55 @@
+id: jetty-dump-servlet-exposed
+
+info:
+  name: Eclipse Jetty Dump Servlet Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Jetty Dump Servlet pages that disclose request,
+    servlet, header, and runtime details useful for environment mapping.
+  tags:
+    - misconfig
+    - jetty
+    - java
+    - servlet
+    - diagnostics
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/dump/"
+      - "{{BaseURL}}/dump/info"
+      - "{{BaseURL}}/test/dump/"
+      - "{{BaseURL}}/test/dump/info"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Dump Servlet"
+          - "(?i)DumpServlet"
+          - "(?i)Servlet Path"
+          - "(?i)Path Info"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Request Headers"
+          - "(?i)Query String"
+          - "(?i)javax\\.servlet"
+          - "(?i)org\\.eclipse\\.jetty"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -100,6 +100,7 @@ Guia rapida para no tener que elegir a ciegas:
 | Spring sobre stack Java | `templates/workflows/spring/spring-fingerprint-to-risk-workflow.yaml` | actuators, perfiles, docs y superficie web Spring | medio |
 | Quarkus / Micronaut | `templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml` | snapshot acotado de superficie moderna Java | bajo-medio |
 | Jetty con apps Java | `templates/workflows/java/jetty-fingerprint-to-java-exposure-workflow.yaml` | configuracion Jetty, realms y exposiciones Java reutilizables | medio |
+| JSF / Jakarta Faces | `templates/workflows/java/jsf-jakarta-faces-workflow.yaml` | ViewState, PrimeFaces, `faces-config.xml`, descriptors Jakarta EE y stacktraces Faces | medio |
 
 Regla practica:
 
@@ -125,6 +126,9 @@ scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/wildfly
 
 # Jetty con apps Java
 scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/java/jetty-fingerprint-to-java-exposure-workflow.yaml --aggregate-output
+
+# JSF / Jakarta Faces
+scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/java/jsf-jakarta-faces-workflow.yaml --aggregate-output
 ```
 
 Para objetivos WildFly/JBoss, separa el uso segun contexto para evitar ruido y duplicados:
@@ -275,6 +279,7 @@ La regresion HTTP local cubre ya no solo validacion basica de templates, sino ta
 - `Tomcat`: superficie manager/host-manager, `Catalina/localhost/*.xml`, `JNDI/resources`, `GlobalNamingResources`, `server.xml`, `tomcat-users.xml`, `web.xml` y artefactos temporales/backups.
 - `WildFly`: `domain mode`, Elytron, TLS, Undertow HTTPS listeners, `application-users/roles` y correlacion con `keystore/truststore`.
 - `Jetty/Java`: fingerprint por header/error page, `jetty.xml`, realms, cache, mensajeria y configuracion de seguridad Java.
+- `JSF/Jakarta Faces`: ViewState, PrimeFaces resources, `faces-config.xml`, descriptors Jakarta EE y stacktraces Faces.
 
 Para el detalle exacto de la suite y como ampliar fixtures, ver [TESTING.md](TESTING.md).
   - en produccion es comun que Apache, Nginx, balanceadores o gateways sobrescriban el header `Server`, por lo que la ausencia de match no descarta `Micronaut`

@@ -1,0 +1,55 @@
+id: java-jolokia-actuator-endpoint-exposed
+
+info:
+  name: Java Jolokia Actuator Endpoint Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Jolokia endpoints on common Java management context paths.
+    Jolokia bridges HTTP to JMX and can disclose MBeans, runtime state, and
+    management operation metadata.
+  tags:
+    - misconfig
+    - java
+    - jolokia
+    - jmx
+    - actuator
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/actuator/jolokia"
+      - "{{BaseURL}}/actuator/jolokia/list"
+      - "{{BaseURL}}/manage/jolokia"
+      - "{{BaseURL}}/manage/jolokia/list"
+      - "{{BaseURL}}/management/jolokia"
+      - "{{BaseURL}}/management/jolokia/list"
+      - "{{BaseURL}}/jolokia/list"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"(request|value|status|timestamp)"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)javax\\.management"
+          - "(?i)java\\.lang"
+          - "(?i)mbean"
+          - "(?i)jolokia"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<html")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

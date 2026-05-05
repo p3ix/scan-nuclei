@@ -1,0 +1,54 @@
+id: jetty-test-webapp-exposed
+
+info:
+  name: Eclipse Jetty Test Web Application Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Jetty test/demo web applications that are reachable from the
+    network. Test applications often expose diagnostic servlets and examples.
+  tags:
+    - misconfig
+    - jetty
+    - java
+    - demo
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/test/"
+      - "{{BaseURL}}/test"
+      - "{{BaseURL}}/test/index.html"
+      - "{{BaseURL}}/demo/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Jetty Test Webapp"
+          - "(?i)Jetty Test WebApp"
+          - "(?i)Test Web Application"
+          - "(?i)Dump Servlet"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)server:\\s*.*jetty"
+          - "(?i)org\\.eclipse\\.jetty"
+          - "(?i)powered by jetty"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

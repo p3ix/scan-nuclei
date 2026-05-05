@@ -17,10 +17,21 @@ info:
 http:
   - method: GET
     path:
+      - "{{BaseURL}}/openapi"
       - "{{BaseURL}}/openapi.yaml"
       - "{{BaseURL}}/openapi.yml"
       - "{{BaseURL}}/swagger.yaml"
       - "{{BaseURL}}/swagger.yml"
+      - "{{BaseURL}}/api/openapi.yaml"
+      - "{{BaseURL}}/api/openapi.yml"
+      - "{{BaseURL}}/api/swagger.yaml"
+      - "{{BaseURL}}/api/swagger.yml"
+      - "{{BaseURL}}/docs/openapi.yaml"
+      - "{{BaseURL}}/docs/openapi.yml"
+      - "{{BaseURL}}/docs/swagger.yaml"
+      - "{{BaseURL}}/docs/swagger.yml"
+      - "{{BaseURL}}/api-docs.yaml"
+      - "{{BaseURL}}/api-docs.yml"
 
     matchers-condition: and
     matchers:

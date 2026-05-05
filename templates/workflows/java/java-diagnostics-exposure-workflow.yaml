@@ -19,6 +19,11 @@ workflows:
       - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jsf-faces-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jakarta-ee-descriptors-exposed.yaml
+      - template: templates/exposures/error-pages/jakarta-faces-stacktrace-exposed.yaml
+      - template: templates/exposures/swagger-config-exposed.yaml
+      - template: templates/exposures/apis/graphql-ui-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-loggers-endpoint-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-scheduledtasks-endpoint-exposed.yaml
   - template: templates/technologies/java-web/servlet-error-signature-fingerprint.yaml
@@ -31,5 +36,10 @@ workflows:
       - template: templates/exposures/sensitive-paths/java-cache-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-messaging-config-exposed.yaml
       - template: templates/exposures/sensitive-paths/java-security-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jsf-faces-config-exposed.yaml
+      - template: templates/exposures/sensitive-paths/jakarta-ee-descriptors-exposed.yaml
+      - template: templates/exposures/error-pages/jakarta-faces-stacktrace-exposed.yaml
+      - template: templates/exposures/swagger-config-exposed.yaml
+      - template: templates/exposures/apis/graphql-ui-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-loggers-endpoint-exposed.yaml
       - template: templates/misconfiguration/java-apps/java-scheduledtasks-endpoint-exposed.yaml

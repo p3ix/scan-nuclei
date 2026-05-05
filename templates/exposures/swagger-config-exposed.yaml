@@ -1,0 +1,55 @@
+id: swagger-config-exposed
+
+info:
+  name: Swagger UI Configuration Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Swagger/OpenAPI UI configuration endpoints. These often
+    reveal grouped API docs, service display names, validator settings, OAuth
+    redirect URLs, and the concrete OpenAPI document paths to request next.
+  tags:
+    - exposure
+    - swagger
+    - openapi
+    - api
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/v3/api-docs/swagger-config"
+      - "{{BaseURL}}/api/v3/api-docs/swagger-config"
+      - "{{BaseURL}}/api-docs/swagger-config"
+      - "{{BaseURL}}/api/api-docs/swagger-config"
+      - "{{BaseURL}}/swagger-config"
+      - "{{BaseURL}}/api/swagger-config"
+      - "{{BaseURL}}/swagger-ui/swagger-config"
+      - "{{BaseURL}}/swagger-ui/swagger-initializer.js"
+      - "{{BaseURL}}/swagger-initializer.js"
+      - "{{BaseURL}}/api/swagger-ui/swagger-initializer.js"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"configUrl"\s*:'
+          - '(?i)"urls"\s*:\s*\['
+          - '(?i)"url"\s*:\s*".*(api-docs|openapi|swagger)'
+          - '(?i)SwaggerUIBundle\s*\('
+          - '(?i)(oauth2RedirectUrl|validatorUrl|swagger-config)'
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/json|application/javascript|text/javascript|text/plain)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

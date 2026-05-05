@@ -1,0 +1,50 @@
+id: primefaces-resource-fingerprint
+
+info:
+  name: PrimeFaces Resource Fingerprint
+  author: scan-nuclei
+  severity: info
+  description: |
+    Detects PrimeFaces resources exposed through JSF/Jakarta Faces resource
+    handlers. Informational only; useful for stack mapping and targeted review.
+  tags:
+    - tech
+    - java
+    - jakarta
+    - jsf
+    - faces
+    - primefaces
+    - fingerprint
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/javax.faces.resource/primefaces.js.xhtml?ln=primefaces"
+      - "{{BaseURL}}/jakarta.faces.resource/primefaces.js.xhtml?ln=primefaces"
+      - "{{BaseURL}}/javax.faces.resource/core.js.xhtml?ln=primefaces"
+      - "{{BaseURL}}/jakarta.faces.resource/core.js.xhtml?ln=primefaces"
+      - "{{BaseURL}}/javax.faces.resource/theme.css.xhtml?ln=primefaces"
+      - "{{BaseURL}}/jakarta.faces.resource/theme.css.xhtml?ln=primefaces"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)PrimeFaces\\."
+          - "(?i)primefaces"
+          - "(?i)ui-widget"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/javascript|text/javascript|text/css|text/plain)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: matched_path

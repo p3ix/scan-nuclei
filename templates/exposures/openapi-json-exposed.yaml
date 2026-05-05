@@ -17,14 +17,35 @@ info:
 http:
   - method: GET
     path:
+      - "{{BaseURL}}/swagger"
+      - "{{BaseURL}}/openapi"
       - "{{BaseURL}}/v3/api-docs"
       - "{{BaseURL}}/v2/api-docs"
+      - "{{BaseURL}}/api-docs"
+      - "{{BaseURL}}/api-docs.json"
       - "{{BaseURL}}/openapi.json"
       - "{{BaseURL}}/swagger.json"
+      - "{{BaseURL}}/api/openapi.json"
+      - "{{BaseURL}}/api/swagger.json"
+      - "{{BaseURL}}/api/v3/api-docs"
+      - "{{BaseURL}}/api/v2/api-docs"
+      - "{{BaseURL}}/api/api-docs"
+      - "{{BaseURL}}/api/api-docs.json"
       - "{{BaseURL}}/docs.json"
       - "{{BaseURL}}/api/docs.json"
+      - "{{BaseURL}}/docs/openapi.json"
+      - "{{BaseURL}}/docs/swagger.json"
+      - "{{BaseURL}}/swagger/v1/swagger.json"
+      - "{{BaseURL}}/swagger/v2/swagger.json"
+      - "{{BaseURL}}/swagger/v3/swagger.json"
       - "{{BaseURL}}/swagger/docs/v1"
       - "{{BaseURL}}/swagger/docs/v1.json"
+      - "{{BaseURL}}/api/swagger/v1/swagger.json"
+      - "{{BaseURL}}/api/swagger/v2/swagger.json"
+      - "{{BaseURL}}/api/swagger/v3/swagger.json"
+      - "{{BaseURL}}/openapi/v1.json"
+      - "{{BaseURL}}/openapi/v2.json"
+      - "{{BaseURL}}/openapi/v3.json"
 
     extractors:
       - type: dsl
@@ -48,4 +69,4 @@ http:
       - type: regex
         part: header
         regex:
-          - "(?i)content-type:\\s*(application/json|application/vnd\\.oas\\.json|text/plain)"
+          - "(?i)content-type:\\s*(application/json|application/vnd\\.oas\\.json|application/schema\\+json|text/plain)"
