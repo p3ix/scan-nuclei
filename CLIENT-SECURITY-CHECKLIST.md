@@ -31,7 +31,7 @@ nuclei -validate -t templates/
       ruido:
 
 ```bash
-scripts/check-nuclei.sh --target https://objetivo --aggregate-output
+scripts/full-scan.sh --target https://objetivo
 ```
 
 - [ ] Si el stack esta claro, usar workflow especifico en vez de barrido total.
@@ -95,6 +95,7 @@ Este repo esta especialmente orientado a:
 
 - [ ] Ejecutar fingerprinting o workflow adecuado para identificar stack.
 - [ ] Ejecutar workflow especifico si aplica:
+      - Full coverage: `templates/workflows/global/full-coverage-workflow.yaml`
       - Apache solo: `templates/workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml`
       - Apache hardening: `templates/workflows/apache/apache-hardening-workflow.yaml`
       - Apache proxy/admin: `templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml`
@@ -109,6 +110,13 @@ Este repo esta especialmente orientado a:
       - Java diagnostico generico: `templates/workflows/java/java-diagnostics-exposure-workflow.yaml`
       - Jetty: `templates/workflows/java/jetty-fingerprint-to-java-exposure-workflow.yaml`
       - JSF/Jakarta Faces: `templates/workflows/java/jsf-jakarta-faces-workflow.yaml`
+      - Nginx: `templates/workflows/nginx/nginx-hardening-workflow.yaml`
+      - Observability: `templates/workflows/observability/observability-exposure-workflow.yaml`
+      - Infraestructura: `templates/workflows/infrastructure/infrastructure-admin-surface-workflow.yaml`
+      - CI/CD: `templates/workflows/cicd/cicd-exposure-workflow.yaml`
+      - Search stack: `templates/workflows/search/search-stack-exposure-workflow.yaml`
+      - Messaging: `templates/workflows/messaging/messaging-admin-surface-workflow.yaml`
+      - Java platform admin: `templates/workflows/java/java-platform-admin-surface-workflow.yaml`
 - [ ] Si el objetivo tiene muchos paths o context roots, probar tambien con
       rutas base relevantes: `/`, `/app`, `/api`, `/admin`, `/manager`,
       `/services`, `/actuator`, `/management`.

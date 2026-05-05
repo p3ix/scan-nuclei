@@ -34,6 +34,9 @@ python3 scripts/run-http-regression.py
 
 # ejecutar contra un objetivo
 nuclei -t templates/ -u https://objetivo
+
+# barrido completo recomendado con salida agregada
+scripts/full-scan.sh --target https://objetivo
 ```
 
 Para detalles de testing y regresion minima, ver [TESTING.md](TESTING.md).
@@ -63,6 +66,36 @@ scripts/check-nuclei.sh --target https://objetivo --update-templates
 # actualizar nuclei + templates y luego validar + scan
 scripts/check-nuclei.sh --target https://objetivo --update-nuclei --update-templates
 ```
+
+## Barrido completo recomendado
+
+Si el objetivo es **tirar todas las plantillas de golpe**, usa:
+
+```bash
+scripts/full-scan.sh --target https://objetivo
+```
+
+Esto ejecuta todos los templates bajo `templates/`, valida antes de escanear y
+agrega la salida por `host + template` para que el resultado sea mas manejable.
+
+Opciones utiles:
+
+```bash
+# limitar tasa
+scripts/full-scan.sh --target https://objetivo --rate-limit 5
+
+# ver salida raw de nuclei sin agregacion
+scripts/full-scan.sh --target https://objetivo --raw-output
+
+# pasar flags extra a nuclei
+scripts/full-scan.sh --target https://objetivo -- --follow-redirects -c 10 -timeout 15s
+```
+
+Regla practica:
+
+- `scripts/full-scan.sh`: modo por defecto para cobertura amplia.
+- `scripts/check-nuclei.sh -w <workflow>`: modo enfocado por tecnologia o familia.
+- `nuclei -t templates/`: forma directa si no quieres usar wrappers.
 
 ### Salida agregada (menos ruido)
 
@@ -101,6 +134,14 @@ Guia rapida para no tener que elegir a ciegas:
 | Quarkus / Micronaut | `templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml` | snapshot acotado de superficie moderna Java | bajo-medio |
 | Jetty con apps Java | `templates/workflows/java/jetty-fingerprint-to-java-exposure-workflow.yaml` | configuracion Jetty, realms y exposiciones Java reutilizables | medio |
 | JSF / Jakarta Faces | `templates/workflows/java/jsf-jakarta-faces-workflow.yaml` | ViewState, PrimeFaces, `faces-config.xml`, descriptors Jakarta EE y stacktraces Faces | medio |
+| Nginx | `templates/workflows/nginx/nginx-hardening-workflow.yaml` | autoindex, stub status, VTS y version disclosure | bajo-medio |
+| Observability | `templates/workflows/observability/observability-exposure-workflow.yaml` | Prometheus, Alertmanager, Grafana signup, cAdvisor, etcd y Zipkin | medio |
+| Infraestructura | `templates/workflows/infrastructure/infrastructure-admin-surface-workflow.yaml` | Kubernetes, Docker Registry, Consul, Vault, cAdvisor y etcd | medio-alto |
+| CI/CD | `templates/workflows/cicd/cicd-exposure-workflow.yaml` | Jenkins dashboard/API y Script Console | medio |
+| Search stack | `templates/workflows/search/search-stack-exposure-workflow.yaml` | Elasticsearch, Kibana y Solr | medio |
+| Messaging | `templates/workflows/messaging/messaging-admin-surface-workflow.yaml` | RabbitMQ management y configuracion messaging Java expuesta | medio |
+| Java platform admin | `templates/workflows/java/java-platform-admin-surface-workflow.yaml` | Druid, Nacos, Solr, Flink, Spark, Hawtio/Jolokia y H2 | medio-alto |
+| Full coverage | `templates/workflows/global/full-coverage-workflow.yaml` | Workflows principales encadenados para cobertura amplia | alto |
 
 Regla practica:
 
@@ -129,6 +170,15 @@ scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/java/je
 
 # JSF / Jakarta Faces
 scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/java/jsf-jakarta-faces-workflow.yaml --aggregate-output
+
+# Observability
+scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/observability/observability-exposure-workflow.yaml --aggregate-output
+
+# Infraestructura
+scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/infrastructure/infrastructure-admin-surface-workflow.yaml --aggregate-output
+
+# Full coverage via workflows
+scripts/check-nuclei.sh --target https://objetivo -w templates/workflows/global/full-coverage-workflow.yaml --aggregate-output
 ```
 
 Para objetivos WildFly/JBoss, separa el uso segun contexto para evitar ruido y duplicados:

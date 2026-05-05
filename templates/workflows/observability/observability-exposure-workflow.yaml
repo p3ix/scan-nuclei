@@ -1,0 +1,15 @@
+id: observability-exposure-workflow
+
+info:
+  name: Observability Exposure Workflow
+  author: scan-nuclei
+  description: Runs monitoring, metrics, and observability exposure checks.
+
+workflows:
+  - template: templates/misconfiguration/observability/prometheus-targets-exposed.yaml
+  - template: templates/misconfiguration/observability/prometheus-admin-api-surface-potential.yaml
+  - template: templates/misconfiguration/observability/alertmanager-ui-exposed.yaml
+  - template: templates/misconfiguration/observability/grafana-login-public-signup-enabled.yaml
+  - template: templates/misconfiguration/observability/cadvisor-metrics-exposed.yaml
+  - template: templates/misconfiguration/observability/etcd-metrics-exposed.yaml
+  - template: templates/misconfiguration/java-apps/zipkin-ui-exposed.yaml

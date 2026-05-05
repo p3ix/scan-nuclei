@@ -1,0 +1,17 @@
+id: java-platform-admin-surface-workflow
+
+info:
+  name: Java Platform Admin Surface Workflow
+  author: scan-nuclei
+  description: Runs Java platform consoles and operational admin surface checks.
+
+workflows:
+  - template: templates/misconfiguration/java-apps/alibaba-druid-monitor-exposed.yaml
+  - template: templates/misconfiguration/java-apps/nacos-console-exposed.yaml
+  - template: templates/misconfiguration/java-apps/solr-admin-console-exposed.yaml
+  - template: templates/misconfiguration/java-apps/apache-flink-dashboard-exposed.yaml
+  - template: templates/misconfiguration/java-apps/apache-spark-ui-exposed.yaml
+  - template: templates/misconfiguration/java-apps/hawtio-console-exposed.yaml
+  - template: templates/misconfiguration/java-apps/java-jolokia-actuator-endpoint-exposed.yaml
+  - template: templates/exposures/sensitive-paths/jolokia-endpoint-exposed.yaml
+  - template: templates/exposures/sensitive-paths/h2-console-exposed.yaml

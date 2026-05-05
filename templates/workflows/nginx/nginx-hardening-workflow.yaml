@@ -1,0 +1,12 @@
+id: nginx-hardening-workflow
+
+info:
+  name: Nginx Hardening Workflow
+  author: scan-nuclei
+  description: Runs Nginx exposure and hardening checks in one focused workflow.
+
+workflows:
+  - template: templates/misconfiguration/nginx/nginx-autoindex-exposed.yaml
+  - template: templates/misconfiguration/nginx/nginx-stub-status-exposed.yaml
+  - template: templates/misconfiguration/nginx/nginx-vts-status-exposed.yaml
+  - template: templates/misconfiguration/nginx/nginx-server-version-disclosure.yaml

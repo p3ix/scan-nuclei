@@ -1,0 +1,10 @@
+id: cicd-exposure-workflow
+
+info:
+  name: CI/CD Exposure Workflow
+  author: scan-nuclei
+  description: Runs CI/CD administrative surface checks.
+
+workflows:
+  - template: templates/misconfiguration/cicd/jenkins-dashboard-exposed.yaml
+  - template: templates/misconfiguration/cicd/jenkins-script-console-exposed.yaml

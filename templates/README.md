@@ -77,4 +77,30 @@ La guia operativa completa vive en `../TRIAGE.md`.
 - `workflows/apache/apache-hardening-workflow.yaml`:
   - orientado a posture review, headers, metodos inseguros, listing y configuracion expuesta.
 
+## Nota de workflows cobertura amplia
+
+- `workflows/global/full-coverage-workflow.yaml`:
+  - encadena los workflows principales para cobertura amplia cuando se quiera
+    tirar todo desde `nuclei -w`.
+- Para tirar todos los templates HTTP directamente y con salida agregada, usar
+  `scripts/full-scan.sh --target https://objetivo` desde la raiz del repo.
+
+## Nota de workflows infraestructura y observability
+
+- `workflows/nginx/nginx-hardening-workflow.yaml`:
+  - orientado a autoindex, status, VTS y version disclosure.
+- `workflows/observability/observability-exposure-workflow.yaml`:
+  - orientado a Prometheus, Alertmanager, Grafana signup, cAdvisor, etcd y Zipkin.
+- `workflows/infrastructure/infrastructure-admin-surface-workflow.yaml`:
+  - orientado a Kubernetes, Docker Registry, Consul, Vault, cAdvisor y etcd.
+- `workflows/cicd/cicd-exposure-workflow.yaml`:
+  - orientado a Jenkins dashboard/API y Script Console.
+- `workflows/search/search-stack-exposure-workflow.yaml`:
+  - orientado a Elasticsearch, Kibana y Solr.
+- `workflows/messaging/messaging-admin-surface-workflow.yaml`:
+  - orientado a RabbitMQ y configuracion messaging Java expuesta.
+- `workflows/java/java-platform-admin-surface-workflow.yaml`:
+  - orientado a consolas/plataformas Java como Druid, Nacos, Solr, Flink,
+    Spark, Hawtio/Jolokia y H2.
+
 Las subcarpetas de familia (por ejemplo `cves/`, `workflows/`) contienen plantillas; no se usan archivos placeholder para directorios vacios.

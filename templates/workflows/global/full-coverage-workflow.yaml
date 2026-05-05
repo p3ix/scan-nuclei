@@ -1,0 +1,30 @@
+id: full-coverage-workflow
+
+info:
+  name: Full Coverage Workflow
+  author: scan-nuclei
+  description: Runs the main focused workflows together for broad client-facing coverage.
+
+workflows:
+  - template: templates/workflows/apache/apache-misconfig-from-fingerprint-workflow.yaml
+  - template: templates/workflows/apache/apache-hardening-workflow.yaml
+  - template: templates/workflows/apache/apache-proxy-admin-surface-workflow.yaml
+  - template: templates/workflows/apache/apache-fronting-tomcat-workflow.yaml
+  - template: templates/workflows/apache/apache-fronting-wildfly-workflow.yaml
+  - template: templates/workflows/tomcat/tomcat-version-priority-workflow.yaml
+  - template: templates/workflows/tomcat/tomcat-hardening-workflow.yaml
+  - template: templates/workflows/tomcat/tomcat-fingerprint-to-java-exposure-workflow.yaml
+  - template: templates/workflows/wildfly/wildfly-modern-admin-surface-workflow.yaml
+  - template: templates/workflows/wildfly/jboss-legacy-migration-debt-workflow.yaml
+  - template: templates/workflows/spring/spring-fingerprint-to-risk-workflow.yaml
+  - template: templates/workflows/java/java-diagnostics-exposure-workflow.yaml
+  - template: templates/workflows/java/java-modern-stacks-snapshot-workflow.yaml
+  - template: templates/workflows/java/jetty-fingerprint-to-java-exposure-workflow.yaml
+  - template: templates/workflows/java/jsf-jakarta-faces-workflow.yaml
+  - template: templates/workflows/java/java-platform-admin-surface-workflow.yaml
+  - template: templates/workflows/nginx/nginx-hardening-workflow.yaml
+  - template: templates/workflows/observability/observability-exposure-workflow.yaml
+  - template: templates/workflows/infrastructure/infrastructure-admin-surface-workflow.yaml
+  - template: templates/workflows/cicd/cicd-exposure-workflow.yaml
+  - template: templates/workflows/search/search-stack-exposure-workflow.yaml
+  - template: templates/workflows/messaging/messaging-admin-surface-workflow.yaml
