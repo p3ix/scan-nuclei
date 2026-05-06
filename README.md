@@ -8,10 +8,87 @@ Este repo esta pensado para uso directo con Nuclei:
 nuclei -t ./templates -u https://192.168.0.18:8443/
 ```
 
-Validacion opcional de sintaxis:
+## Instalacion rapida
+
+### 1. Instalar dependencias basicas
+
+Necesitas `git` para descargar el repositorio y `nuclei` para ejecutar las plantillas.
+
+En Debian/Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install -y git curl unzip
+```
+
+En macOS con Homebrew:
+
+```bash
+brew install git
+```
+
+En Windows, instala Git desde <https://git-scm.com/download/win> y ejecuta los comandos desde PowerShell o Git Bash.
+
+### 2. Instalar Nuclei
+
+Opcion recomendada en Linux/macOS si tienes Go instalado:
+
+```bash
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+```
+
+Asegurate de tener el binario de Go en el `PATH`:
+
+```bash
+export PATH="$PATH:$(go env GOPATH)/bin"
+```
+
+Comprueba la instalacion:
+
+```bash
+nuclei -version
+```
+
+Alternativa manual:
+
+1. Descarga la version para tu sistema desde <https://github.com/projectdiscovery/nuclei/releases>.
+2. Descomprime el fichero.
+3. Copia el binario `nuclei` a una carpeta incluida en el `PATH`, por ejemplo `/usr/local/bin` en Linux.
+
+### 3. Descargar este repositorio
+
+```bash
+git clone https://github.com/p3ix/scan-nuclei.git
+cd scan-nuclei
+```
+
+Si ya tienes el repo descargado:
+
+```bash
+cd scan-nuclei
+git pull
+```
+
+### 4. Validar que todo funciona
+
+Valida la sintaxis de las plantillas:
 
 ```bash
 nuclei -validate -t ./templates
+```
+
+Si ves `All templates validated successfully`, el entorno esta listo.
+
+### 5. Ejecutar el primer escaneo
+
+```bash
+nuclei -t ./templates -u https://192.168.0.18:8443/
+```
+
+Para escanear otro objetivo, cambia la URL:
+
+```bash
+nuclei -t ./templates -u https://objetivo
 ```
 
 ## Estructura
@@ -41,6 +118,24 @@ Si quieres reducir ruido en una primera pasada, puedes filtrar por severidad:
 
 ```bash
 nuclei -t ./templates -u https://192.168.0.18:8443/ -severity critical,high,medium
+```
+
+Guardar resultados en fichero:
+
+```bash
+nuclei -t ./templates -u https://192.168.0.18:8443/ -o resultados.txt
+```
+
+Guardar resultados en JSONL para procesarlos despues:
+
+```bash
+nuclei -t ./templates -u https://192.168.0.18:8443/ -jsonl -o resultados.jsonl
+```
+
+Actualizar Nuclei cuando quieras tener la ultima version del motor:
+
+```bash
+nuclei -update
 ```
 
 ## Criterio rapido de lectura
