@@ -8,11 +8,9 @@ Este repo esta pensado para uso directo con Nuclei:
 nuclei -t ./templates -u https://192.168.0.18:8443/
 ```
 
-## Instalacion rapida
+## Instalacion en Linux
 
 ### 1. Instalar dependencias basicas
-
-Necesitas `git` para descargar el repositorio y `nuclei` para ejecutar las plantillas.
 
 En Debian/Ubuntu:
 
@@ -21,26 +19,57 @@ sudo apt update
 sudo apt install -y git curl unzip
 ```
 
-En macOS con Homebrew:
+### 2. Instalar Go
+
+Comprueba primero si Go ya esta instalado:
 
 ```bash
-brew install git
+go version
 ```
 
-En Windows, instala Git desde <https://git-scm.com/download/win> y ejecuta los comandos desde PowerShell o Git Bash.
+Si el comando no existe, instala Go. Opcion sencilla desde paquetes del sistema:
 
-### 2. Instalar Nuclei
+```bash
+sudo apt update
+sudo apt install -y golang-go
+```
 
-Opcion recomendada en Linux/macOS si tienes Go instalado:
+Si necesitas la version oficial mas reciente, descargala desde <https://go.dev/dl/> y sigue la guia oficial de Linux. Despues anade Go al `PATH`:
+
+```bash
+export PATH="$PATH:/usr/local/go/bin"
+```
+
+Para dejarlo permanente en Bash:
+
+```bash
+echo 'export PATH="$PATH:/usr/local/go/bin"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Comprueba que funciona:
+
+```bash
+go version
+```
+
+### 3. Instalar Nuclei
 
 ```bash
 go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 ```
 
-Asegurate de tener el binario de Go en el `PATH`:
+Anade los binarios de Go al `PATH`:
 
 ```bash
 export PATH="$PATH:$(go env GOPATH)/bin"
+```
+
+Para dejarlo permanente en Bash:
+
+```bash
+echo 'export PATH="$PATH:$(go env GOPATH)/bin"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 Comprueba la instalacion:
@@ -49,13 +78,7 @@ Comprueba la instalacion:
 nuclei -version
 ```
 
-Alternativa manual:
-
-1. Descarga la version para tu sistema desde <https://github.com/projectdiscovery/nuclei/releases>.
-2. Descomprime el fichero.
-3. Copia el binario `nuclei` a una carpeta incluida en el `PATH`, por ejemplo `/usr/local/bin` en Linux.
-
-### 3. Descargar este repositorio
+### 4. Descargar este repositorio
 
 ```bash
 git clone https://github.com/p3ix/scan-nuclei.git
@@ -69,9 +92,7 @@ cd scan-nuclei
 git pull
 ```
 
-### 4. Validar que todo funciona
-
-Valida la sintaxis de las plantillas:
+### 5. Validar las plantillas
 
 ```bash
 nuclei -validate -t ./templates
@@ -79,16 +100,92 @@ nuclei -validate -t ./templates
 
 Si ves `All templates validated successfully`, el entorno esta listo.
 
-### 5. Ejecutar el primer escaneo
+### 6. Ejecutar el primer escaneo
 
 ```bash
 nuclei -t ./templates -u https://192.168.0.18:8443/
 ```
 
-Para escanear otro objetivo, cambia la URL:
+## Instalacion en Windows
+
+### 1. Instalar Git
+
+1. Descarga Git desde <https://git-scm.com/download/win>.
+2. Ejecuta el instalador.
+3. Cierra y vuelve a abrir PowerShell.
+4. Comprueba la instalacion:
+
+```powershell
+git --version
+```
+
+### 2. Instalar Go
+
+1. Descarga el instalador `.msi` desde <https://go.dev/dl/>.
+2. Ejecuta el instalador y deja las opciones por defecto.
+3. Cierra y vuelve a abrir PowerShell para recargar el `PATH`.
+4. Comprueba que funciona:
+
+```powershell
+go version
+```
+
+### 3. Instalar Nuclei
+
+```powershell
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+```
+
+Anade la carpeta de binarios de Go al `PATH` de usuario:
+
+```powershell
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:USERPROFILE\go\bin", "User")
+```
+
+Cierra y vuelve a abrir PowerShell. Comprueba la instalacion:
+
+```powershell
+nuclei -version
+```
+
+### 4. Descargar este repositorio
+
+```powershell
+git clone https://github.com/p3ix/scan-nuclei.git
+cd scan-nuclei
+```
+
+Si ya tienes el repo descargado:
+
+```powershell
+cd scan-nuclei
+git pull
+```
+
+### 5. Validar las plantillas
+
+```powershell
+nuclei -validate -t .\templates
+```
+
+Si ves `All templates validated successfully`, el entorno esta listo.
+
+### 6. Ejecutar el primer escaneo
+
+```powershell
+nuclei -t .\templates -u https://192.168.0.18:8443/
+```
+
+Para escanear otro objetivo en Linux, cambia la URL:
 
 ```bash
 nuclei -t ./templates -u https://objetivo
+```
+
+En Windows:
+
+```powershell
+nuclei -t .\templates -u https://objetivo
 ```
 
 ## Estructura
@@ -102,37 +199,79 @@ nuclei -t ./templates -u https://objetivo
 
 ## Uso recomendado
 
-Para tu caso, ejecuta todo el arbol:
+Para tu caso, ejecuta todo el arbol.
+
+Linux:
 
 ```bash
 nuclei -t ./templates -u https://192.168.0.18:8443/
 ```
 
+Windows:
+
+```powershell
+nuclei -t .\templates -u https://192.168.0.18:8443/
+```
+
 Si el objetivo usa un certificado interno o autofirmado y Nuclei falla por TLS, usa:
+
+Linux:
 
 ```bash
 nuclei -t ./templates -u https://192.168.0.18:8443/ -tls-sni 192.168.0.18
 ```
 
+Windows:
+
+```powershell
+nuclei -t .\templates -u https://192.168.0.18:8443/ -tls-sni 192.168.0.18
+```
+
 Si quieres reducir ruido en una primera pasada, puedes filtrar por severidad:
+
+Linux:
 
 ```bash
 nuclei -t ./templates -u https://192.168.0.18:8443/ -severity critical,high,medium
 ```
 
+Windows:
+
+```powershell
+nuclei -t .\templates -u https://192.168.0.18:8443/ -severity critical,high,medium
+```
+
 Guardar resultados en fichero:
+
+Linux:
 
 ```bash
 nuclei -t ./templates -u https://192.168.0.18:8443/ -o resultados.txt
 ```
 
+Windows:
+
+```powershell
+nuclei -t .\templates -u https://192.168.0.18:8443/ -o resultados.txt
+```
+
 Guardar resultados en JSONL para procesarlos despues:
+
+Linux:
 
 ```bash
 nuclei -t ./templates -u https://192.168.0.18:8443/ -jsonl -o resultados.jsonl
 ```
 
+Windows:
+
+```powershell
+nuclei -t .\templates -u https://192.168.0.18:8443/ -jsonl -o resultados.jsonl
+```
+
 Actualizar Nuclei cuando quieras tener la ultima version del motor:
+
+Linux y Windows:
 
 ```bash
 nuclei -update
