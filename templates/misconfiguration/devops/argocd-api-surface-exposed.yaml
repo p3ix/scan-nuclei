@@ -1,0 +1,56 @@
+id: argocd-api-surface-exposed
+
+info:
+  name: Argo CD API or Login Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects reachable Argo CD UI or version API. Public deployment control
+    planes are sensitive because they reveal delivery tooling and may become a
+    high-impact target if SSO, RBAC, or default admin hardening is weak.
+  tags:
+    - misconfig
+    - devops
+    - argocd
+    - cd
+    - kubernetes
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/applications"
+      - "{{BaseURL}}/api/version"
+      - "{{BaseURL}}/argocd/"
+      - "{{BaseURL}}/argocd/api/version"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Argo CD"
+          - "(?i)argocd"
+          - '(?i)"Version"\s*:'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)argo-icon"
+          - "(?i)Login"
+          - '(?i)"GitCommit"\s*:'
+          - '(?i)"GitTreeState"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

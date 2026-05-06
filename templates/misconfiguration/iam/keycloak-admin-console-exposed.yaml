@@ -1,0 +1,49 @@
+id: keycloak-admin-console-exposed
+
+info:
+  name: Keycloak Admin Console Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects reachable Keycloak administration consoles. Publicly exposed IAM
+    administration surfaces increase brute-force, phishing, version targeting,
+    and misconfiguration risk even when authentication is required.
+  tags:
+    - misconfig
+    - iam
+    - keycloak
+    - admin
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/admin/"
+      - "{{BaseURL}}/admin/master/console/"
+      - "{{BaseURL}}/auth/admin/"
+      - "{{BaseURL}}/auth/admin/master/console/"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Keycloak"
+          - "(?i)keycloak-admin"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Administration Console"
+          - "(?i)<title>\\s*Keycloak"
+          - "(?i)kc-page-title"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

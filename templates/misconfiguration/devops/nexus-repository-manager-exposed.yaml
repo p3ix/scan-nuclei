@@ -1,0 +1,58 @@
+id: nexus-repository-manager-exposed
+
+info:
+  name: Nexus Repository Manager Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects reachable Sonatype Nexus Repository Manager UI or unauthenticated
+    status/repository API responses. Exposed artifact repositories can leak
+    dependency names, internal packages, build metadata, and deployment flows.
+  tags:
+    - misconfig
+    - devops
+    - nexus
+    - artifacts
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/nexus/"
+      - "{{BaseURL}}/service/rest/v1/status"
+      - "{{BaseURL}}/service/rest/v1/repositories"
+      - "{{BaseURL}}/nexus/service/rest/v1/status"
+      - "{{BaseURL}}/nexus/service/rest/v1/repositories"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Nexus Repository Manager"
+          - "(?i)Sonatype Nexus"
+          - "(?i)Sonatype"
+          - "(?i)NX-"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)nexus-coreui"
+          - '(?i)"edition"\s*:'
+          - '(?i)"version"\s*:'
+          - '(?i)"format"\s*:'
+          - '(?i)"repository"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

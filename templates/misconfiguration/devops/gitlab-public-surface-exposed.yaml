@@ -1,0 +1,50 @@
+id: gitlab-public-surface-exposed
+
+info:
+  name: GitLab Public Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects reachable GitLab web surfaces. Public GitLab exposure can disclose
+    project metadata, usernames, registration state, version hints, and CI/CD
+    attack surface depending on instance configuration.
+  tags:
+    - misconfig
+    - devops
+    - gitlab
+    - scm
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/users/sign_in"
+      - "{{BaseURL}}/explore"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>.*GitLab"
+          - "(?i)gon\\.gitlab_url"
+          - "(?i)assets/gitlab"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)users/sign_in"
+          - "(?i)Explore GitLab"
+          - "(?i)GitLab Community Edition"
+          - "(?i)GitLab Enterprise Edition"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

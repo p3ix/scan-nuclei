@@ -1,0 +1,53 @@
+id: harbor-registry-surface-exposed
+
+info:
+  name: Harbor Registry Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects reachable Harbor container registry UI or unauthenticated system
+    information endpoint. Public registry surfaces can expose project metadata,
+    image naming conventions, software supply-chain structure, and attack paths.
+  tags:
+    - misconfig
+    - devops
+    - harbor
+    - registry
+    - containers
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/harbor/sign-in"
+      - "{{BaseURL}}/api/v2.0/systeminfo"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Harbor"
+          - "(?i)harbor"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)container registry"
+          - "(?i)harbor-logo"
+          - '(?i)"harbor_version"\s*:'
+          - '(?i)"auth_mode"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

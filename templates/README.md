@@ -15,6 +15,11 @@ nuclei -t ./templates -u https://192.168.0.18:8443/
 - `technologies/`: fingerprinting y version disclosure.
 - `default-logins/`: credenciales por defecto.
 
+Subfamilias destacadas:
+
+- `misconfiguration/devops/`: GitLab, Nexus, Artifactory, SonarQube, Argo CD y Harbor.
+- `misconfiguration/iam/`: Keycloak y superficies de identidad.
+
 ## Nomenclatura
 
 - `*-exposed`: evidencia confirmada de exposicion.

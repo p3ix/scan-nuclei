@@ -1,0 +1,55 @@
+id: artifactory-repository-exposed
+
+info:
+  name: JFrog Artifactory Surface Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects reachable JFrog Artifactory UI or unauthenticated system version
+    endpoints. Exposed artifact repositories can reveal package names, build
+    pipelines, deployment conventions, and internal dependency structure.
+  tags:
+    - misconfig
+    - devops
+    - artifactory
+    - jfrog
+    - artifacts
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/ui/"
+      - "{{BaseURL}}/artifactory/"
+      - "{{BaseURL}}/artifactory/api/system/version"
+
+    headers:
+      Accept: application/json,text/html
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Artifactory"
+          - "(?i)JFrog"
+          - "(?i)X-Artifactory"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)JFrog Platform"
+          - "(?i)artifactory"
+          - '(?i)"version"\s*:'
+          - '(?i)"revision"\s*:'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

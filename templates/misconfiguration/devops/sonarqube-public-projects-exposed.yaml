@@ -1,0 +1,54 @@
+id: sonarqube-public-projects-exposed
+
+info:
+  name: SonarQube Public Projects Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects SonarQube instances where project listing data is reachable without
+    authentication. Public project metadata can disclose repository names,
+    application names, languages, quality gates, and internal engineering scope.
+  tags:
+    - misconfig
+    - devops
+    - sonarqube
+    - code-quality
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/components/search?qualifiers=TRK&ps=5"
+      - "{{BaseURL}}/sonarqube/api/components/search?qualifiers=TRK&ps=5"
+
+    headers:
+      Accept: application/json
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"components"\s*:\s*\['
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"qualifier"\s*:\s*"TRK"'
+          - '(?i)"organization"\s*:'
+          - '(?i)"visibility"\s*:'
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)sonarqube"
+          - "(?i)application/json"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

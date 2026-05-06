@@ -1,6 +1,6 @@
 # scan-nuclei
 
-Plantillas Nuclei enfocadas en auditorias HTTP de aplicaciones y plataformas Java: Apache HTTPD, Tomcat, WildFly/JBoss, Spring, Quarkus, Micronaut, Jetty y superficies habituales de infraestructura expuesta.
+Plantillas Nuclei enfocadas en auditorias HTTP de aplicaciones y plataformas Java: Apache HTTPD, Tomcat, WildFly/JBoss, Spring, Quarkus, Micronaut, Jetty, herramientas DevOps/IAM y superficies habituales de infraestructura expuesta.
 
 Este repo esta pensado para uso directo con Nuclei:
 
@@ -196,6 +196,11 @@ nuclei -t .\templates -u https://objetivo
 - `templates/exposures/`: ficheros sensibles, endpoints de diagnostico, OpenAPI/WSDL/Swagger, sourcemaps y artefactos publicados.
 - `templates/technologies/`: fingerprinting y version disclosure.
 - `templates/default-logins/`: comprobaciones de credenciales por defecto.
+
+Subfamilias utiles para empresa:
+
+- `templates/misconfiguration/devops/`: GitLab, Nexus, Artifactory, SonarQube, Argo CD y Harbor.
+- `templates/misconfiguration/iam/`: Keycloak y otras superficies de identidad.
 
 ## Uso recomendado
 
