@@ -202,6 +202,8 @@ Subfamilias utiles para empresa:
 - `templates/misconfiguration/devops/`: GitLab, Nexus, Artifactory, SonarQube, Argo CD y Harbor.
 - `templates/misconfiguration/iam/`: Keycloak y otras superficies de identidad.
 
+La matriz completa de cobertura esta en [COVERAGE-MATRIX.md](COVERAGE-MATRIX.md).
+
 ## Uso recomendado
 
 Para tu caso, ejecuta todo el arbol.

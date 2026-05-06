@@ -20,6 +20,8 @@ Subfamilias destacadas:
 - `misconfiguration/devops/`: GitLab, Nexus, Artifactory, SonarQube, Argo CD y Harbor.
 - `misconfiguration/iam/`: Keycloak y superficies de identidad.
 
+La matriz completa de cobertura vive en `../COVERAGE-MATRIX.md`.
+
 ## Nomenclatura
 
 - `*-exposed`: evidencia confirmada de exposicion.
