@@ -1,0 +1,48 @@
+id: apache-webdav-methods-enabled
+
+info:
+  name: Apache WebDAV Methods Enabled
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Apache HTTPD WebDAV capabilities through DAV and Allow headers.
+    Exposed WebDAV methods can permit unintended file operations if location
+    authorization is weak or inherited incorrectly.
+  tags:
+    - apache
+    - httpd
+    - webdav
+    - dav
+    - misconfig
+    - methods
+
+http:
+  - method: OPTIONS
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/webdav/"
+      - "{{BaseURL}}/dav/"
+      - "{{BaseURL}}/uploads/"
+      - "{{BaseURL}}/files/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code >= 200 && status_code < 500"
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?im)^dav:\\s*(1|2|<DAV:)"
+          - "(?im)^allow:\\s*.*\\b(PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK)\\b"
+      - type: regex
+        part: header
+        regex:
+          - "(?im)^server:\\s*.*Apache"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

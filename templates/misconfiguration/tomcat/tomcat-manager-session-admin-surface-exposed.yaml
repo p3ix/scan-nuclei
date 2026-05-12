@@ -1,0 +1,44 @@
+id: tomcat-manager-session-admin-surface-exposed
+
+info:
+  name: Tomcat Manager Session Administration Surface Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat Manager session administration endpoints. When
+    accessible, these endpoints can enumerate sessions and support disruptive
+    session management actions through the Manager application.
+  tags:
+    - tomcat
+    - misconfig
+    - manager
+    - sessions
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/text/sessions?path=/"
+      - "{{BaseURL}}/manager/text/sessions?path=/ROOT"
+      - "{{BaseURL}}/manager/text/list"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Tomcat Manager Application"
+          - "(?m)^OK - Session information for application"
+          - "(?m)^OK - Listed applications for virtual host"
+          - "(?i)WWW-Authenticate:\\s*Basic\\s+realm=\"Tomcat Manager Application\""
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

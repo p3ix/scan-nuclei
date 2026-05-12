@@ -1,0 +1,55 @@
+id: apache-cxf-services-listing-exposed
+
+info:
+  name: Apache CXF Services Listing Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Apache CXF service listing pages that disclose SOAP/REST
+    endpoints, WSDL links, service classes, and integration surface.
+  tags:
+    - misconfig
+    - java
+    - apache
+    - cxf
+    - soap
+    - services
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/services"
+      - "{{BaseURL}}/services/"
+      - "{{BaseURL}}/cxf"
+      - "{{BaseURL}}/cxf/"
+      - "{{BaseURL}}/api/services"
+      - "{{BaseURL}}/ws/services"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Available\\s+SOAP\\s+services"
+          - "(?i)Available\\s+RESTful\\s+services"
+          - "(?i)Apache\\s+CXF"
+          - "(?i)Generated\\s+by\\s+Apache\\s+CXF"
+          - "(?i)CXF\\s+service\\s+list"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)\\?wsdl"
+          - "(?i)service\\s+endpoint\\s+interface"
+          - "(?i)<span[^>]*>\\s*Endpoint\\s+address"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

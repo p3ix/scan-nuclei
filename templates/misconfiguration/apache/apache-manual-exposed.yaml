@@ -1,0 +1,47 @@
+id: apache-manual-exposed
+
+info:
+  name: Apache HTTPD Manual Exposed
+  author: scan-nuclei
+  severity: low
+  description: |
+    Detects publicly reachable Apache HTTPD manual pages. The manual itself is
+    usually low impact, but it can identify Apache deployments, enabled doc
+    aliases, language negotiation, and outdated packaged defaults.
+  tags:
+    - apache
+    - httpd
+    - misconfig
+    - docs
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manual/"
+      - "{{BaseURL}}/manual/index.html"
+      - "{{BaseURL}}/manual/en/"
+      - "{{BaseURL}}/manual/en/index.html"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>Apache HTTP Server.*Documentation</title>"
+          - "(?i)Apache HTTP Server Version .* Documentation"
+          - "(?i)Apache HTTP Server Documentation"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*text/html"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

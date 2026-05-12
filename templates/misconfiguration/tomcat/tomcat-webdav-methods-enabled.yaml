@@ -1,0 +1,51 @@
+id: tomcat-webdav-methods-enabled
+
+info:
+  name: Tomcat WebDAV Methods Enabled
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects WebDAV methods advertised by Tomcat or Java servlet deployments.
+    WebDAV exposure can enable unintended content publishing, file operations,
+    or richer attack surface when access controls are weak.
+  tags:
+    - tomcat
+    - java
+    - servlet
+    - webdav
+    - misconfig
+    - methods
+
+http:
+  - method: OPTIONS
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/webdav/"
+      - "{{BaseURL}}/dav/"
+      - "{{BaseURL}}/files/"
+      - "{{BaseURL}}/uploads/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code >= 200 && status_code < 500"
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?im)^allow:\\s*.*\\b(PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK)\\b"
+          - "(?im)^dav:\\s*(1|2|<DAV:)"
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?im)^server:\\s*.*(Apache-Coyote|Tomcat|Catalina)"
+          - "(?im)^set-cookie:\\s*JSESSIONID="
+          - "(?im)^www-authenticate:\\s*Basic\\s+realm=\"Tomcat"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

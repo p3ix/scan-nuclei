@@ -1,0 +1,47 @@
+id: tomcat-manager-diagnostics-endpoints-exposed
+
+info:
+  name: Tomcat Manager Diagnostic Text Endpoints Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects Tomcat Manager diagnostic text endpoints such as VM info,
+    thread dumps, and TLS cipher listings. These endpoints can reveal runtime
+    versions, JVM arguments, connector details, and operational state.
+  tags:
+    - tomcat
+    - misconfig
+    - manager
+    - diagnostics
+    - jvm
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/manager/text/vminfo"
+      - "{{BaseURL}}/manager/text/threaddump"
+      - "{{BaseURL}}/manager/text/sslConnectorCiphers"
+      - "{{BaseURL}}/manager/text/serverinfo"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Tomcat Manager Application"
+          - "(?m)^OK - VM info"
+          - "(?m)^OK - Server info"
+          - "(?i)java\\.runtime\\.version"
+          - "(?i)Full thread dump"
+          - "(?i)SSLHostConfig"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

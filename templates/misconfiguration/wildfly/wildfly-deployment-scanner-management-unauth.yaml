@@ -1,0 +1,49 @@
+id: wildfly-deployment-scanner-management-unauth
+
+info:
+  name: WildFly Deployment Scanner Management Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated reads of WildFly deployment-scanner resources.
+    Exposure can reveal deployment directories, scanner intervals, and whether
+    automatic deployment pickup is enabled.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - deployment
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=deployment-scanner?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=deployment-scanner/scanner=default?operation=read-resource&include-runtime=true"
+      - "{{BaseURL}}/management/subsystem=deployment-scanner?operation=read-children-names&child-type=scanner"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"deployment-scanner"'
+          - '(?i)"scan-interval"'
+          - '(?i)"deployment-timeout"'
+          - '(?i)"path"\\s*:'
+          - '(?i)"auto-deploy'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

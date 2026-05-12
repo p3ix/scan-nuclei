@@ -1,0 +1,51 @@
+id: wildfly-messaging-activemq-management-unauth
+
+info:
+  name: WildFly Messaging ActiveMQ Management Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated reads of WildFly messaging-activemq management
+    resources. These responses can disclose JMS queues, topics, acceptors,
+    connectors, and broker topology.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - activemq
+    - jms
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=messaging-activemq?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=messaging-activemq/server=default?operation=read-resource&recursive=true"
+      - "{{BaseURL}}/management/subsystem=messaging-activemq/server=default?operation=read-children-names&child-type=jms-queue"
+      - "{{BaseURL}}/management/subsystem=messaging-activemq/server=default?operation=read-children-names&child-type=jms-topic"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"messaging-activemq"'
+          - '(?i)"jms-queue"'
+          - '(?i)"jms-topic"'
+          - '(?i)"acceptor"'
+          - '(?i)"connector"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

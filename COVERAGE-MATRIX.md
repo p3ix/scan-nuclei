@@ -20,8 +20,8 @@ El objetivo de la matriz es explicar el alcance de seguridad de forma practica: 
 | Consolas administrativas | Jenkins, Kubernetes, Docker Registry, Consul, Vault, RabbitMQ, Solr, Nacos, Druid, Flink, Spark, Hawtio | Superficie de administracion expuesta o sin autenticacion | Alta |
 | DevOps y supply chain | GitLab, Nexus, Artifactory, SonarQube, Argo CD, Harbor | Fuga de codigo, artefactos, imagenes, pipelines y despliegues | Media/alta |
 | IAM | Keycloak | Superficie de identidad expuesta, riesgo de ataques a SSO/admin | Media/alta |
-| Servidores web/proxy | Apache HTTPD, Nginx, Tomcat, Jetty, WildFly/Undertow | Headers debiles, directory listing, TRACE, proxy exposure, status/admin pages | Media/alta |
-| Frameworks Java | Spring Boot, Quarkus, Micronaut, JSF/Jakarta Faces, Struts | Actuators, endpoints de gestion, stacktraces, CORS, cookies, dev/debug | Media/alta |
+| Servidores web/proxy | Apache HTTPD, Nginx, Tomcat, Jetty, WildFly/Undertow | Headers debiles, directory listing, WebDAV, TRACE, proxy exposure, status/admin pages | Media/alta |
+| Frameworks Java | Spring Boot, Quarkus, Micronaut, JSF/Jakarta Faces, Struts, Axis2, CXF | Actuators, endpoints de gestion, stacktraces, CORS, cookies, dev/debug, listados de servicios | Media/alta |
 | Observabilidad | Prometheus, Alertmanager, Grafana signup, cAdvisor, etcd, Zipkin | Fuga de metricas, targets internos, topologia y datos operativos | Media/alta |
 | Fingerprinting | Apache, Tomcat, WildFly, Jetty, Spring, Quarkus, Micronaut, Java Web | Identificacion de tecnologia y version para priorizar hallazgos | Informativa |
 
@@ -39,12 +39,12 @@ El objetivo de la matriz es explicar el alcance de seguridad de forma practica: 
 | `templates/exposures/debug-probes/` | 3 | Endpoints de diagnostico Java | Heapdump, logfile, threaddump | Puede revelar secretos en memoria, trazas, rutas y datos sensibles |
 | `templates/exposures/error-pages/` | 3 | Stacktraces y errores verbosos | Tomcat, WildFly/Undertow, Jakarta Faces | Reduce informacion tecnica util para ataques dirigidos |
 | `templates/exposures/sensitive-paths/` | 97 | Ficheros sensibles y rutas comunes en Java/Tomcat/WildFly/Spring | `.git/config`, `application.yml`, `server.xml`, `tomcat-users.xml`, `standalone.xml`, keystores, logs, WAR/JAR, `WEB-INF/web.xml` | Es la cobertura mas fuerte contra fugas de configuracion, secretos y artefactos internos |
-| `templates/misconfiguration/apache/` | 45 | Misconfiguracion Apache HTTPD y proxy | `server-status`, `server-info`, directory listing, `.ht*`, TRACE, headers, open proxy, balancer-manager, mod_cluster, jk-status, config leaks | Cubre hardening, exposicion admin/proxy y fugas de backend |
+| `templates/misconfiguration/apache/` | 47 | Misconfiguracion Apache HTTPD y proxy | `server-status`, `server-info`, directory listing, `.ht*`, WebDAV, manual expuesto, TRACE, headers, open proxy, balancer-manager, mod_cluster, jk-status, config leaks | Cubre hardening, exposicion admin/proxy y fugas de backend |
 | `templates/misconfiguration/cicd/` | 2 | Jenkins | Dashboard/API y Script Console | Detecta riesgo critico en CI/CD y posible ejecucion remota si hay mala configuracion |
 | `templates/misconfiguration/devops/` | 6 | Herramientas DevOps y supply chain | GitLab, Nexus, Artifactory, SonarQube, Argo CD, Harbor | Localiza superficies que pueden revelar codigo, artefactos, imagenes, pipelines y despliegues |
 | `templates/misconfiguration/iam/` | 1 | Identidad y SSO | Keycloak admin console | Identifica superficie sensible de autenticacion/autorizacion |
 | `templates/misconfiguration/infrastructure/` | 5 | Infraestructura expuesta | Kubernetes API, Kubernetes Dashboard, Docker Registry catalog, Consul API, Vault health | Detecta planos de control y servicios internos publicados por error |
-| `templates/misconfiguration/java-apps/` | 31 | Consolas, endpoints y hardening de apps Java | Spring Actuator write surfaces, Druid, Nacos, Solr, Flink, Spark, Eureka, Hawtio, Jolokia, Zipkin, H2, headers | Cubre exposiciones comunes en plataformas Java empresariales |
+| `templates/misconfiguration/java-apps/` | 34 | Consolas, endpoints y hardening de apps Java | Spring Actuator write surfaces, Axis2, CXF, Druid, Nacos, Solr, Flink, Spark, Eureka, Hawtio, Jolokia, Zipkin, H2, headers | Cubre exposiciones comunes en plataformas Java empresariales |
 | `templates/misconfiguration/jetty/` | 3 | Jetty | Directory listing, dump servlet, test webapp | Detecta apps de prueba/debug y listados inseguros |
 | `templates/misconfiguration/messaging/` | 1 | Mensajeria | RabbitMQ Management | Identifica paneles de broker expuestos |
 | `templates/misconfiguration/micronaut/` | 7 | Micronaut management | Env, threaddump, metrics, management endpoints, loggers/refresh/stop | Reduce exposicion de operacion y endpoints potencialmente peligrosos |
@@ -52,8 +52,8 @@ El objetivo de la matriz es explicar el alcance de seguridad de forma practica: 
 | `templates/misconfiguration/observability/` | 6 | Observabilidad | Prometheus targets/admin API, Alertmanager, Grafana signup, cAdvisor, etcd metrics | Evita fuga de topologia, targets, servicios y datos operativos |
 | `templates/misconfiguration/quarkus/` | 3 | Quarkus | Health, metrics, OpenAPI | Detecta endpoints operativos/documentales expuestos |
 | `templates/misconfiguration/search/` | 2 | Buscadores y analitica | Elasticsearch API sin autenticacion, Kibana status | Reduce riesgo de fuga de indices, cluster info y paneles |
-| `templates/misconfiguration/tomcat/` | 7 | Tomcat Manager/Host Manager | Manager HTML, script, text deploy, JMX proxy, host-manager, restriccion localhost | Detecta superficie admin y despliegue remoto |
-| `templates/misconfiguration/wildfly/` | 17 | WildFly/JBoss moderno | Consola, management model/read ops, datasources, Elytron/TLS, mail, mod_cluster, health, metrics, OpenAPI, domain topology | Muy valioso para detectar administracion WildFly expuesta o lectura no autenticada |
+| `templates/misconfiguration/tomcat/` | 10 | Tomcat Manager/Host Manager | Manager HTML, script, text deploy, JMX proxy, diagnostico, sesiones, WebDAV, host-manager, restriccion localhost | Detecta superficie admin, despliegue remoto y metodos inseguros |
+| `templates/misconfiguration/wildfly/` | 21 | WildFly/JBoss moderno | Consola, management model/read ops, datasources, Elytron/TLS, mail, messaging-activemq, deployment-scanner, system properties, batch-jberet, mod_cluster, health, metrics, OpenAPI, domain topology | Muy valioso para detectar administracion WildFly expuesta o lectura no autenticada |
 | `templates/technologies/apache/` | 6 | Fingerprinting Apache | Server header, default page, version disclosure, reverse proxy/fronting Tomcat/WildFly | Ayuda a entender arquitectura y priorizar checks |
 | `templates/technologies/java-web/` | 6 | Fingerprinting Java Web | JSESSIONID, servlet errors, JSF/Jakarta Faces, PrimeFaces, `X-Powered-By`, framework headers | Identifica tecnologia y frameworks antes de triage |
 | `templates/technologies/jetty/` | 2 | Fingerprinting Jetty | Server header y error page | Contexto tecnologico |

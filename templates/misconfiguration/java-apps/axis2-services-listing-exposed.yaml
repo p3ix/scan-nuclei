@@ -1,0 +1,52 @@
+id: axis2-services-listing-exposed
+
+info:
+  name: Apache Axis2 Services Listing Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Apache Axis2 service listings that reveal deployed SOAP
+    services, operation names, namespaces, and WSDL links.
+  tags:
+    - misconfig
+    - java
+    - axis2
+    - apache
+    - soap
+    - services
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/axis2/services/"
+      - "{{BaseURL}}/axis2/services/listServices"
+      - "{{BaseURL}}/services/"
+      - "{{BaseURL}}/services/listServices"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)<title>\\s*Axis2\\s+Services\\s*</title>"
+          - "(?i)Available\\s+services"
+          - "(?i)Service\\s+EPR"
+          - "(?i)Axis2\\s+Web\\s+Service"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)\\?wsdl"
+          - "(?i)<h[1-4]>\\s*Services\\s*</h[1-4]>"
+          - "(?i)Deployed\\s+services"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

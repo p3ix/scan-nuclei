@@ -1,0 +1,46 @@
+id: axis2-admin-console-exposed
+
+info:
+  name: Apache Axis2 Admin Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache Axis2 administrative consoles. Even when protected
+    by authentication, public Axis2 admin surfaces are high-value targets for
+    weak credentials and deployment abuse.
+  tags:
+    - misconfig
+    - java
+    - axis2
+    - apache
+    - admin
+    - panel
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/axis2/axis2-admin/"
+      - "{{BaseURL}}/axis2/axis2-admin/login"
+      - "{{BaseURL}}/axis2-admin/"
+      - "{{BaseURL}}/services/axis2-admin/"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Axis2\\s+Administration"
+          - "(?i)Apache\\s+Axis2\\s+Web\\s+Admin"
+          - "(?i)axis2-admin"
+          - "(?i)Axis2 Admin Login"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

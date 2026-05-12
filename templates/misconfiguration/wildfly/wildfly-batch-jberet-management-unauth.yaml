@@ -1,0 +1,50 @@
+id: wildfly-batch-jberet-management-unauth
+
+info:
+  name: WildFly Batch JBeret Management Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated reads of WildFly batch-jberet management resources.
+    Batch metadata can reveal job repositories, executor configuration, and
+    operational entry points in enterprise Java applications.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - batch
+    - jberet
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=batch-jberet?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=batch-jberet?operation=read-resource&recursive=true"
+      - "{{BaseURL}}/management/subsystem=batch-jberet?operation=read-children-names&child-type=job-repository"
+      - "{{BaseURL}}/management/subsystem=batch-jberet?operation=read-children-names&child-type=thread-pool"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"batch-jberet"'
+          - '(?i)"job-repository"'
+          - '(?i)"thread-pool"'
+          - '(?i)"restart-jobs-on-resume"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

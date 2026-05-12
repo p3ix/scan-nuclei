@@ -1,0 +1,52 @@
+id: wildfly-system-properties-management-unauth
+
+info:
+  name: WildFly System Properties Management Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated reads of WildFly system properties or platform MBean
+    runtime data. These resources can disclose Java versions, filesystem paths,
+    proxy settings, runtime arguments, and environment-specific configuration.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - java
+    - management
+    - properties
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/system-property=java.home?operation=read-resource"
+      - "{{BaseURL}}/management/system-property=java.version?operation=read-resource"
+      - "{{BaseURL}}/management/core-service=platform-mbean/type=runtime?operation=read-resource&include-runtime=true"
+      - "{{BaseURL}}/management/core-service=platform-mbean/type=operating-system?operation=read-resource&include-runtime=true"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"java\\.home"'
+          - '(?i)"java\\.version"'
+          - '(?i)"system-properties"'
+          - '(?i)"vm-name"'
+          - '(?i)"runtime-name"'
+          - '(?i)"available-processors"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
