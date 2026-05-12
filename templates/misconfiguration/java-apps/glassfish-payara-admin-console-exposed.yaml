@@ -1,0 +1,56 @@
+id: glassfish-payara-admin-console-exposed
+
+info:
+  name: GlassFish or Payara Admin Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed GlassFish or Payara administration consoles and REST
+    management surfaces. These Java application server consoles are high-value
+    administrative targets when reachable from untrusted networks.
+  tags:
+    - misconfig
+    - java
+    - glassfish
+    - payara
+    - admin
+    - console
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/common/index.jsf"
+      - "{{BaseURL}}/login.jsf"
+      - "{{BaseURL}}/management/domain"
+      - "{{BaseURL}}/management/domain/server"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)GlassFish\\s+Server\\s+Open\\s+Source\\s+Edition"
+          - "(?i)Payara\\s+Server"
+          - "(?i)GlassFish\\s+Server\\s+Administration\\s+Console"
+          - "(?i)Administration\\s+Console"
+          - '(?i)"extraProperties"\\s*:'
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)glassfish"
+          - "(?i)payara"
+          - "(?i)server\\.admin"
+          - "(?i)X-GlassFish"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

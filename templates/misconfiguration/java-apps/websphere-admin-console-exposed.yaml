@@ -1,0 +1,50 @@
+id: websphere-admin-console-exposed
+
+info:
+  name: IBM WebSphere Admin Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed IBM WebSphere Integrated Solutions Console paths. The console
+    exposes a sensitive enterprise Java administration surface and should be
+    restricted to trusted management networks.
+  tags:
+    - misconfig
+    - java
+    - websphere
+    - ibm
+    - admin
+    - console
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/ibm/console"
+      - "{{BaseURL}}/ibm/console/"
+      - "{{BaseURL}}/ibm/console/login.do"
+      - "{{BaseURL}}/admin/"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 302 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Integrated\\s+Solutions\\s+Console"
+          - "(?i)IBM\\s+WebSphere"
+          - "(?i)WebSphere\\s+Application\\s+Server"
+          - "(?i)ibm\\/console"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

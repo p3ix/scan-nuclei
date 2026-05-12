@@ -1,0 +1,51 @@
+id: apache-modsecurity-config-exposed
+
+info:
+  name: Apache ModSecurity Configuration Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed ModSecurity configuration files. These files can disclose WAF
+    rules, disabled protections, audit log paths, anomaly thresholds, and backend
+    hardening assumptions.
+  tags:
+    - apache
+    - httpd
+    - modsecurity
+    - waf
+    - config
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/modsecurity.conf"
+      - "{{BaseURL}}/mod_security.conf"
+      - "{{BaseURL}}/security2.conf"
+      - "{{BaseURL}}/conf/modsecurity.conf"
+      - "{{BaseURL}}/conf.d/mod_security.conf"
+      - "{{BaseURL}}/etc/modsecurity/modsecurity.conf"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^SecRuleEngine\\s+(On|Off|DetectionOnly)"
+          - "(?im)^SecRequestBodyAccess\\s+"
+          - "(?im)^SecAuditLog\\s+"
+          - "(?im)^Include\\s+.*modsecurity"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/plain|text/html|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

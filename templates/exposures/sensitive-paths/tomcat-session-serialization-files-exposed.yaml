@@ -1,0 +1,51 @@
+id: tomcat-session-serialization-files-exposed
+
+info:
+  name: Tomcat Serialized Session Files Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat serialized session persistence files. These artifacts
+    may contain user session data, principal objects, application state, and
+    serialized Java classes.
+  tags:
+    - exposure
+    - tomcat
+    - java
+    - session
+    - serialization
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/SESSIONS.ser"
+      - "{{BaseURL}}/sessions.ser"
+      - "{{BaseURL}}/work/Catalina/localhost/_/SESSIONS.ser"
+      - "{{BaseURL}}/work/Catalina/localhost/ROOT/SESSIONS.ser"
+      - "{{BaseURL}}/temp/SESSIONS.ser"
+      - "{{BaseURL}}/WEB-INF/SESSIONS.ser"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: dsl
+        dsl:
+          - "content_length > 20"
+      - type: regex
+        part: header
+        condition: or
+        regex:
+          - "(?i)content-type:\\s*application/(java-serialized-object|octet-stream)"
+          - "(?i)content-type:\\s*(binary/octet-stream|text/plain)"
+      - type: binary
+        binary:
+          - "aced0005"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

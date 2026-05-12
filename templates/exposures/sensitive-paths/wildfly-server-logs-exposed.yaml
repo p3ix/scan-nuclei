@@ -1,0 +1,55 @@
+id: wildfly-server-logs-exposed
+
+info:
+  name: WildFly or JBoss Server Logs Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed WildFly or JBoss server logs. These logs can disclose stack
+    traces, deployments, datasource errors, credentials in startup messages, and
+    internal package names.
+  tags:
+    - exposure
+    - wildfly
+    - jboss
+    - logs
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/standalone/log/server.log"
+      - "{{BaseURL}}/domain/servers/server-one/log/server.log"
+      - "{{BaseURL}}/logs/server.log"
+      - "{{BaseURL}}/server.log"
+      - "{{BaseURL}}/jboss/server/default/log/server.log"
+      - "{{BaseURL}}/jboss/server/production/log/server.log"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)WFLYSRV[0-9]{4}"
+          - "(?i)JBAS[0-9]{4}"
+          - "(?i)WildFly\\s+Full"
+          - "(?i)JBoss\\s+EAP"
+          - "(?i)org\\.jboss\\."
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Deployed\\s+\".*\\.(war|ear|jar)\""
+          - "(?i)Started\\s+.*\\s+in\\s+[0-9]+ms"
+          - "(?i)Caused by:\\s+"
+          - "(?i)Datasource"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

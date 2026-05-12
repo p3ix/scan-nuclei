@@ -1,0 +1,50 @@
+id: wildfly-infinispan-management-unauth
+
+info:
+  name: WildFly Infinispan Cache Management Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated reads of WildFly Infinispan subsystem resources.
+    Cache container metadata can reveal clustering, session replication, and
+    application state storage topology.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - infinispan
+    - cache
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=infinispan?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=infinispan?operation=read-resource&recursive=true"
+      - "{{BaseURL}}/management/subsystem=infinispan?operation=read-children-names&child-type=cache-container"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"infinispan"'
+          - '(?i)"cache-container"'
+          - '(?i)"local-cache"'
+          - '(?i)"distributed-cache"'
+          - '(?i)"replicated-cache"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

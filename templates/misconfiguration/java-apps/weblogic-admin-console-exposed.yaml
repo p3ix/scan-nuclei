@@ -1,0 +1,50 @@
+id: weblogic-admin-console-exposed
+
+info:
+  name: Oracle WebLogic Administration Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Oracle WebLogic administration console paths. Publicly
+    reachable WebLogic consoles are sensitive administrative attack surface and
+    often indicate an internet-exposed Java application server tier.
+  tags:
+    - misconfig
+    - java
+    - weblogic
+    - oracle
+    - admin
+    - console
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/console"
+      - "{{BaseURL}}/console/"
+      - "{{BaseURL}}/console/login/LoginForm.jsp"
+      - "{{BaseURL}}/console/login/LoginForm.jsp?refresh=true"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 302 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Oracle\\s+WebLogic\\s+Server\\s+Administration\\s+Console"
+          - "(?i)WebLogic\\s+Server\\s+Administration\\s+Console"
+          - "(?i)bea_wls_internal"
+          - "(?i)WebLogic"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

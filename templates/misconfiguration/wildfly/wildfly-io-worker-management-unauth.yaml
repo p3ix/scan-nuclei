@@ -1,0 +1,50 @@
+id: wildfly-io-worker-management-unauth
+
+info:
+  name: WildFly IO Worker Management Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated reads of WildFly IO subsystem worker and buffer-pool
+    resources. Exposure can reveal connector sizing, worker names, and runtime
+    networking configuration.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - io
+    - undertow
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=io?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=io?operation=read-resource&recursive=true"
+      - "{{BaseURL}}/management/subsystem=io?operation=read-children-names&child-type=worker"
+      - "{{BaseURL}}/management/subsystem=io?operation=read-children-names&child-type=buffer-pool"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"worker"'
+          - '(?i)"buffer-pool"'
+          - '(?i)"io-threads"'
+          - '(?i)"task-max-threads"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

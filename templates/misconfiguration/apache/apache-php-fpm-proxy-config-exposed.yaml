@@ -1,0 +1,55 @@
+id: apache-php-fpm-proxy-config-exposed
+
+info:
+  name: Apache PHP-FPM Proxy Configuration Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache configuration snippets that route PHP requests to
+    PHP-FPM through proxy_fcgi. These files can disclose internal sockets,
+    backend hosts, document roots, and handler rules.
+  tags:
+    - apache
+    - httpd
+    - php-fpm
+    - proxy_fcgi
+    - config
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/php-fpm.conf"
+      - "{{BaseURL}}/php-fpm.conf.bak"
+      - "{{BaseURL}}/conf/php-fpm.conf"
+      - "{{BaseURL}}/conf.d/php-fpm.conf"
+      - "{{BaseURL}}/apache2/conf-enabled/php-fpm.conf"
+      - "{{BaseURL}}/httpd/conf.d/php-fpm.conf"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^\\s*SetHandler\\s+\"?proxy:unix:"
+          - "(?im)^\\s*SetHandler\\s+\"?proxy:fcgi://"
+          - "(?im)^\\s*ProxyPassMatch\\s+.*fcgi://"
+          - "(?im)^\\s*FilesMatch\\s+.*\\.php"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)php-fpm"
+          - "(?i)proxy_fcgi"
+          - "(?i)fcgi://"
+          - "(?i)/run/php/"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

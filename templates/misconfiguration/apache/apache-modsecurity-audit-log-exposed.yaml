@@ -1,0 +1,55 @@
+id: apache-modsecurity-audit-log-exposed
+
+info:
+  name: Apache ModSecurity Audit Log Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed ModSecurity audit logs. Audit logs may contain request
+    bodies, headers, cookies, tokens, client IPs, blocked payloads, and backend
+    application paths.
+  tags:
+    - apache
+    - httpd
+    - modsecurity
+    - waf
+    - logs
+    - sensitive
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/modsec_audit.log"
+      - "{{BaseURL}}/modsec_debug.log"
+      - "{{BaseURL}}/logs/modsec_audit.log"
+      - "{{BaseURL}}/logs/modsec_debug.log"
+      - "{{BaseURL}}/var/log/apache2/modsec_audit.log"
+      - "{{BaseURL}}/var/log/httpd/modsec_audit.log"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^--[a-f0-9]{8,}-A--$"
+          - "(?i)ModSecurity:\\s+"
+          - "(?i)Access\\s+denied\\s+with\\s+code"
+          - "(?i)Message:\\s+Warning\\."
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^(GET|POST|PUT|DELETE|PATCH|OPTIONS)\\s+\\S+\\s+HTTP/"
+          - "(?im)^Host:\\s+"
+          - "(?i)\\[id\\s+\"[0-9]+\"\\]"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

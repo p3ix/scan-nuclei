@@ -1,0 +1,51 @@
+id: tomcat-work-jsp-artifacts-exposed
+
+info:
+  name: Tomcat Work JSP Artifacts Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Tomcat work directory JSP compilation artifacts. Generated
+    servlet source can reveal original JSP logic, framework bindings, internal
+    paths, and occasionally embedded secrets.
+  tags:
+    - exposure
+    - tomcat
+    - java
+    - jsp
+    - work
+    - source
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/work/Catalina/localhost/ROOT/org/apache/jsp/index_jsp.java"
+      - "{{BaseURL}}/work/Catalina/localhost/_/org/apache/jsp/index_jsp.java"
+      - "{{BaseURL}}/work/Catalina/localhost/ROOT/org/apache/jsp/login_jsp.java"
+      - "{{BaseURL}}/work/Catalina/localhost/_/org/apache/jsp/login_jsp.java"
+      - "{{BaseURL}}/org/apache/jsp/index_jsp.java"
+      - "{{BaseURL}}/org/apache/jsp/login_jsp.java"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)public\\s+final\\s+class\\s+.*_jsp\\s+extends\\s+org\\.apache\\.jasper\\.runtime\\.HttpJspBase"
+          - "(?i)org\\.apache\\.jasper\\.runtime\\.JspSourceDependent"
+          - "(?i)_jspxFactory"
+          - "(?i)JspFactory\\.getDefaultFactory"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/plain|text/x-java|application/octet-stream|text/html)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

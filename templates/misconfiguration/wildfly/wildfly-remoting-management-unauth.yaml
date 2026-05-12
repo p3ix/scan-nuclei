@@ -1,0 +1,49 @@
+id: wildfly-remoting-management-unauth
+
+info:
+  name: WildFly Remoting Management Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated reads of WildFly remoting subsystem resources.
+    Exposure can reveal HTTP connectors, endpoint settings, SASL configuration,
+    and remote invocation surface.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - remoting
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=remoting?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=remoting?operation=read-resource&recursive=true"
+      - "{{BaseURL}}/management/subsystem=remoting?operation=read-children-names&child-type=http-connector"
+      - "{{BaseURL}}/management/subsystem=remoting?operation=read-children-names&child-type=connector"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"remoting"'
+          - '(?i)"http-connector"'
+          - '(?i)"connector"'
+          - '(?i)"sasl-authentication-factory"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

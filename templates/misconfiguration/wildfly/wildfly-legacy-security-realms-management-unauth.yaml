@@ -1,0 +1,49 @@
+id: wildfly-legacy-security-realms-management-unauth
+
+info:
+  name: WildFly Legacy Security Realms Management Without Authentication
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects unauthenticated reads of legacy WildFly/JBoss security-realm
+    resources. These resources can disclose authentication mechanisms, JAAS
+    modules, SSL server identity settings, and management realm names.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - security-realm
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/core-service=management/security-realm=ManagementRealm?operation=read-resource&recursive=true"
+      - "{{BaseURL}}/management/core-service=management/security-realm=ApplicationRealm?operation=read-resource&recursive=true"
+      - "{{BaseURL}}/management/core-service=management?operation=read-children-names&child-type=security-realm"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"ManagementRealm"'
+          - '(?i)"ApplicationRealm"'
+          - '(?i)"security-realm"'
+          - '(?i)"authentication"'
+          - '(?i)"server-identity"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
