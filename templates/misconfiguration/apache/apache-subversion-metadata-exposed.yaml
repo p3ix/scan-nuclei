@@ -1,0 +1,51 @@
+id: apache-subversion-metadata-exposed
+
+info:
+  name: Apache Subversion Metadata Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed `.svn` metadata through Apache-served directories. SVN
+    metadata can reveal repository URLs, working-copy paths, filenames, and in
+    older layouts source contents.
+  tags:
+    - apache
+    - httpd
+    - svn
+    - source
+    - exposure
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.svn/entries"
+      - "{{BaseURL}}/.svn/wc.db"
+      - "{{BaseURL}}/.svn/all-wcprops"
+      - "{{BaseURL}}/app/.svn/entries"
+      - "{{BaseURL}}/static/.svn/entries"
+      - "{{BaseURL}}/WEB-INF/.svn/entries"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^dir\\s*$"
+          - "(?i)svn:\\/\\/"
+          - "(?i)http[s]?:\\/\\/[^\\s]+\\/svn\\/"
+          - "(?i)SQLite format 3"
+          - "(?i)svn:wc:ra_dav:version-url"
+      - type: dsl
+        dsl:
+          - "content_length > 20"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

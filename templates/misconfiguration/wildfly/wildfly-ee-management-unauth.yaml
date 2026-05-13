@@ -1,0 +1,50 @@
+id: wildfly-ee-management-unauth
+
+info:
+  name: WildFly EE Subsystem Management Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated reads of WildFly EE subsystem resources. Exposure can
+    disclose managed executor services, default bindings, concurrency utilities,
+    and Java EE runtime configuration.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - java-ee
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=ee?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=ee?operation=read-resource&recursive=true"
+      - "{{BaseURL}}/management/subsystem=ee?operation=read-children-names&child-type=managed-executor-service"
+      - "{{BaseURL}}/management/subsystem=ee?operation=read-children-names&child-type=context-service"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"managed-executor-service"'
+          - '(?i)"context-service"'
+          - '(?i)"default-bindings-service"'
+          - '(?i)"global-modules"'
+          - '(?i)"ee"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

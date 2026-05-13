@@ -1,0 +1,55 @@
+id: java-server-side-templates-exposed
+
+info:
+  name: Java Server-Side Template Files Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Java server-side template files such as Thymeleaf, FreeMarker,
+    Velocity, and JSP fragments. Templates can reveal view logic, internal model
+    names, routes, and sometimes secrets.
+  tags:
+    - exposure
+    - java
+    - template
+    - thymeleaf
+    - freemarker
+    - velocity
+    - jsp
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/templates/index.html"
+      - "{{BaseURL}}/templates/login.html"
+      - "{{BaseURL}}/WEB-INF/templates/index.html"
+      - "{{BaseURL}}/WEB-INF/templates/login.html"
+      - "{{BaseURL}}/WEB-INF/views/index.jsp"
+      - "{{BaseURL}}/WEB-INF/views/login.jsp"
+      - "{{BaseURL}}/templates/index.ftl"
+      - "{{BaseURL}}/templates/index.vm"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)th:(text|if|each|href|action)="
+          - "(?i)xmlns:th=\"http://www\\.thymeleaf\\.org\""
+          - "(?i)<#(if|list|include|assign)\\b"
+          - "(?i)\\$\\{[^}]+\\}"
+          - "(?i)<%@\\s*(page|taglib|include)\\b"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/html|text/plain|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,53 @@
+id: flowable-ui-exposed
+
+info:
+  name: Flowable UI Applications Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Flowable UI applications, including Admin, Task, Modeler,
+    IDM, and REST surfaces. These endpoints can disclose workflow automation
+    topology and administrative login surfaces.
+  tags:
+    - misconfig
+    - java
+    - flowable
+    - bpm
+    - workflow
+    - panel
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/flowable-ui/"
+      - "{{BaseURL}}/flowable-admin/"
+      - "{{BaseURL}}/flowable-task/"
+      - "{{BaseURL}}/flowable-modeler/"
+      - "{{BaseURL}}/flowable-idm/"
+      - "{{BaseURL}}/flowable-rest/service/management/properties"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Flowable"
+          - "(?i)flowable-ui"
+          - "(?i)flowable-admin"
+          - "(?i)flowable-task"
+          - '(?i)"flowable\\.version"'
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

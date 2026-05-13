@@ -1,0 +1,52 @@
+id: camunda-webapps-exposed
+
+info:
+  name: Camunda Web Applications Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Camunda web applications such as Cockpit, Tasklist, Admin,
+    and REST API surfaces. These endpoints reveal workflow and process
+    automation attack surface, even when authentication is enforced.
+  tags:
+    - misconfig
+    - java
+    - camunda
+    - bpm
+    - workflow
+    - panel
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/camunda/"
+      - "{{BaseURL}}/camunda/app/cockpit/default/"
+      - "{{BaseURL}}/camunda/app/tasklist/default/"
+      - "{{BaseURL}}/camunda/app/admin/default/"
+      - "{{BaseURL}}/engine-rest/version"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Camunda"
+          - "(?i)camunda-bpm"
+          - "(?i)Cockpit"
+          - "(?i)Tasklist"
+          - '(?i)"version"\\s*:\\s*"7\\.[0-9]+'
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

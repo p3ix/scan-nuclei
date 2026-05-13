@@ -1,0 +1,52 @@
+id: vaadin-debug-console-exposed
+
+info:
+  name: Vaadin Debug Console Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects Vaadin debug console indicators. Debug mode can expose client-server
+    communication details, component hierarchies, performance timings, and
+    framework metadata useful for targeted testing.
+  tags:
+    - misconfig
+    - java
+    - vaadin
+    - debug
+    - framework
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/?debug"
+      - "{{BaseURL}}/?debug=true"
+      - "{{BaseURL}}/VAADIN/debug"
+      - "{{BaseURL}}/VAADIN/vaadinBootstrap.js"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)Vaadin\\s+Debug\\s+Window"
+          - "(?i)vaadin\\.debug"
+          - "(?i)Vaadin\\.Flow"
+          - "(?i)window\\.Vaadin"
+          - "(?i)VAADIN\\/vaadinBootstrap"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Vaadin"
+          - "(?i)JSESSIONID"
+          - "(?i)Atmosphere"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,49 @@
+id: wildfly-transactions-management-unauth
+
+info:
+  name: WildFly Transactions Management Without Authentication
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects unauthenticated reads of WildFly transaction subsystem resources.
+    These responses can disclose recovery settings, timeout policy, node
+    identifiers, and runtime transaction management configuration.
+  tags:
+    - misconfig
+    - wildfly
+    - jboss
+    - transactions
+    - management
+    - unauth
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/management/subsystem=transactions?operation=read-resource"
+      - "{{BaseURL}}/management/subsystem=transactions?operation=read-resource&include-runtime=true"
+      - "{{BaseURL}}/management/subsystem=transactions?operation=read-resource&recursive=true"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        regex:
+          - '(?i)"outcome"\\s*:\\s*"success"'
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - '(?i)"default-timeout"'
+          - '(?i)"node-identifier"'
+          - '(?i)"object-store"'
+          - '(?i)"enable-statistics"'
+          - '(?i)"transactions"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

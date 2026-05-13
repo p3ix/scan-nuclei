@@ -1,0 +1,53 @@
+id: apache-karaf-felix-console-exposed
+
+info:
+  name: Apache Karaf or Felix Web Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache Karaf/Felix OSGi web consoles. These consoles expose
+    bundle, configuration, service, and runtime management surfaces for Java
+    applications and middleware.
+  tags:
+    - misconfig
+    - java
+    - karaf
+    - felix
+    - osgi
+    - console
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/system/console"
+      - "{{BaseURL}}/system/console/"
+      - "{{BaseURL}}/system/console/bundles"
+      - "{{BaseURL}}/system/console/configMgr"
+      - "{{BaseURL}}/karaf/system/console"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Apache\\s+Felix\\s+Web\\s+Console"
+          - "(?i)OSGi\\s+Management\\s+Console"
+          - "(?i)Karaf"
+          - "(?i)system\\/console\\/bundles"
+          - "(?i)realm=\"Karaf\""
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

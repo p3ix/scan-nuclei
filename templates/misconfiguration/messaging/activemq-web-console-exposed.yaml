@@ -1,0 +1,53 @@
+id: activemq-web-console-exposed
+
+info:
+  name: Apache ActiveMQ Web Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache ActiveMQ web consoles. Public broker consoles can
+    disclose queues, topics, consumers, producers, and may permit administrative
+    broker actions if authentication is weak or missing.
+  tags:
+    - misconfig
+    - messaging
+    - java
+    - apache
+    - activemq
+    - broker
+    - console
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/admin/"
+      - "{{BaseURL}}/admin"
+      - "{{BaseURL}}/activemq/admin/"
+      - "{{BaseURL}}/hawtio/"
+      - "{{BaseURL}}/api/jolokia/version"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Apache\\s+ActiveMQ"
+          - "(?i)ActiveMQ\\s+Console"
+          - "(?i)Queues\\s*</a>"
+          - "(?i)Topics\\s*</a>"
+          - "(?i)org\\.apache\\.activemq"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

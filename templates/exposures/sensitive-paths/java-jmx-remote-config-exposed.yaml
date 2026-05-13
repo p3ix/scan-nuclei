@@ -1,0 +1,52 @@
+id: java-jmx-remote-config-exposed
+
+info:
+  name: Java JMX Remote Configuration Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed JMX remote password/access configuration files. These files
+    may disclose JMX usernames, roles, read/write permissions, and sometimes
+    cleartext credentials for remote management.
+  tags:
+    - exposure
+    - java
+    - jmx
+    - credentials
+    - config
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/jmxremote.password"
+      - "{{BaseURL}}/jmxremote.access"
+      - "{{BaseURL}}/conf/jmxremote.password"
+      - "{{BaseURL}}/conf/jmxremote.access"
+      - "{{BaseURL}}/config/jmxremote.password"
+      - "{{BaseURL}}/WEB-INF/classes/jmxremote.password"
+      - "{{BaseURL}}/WEB-INF/classes/jmxremote.access"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^[a-z0-9._-]+\\s+(readonly|readwrite)\\s*$"
+          - "(?im)^[a-z0-9._-]+\\s+[^\\s#]{3,}\\s*$"
+          - "(?im)^monitorRole\\s+"
+          - "(?im)^controlRole\\s+"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/plain|text/html|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

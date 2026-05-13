@@ -1,0 +1,51 @@
+id: apache-envvars-exposed
+
+info:
+  name: Apache Envvars File Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache `envvars` files. These files can disclose runtime
+    users, log directories, locale settings, MPM settings, and environment
+    variables inherited by Apache child processes.
+  tags:
+    - apache
+    - httpd
+    - config
+    - env
+    - exposure
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/envvars"
+      - "{{BaseURL}}/envvars.bak"
+      - "{{BaseURL}}/apache2/envvars"
+      - "{{BaseURL}}/conf/envvars"
+      - "{{BaseURL}}/etc/apache2/envvars"
+      - "{{BaseURL}}/etc/httpd/envvars"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^export\\s+APACHE_RUN_USER="
+          - "(?im)^export\\s+APACHE_RUN_GROUP="
+          - "(?im)^export\\s+APACHE_LOG_DIR="
+          - "(?im)^export\\s+APACHE_PID_FILE="
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/plain|text/html|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
