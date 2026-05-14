@@ -1,294 +1,198 @@
-# scan-nuclei
+<p align="center">
+  <img src="assets/scan-nuclei-overview.svg" alt="scan-nuclei coverage overview" width="100%">
+</p>
 
-Plantillas Nuclei enfocadas en auditorias HTTP de aplicaciones y plataformas Java: Apache HTTPD, Tomcat, WildFly/JBoss, Spring, Quarkus, Micronaut, Jetty, herramientas DevOps/IAM y superficies habituales de infraestructura expuesta.
+<h1 align="center">scan-nuclei</h1>
 
-Este repo esta pensado para uso directo con Nuclei:
+<p align="center">
+  Plantillas Nuclei curadas para auditorias HTTP de aplicaciones Java, servidores web, plataformas DevOps y superficies empresariales expuestas.
+</p>
 
-```bash
-nuclei -t ./templates -u https://192.168.0.18:8443/
-```
+<p align="center">
+  <a href="https://github.com/projectdiscovery/nuclei"><img alt="Nuclei" src="https://img.shields.io/badge/Nuclei-v3-compatible-00A7E1?style=for-the-badge"></a>
+  <img alt="Templates" src="https://img.shields.io/badge/templates-393-22C55E?style=for-the-badge">
+  <img alt="Focus" src="https://img.shields.io/badge/focus-Java%20%7C%20Apache%20%7C%20Tomcat%20%7C%20WildFly-F59E0B?style=for-the-badge">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-64748B?style=for-the-badge">
+</p>
 
-## Instalacion en Linux
+---
 
-### 1. Instalar dependencias basicas
+## Vision General
 
-En Debian/Ubuntu:
+`scan-nuclei` es una coleccion profesional de plantillas para ejecutar con [Nuclei](https://github.com/projectdiscovery/nuclei) sobre objetivos HTTP/HTTPS. El repositorio esta especialmente orientado a stacks Java empresariales y a la superficie que suele quedar publicada alrededor de ellos: Apache HTTPD, Tomcat, WildFly/JBoss, Spring Boot, Quarkus, Micronaut, Jetty, consolas administrativas, DevOps, documentacion API, observabilidad y ficheros sensibles.
+
+El objetivo es que una primera ejecucion proporcione contexto accionable: tecnologia detectada, paneles expuestos, endpoints no autenticados, artefactos sensibles, configuraciones peligrosas y CVEs potenciales que requieren validacion manual.
+
+## Cobertura
+
+| Familia | Plantillas | Enfoque |
+| --- | ---: | --- |
+| `misconfiguration/` | 184 | Consolas, endpoints administrativos, hardening HTTP, proxies, observabilidad, infraestructura y plataformas Java |
+| `exposures/` | 121 | Ficheros sensibles, OpenAPI/Swagger/Knife4j, WSDL/WADL, sourcemaps, logs, heapdumps y artefactos publicados |
+| `vulnerabilities/` | 36 | Riesgos explotables o de alto impacto sin CVE unica, principalmente Spring, servlets, Micronaut y Struts |
+| `technologies/` | 29 | Fingerprinting de Apache, Tomcat, WildFly, Jetty, Spring Boot, Quarkus, Micronaut y Java Web |
+| `cves/` | 21 | Checks no intrusivos para Apache HTTPD, Tomcat y ecosistema Java/JBoss/Spring/Struts |
+| `default-logins/` | 2 | Credenciales por defecto en superficies Tomcat/Manager |
+
+La matriz completa vive en [COVERAGE-MATRIX.md](COVERAGE-MATRIX.md).
+
+## Superficies Cubiertas
+
+| Area | Ejemplos |
+| --- | --- |
+| Java empresarial | Spring Boot, Spring Cloud, Jakarta/JSF, Struts, Axis2, CXF, Vaadin, Dubbo, Camunda, Flowable, XXL-JOB, Apollo, Sentinel, Hystrix |
+| Servidores y middleware | Apache HTTPD, Tomcat, WildFly/JBoss, Jetty, Undertow, Nginx, WebLogic, WebSphere, GlassFish/Payara, Karaf/Felix |
+| DevOps y supply chain | Jenkins, GitLab, Nexus, Artifactory, SonarQube, Argo CD, Harbor |
+| APIs y documentacion | OpenAPI, Swagger UI, Swagger config, Knife4j, WSDL, WADL, GraphQL |
+| Observabilidad e infraestructura | Prometheus, Alertmanager, Grafana, cAdvisor, etcd, Consul, Vault, Docker Registry, Kubernetes |
+| Ficheros sensibles | `.git`, configs Java/Spring/Tomcat/WildFly, keystores, logs, WAR/JAR, `WEB-INF`, JMX remote, `SESSIONS.ser`, JSP compilados |
+
+## Instalacion Rapida
+
+### Linux
 
 ```bash
 sudo apt update
-sudo apt install -y git curl unzip
-```
-
-### 2. Instalar Go
-
-Comprueba primero si Go ya esta instalado:
-
-```bash
-go version
-```
-
-Si el comando no existe, instala Go. Opcion sencilla desde paquetes del sistema:
-
-```bash
-sudo apt update
-sudo apt install -y golang-go
-```
-
-Si necesitas la version oficial mas reciente, descargala desde <https://go.dev/dl/> y sigue la guia oficial de Linux. Despues anade Go al `PATH`:
-
-```bash
-export PATH="$PATH:/usr/local/go/bin"
-```
-
-Para dejarlo permanente en Bash:
-
-```bash
-echo 'export PATH="$PATH:/usr/local/go/bin"' >> ~/.bashrc
-source ~/.bashrc
-```
-
-Comprueba que funciona:
-
-```bash
-go version
-```
-
-### 3. Instalar Nuclei
-
-```bash
+sudo apt install -y git curl unzip golang-go
 go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-```
-
-Anade los binarios de Go al `PATH`:
-
-```bash
 export PATH="$PATH:$(go env GOPATH)/bin"
+git clone https://github.com/p3ix/scan-nuclei.git
+cd scan-nuclei
+nuclei -validate -t ./templates
 ```
 
-Para dejarlo permanente en Bash:
+Para dejar Nuclei disponible de forma permanente en Bash:
 
 ```bash
 echo 'export PATH="$PATH:$(go env GOPATH)/bin"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-Comprueba la instalacion:
+### Windows
 
-```bash
-nuclei -version
-```
-
-### 4. Descargar este repositorio
-
-```bash
-git clone https://github.com/p3ix/scan-nuclei.git
-cd scan-nuclei
-```
-
-Si ya tienes el repo descargado:
-
-```bash
-cd scan-nuclei
-git pull
-```
-
-### 5. Validar las plantillas
-
-```bash
-nuclei -validate -t ./templates
-```
-
-Si ves `All templates validated successfully`, el entorno esta listo.
-
-### 6. Ejecutar el primer escaneo
-
-```bash
-nuclei -t ./templates -u https://192.168.0.18:8443/
-```
-
-## Instalacion en Windows
-
-### 1. Instalar Git
-
-1. Descarga Git desde <https://git-scm.com/download/win>.
-2. Ejecuta el instalador.
-3. Cierra y vuelve a abrir PowerShell.
-4. Comprueba la instalacion:
-
-```powershell
-git --version
-```
-
-### 2. Instalar Go
-
-1. Descarga el instalador `.msi` desde <https://go.dev/dl/>.
-2. Ejecuta el instalador y deja las opciones por defecto.
-3. Cierra y vuelve a abrir PowerShell para recargar el `PATH`.
-4. Comprueba que funciona:
-
-```powershell
-go version
-```
-
-### 3. Instalar Nuclei
+Instala Git desde <https://git-scm.com/download/win> y Go desde <https://go.dev/dl/>. Despues, en PowerShell:
 
 ```powershell
 go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-```
-
-Anade la carpeta de binarios de Go al `PATH` de usuario:
-
-```powershell
 [Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:USERPROFILE\go\bin", "User")
-```
-
-Cierra y vuelve a abrir PowerShell. Comprueba la instalacion:
-
-```powershell
-nuclei -version
-```
-
-### 4. Descargar este repositorio
-
-```powershell
 git clone https://github.com/p3ix/scan-nuclei.git
 cd scan-nuclei
-```
-
-Si ya tienes el repo descargado:
-
-```powershell
-cd scan-nuclei
-git pull
-```
-
-### 5. Validar las plantillas
-
-```powershell
 nuclei -validate -t .\templates
 ```
 
-Si ves `All templates validated successfully`, el entorno esta listo.
+Cierra y vuelve a abrir PowerShell si `nuclei` no aparece inmediatamente en el `PATH`.
 
-### 6. Ejecutar el primer escaneo
+## Uso
 
-```powershell
-nuclei -t .\templates -u https://192.168.0.18:8443/
-```
-
-Para escanear otro objetivo en Linux, cambia la URL:
+Escaneo completo contra un objetivo:
 
 ```bash
 nuclei -t ./templates -u https://objetivo
 ```
 
-En Windows:
+Windows:
 
 ```powershell
 nuclei -t .\templates -u https://objetivo
 ```
 
-## Estructura
-
-- `templates/cves/`: detecciones asociadas a CVEs concretos.
-- `templates/vulnerabilities/`: vulnerabilidades o exposiciones explotables sin CVE unico.
-- `templates/misconfiguration/`: configuraciones inseguras, consolas y endpoints administrativos expuestos.
-- `templates/exposures/`: ficheros sensibles, endpoints de diagnostico, OpenAPI/WSDL/Swagger, sourcemaps y artefactos publicados.
-- `templates/technologies/`: fingerprinting y version disclosure.
-- `templates/default-logins/`: comprobaciones de credenciales por defecto.
-
-Subfamilias utiles para empresa:
-
-- `templates/misconfiguration/devops/`: GitLab, Nexus, Artifactory, SonarQube, Argo CD y Harbor.
-- `templates/misconfiguration/iam/`: Keycloak y otras superficies de identidad.
-
-La matriz completa de cobertura esta en [COVERAGE-MATRIX.md](COVERAGE-MATRIX.md).
-
-## Uso recomendado
-
-Para tu caso, ejecuta todo el arbol.
-
-Linux:
+Primera pasada reduciendo ruido:
 
 ```bash
-nuclei -t ./templates -u https://192.168.0.18:8443/
+nuclei -t ./templates -u https://objetivo -severity critical,high,medium
 ```
 
-Windows:
+Guardar resultados:
 
-```powershell
-nuclei -t .\templates -u https://192.168.0.18:8443/
+```bash
+nuclei -t ./templates -u https://objetivo -o resultados.txt
 ```
 
-Si el objetivo usa un certificado interno o autofirmado y Nuclei falla por TLS, usa:
+Salida JSONL para integracion con pipelines:
 
-Linux:
+```bash
+nuclei -t ./templates -u https://objetivo -jsonl -o resultados.jsonl
+```
+
+Objetivos con certificado interno o SNI delicado:
 
 ```bash
 nuclei -t ./templates -u https://192.168.0.18:8443/ -tls-sni 192.168.0.18
 ```
 
-Windows:
-
-```powershell
-nuclei -t .\templates -u https://192.168.0.18:8443/ -tls-sni 192.168.0.18
-```
-
-Si quieres reducir ruido en una primera pasada, puedes filtrar por severidad:
-
-Linux:
+Escanear una lista de hosts:
 
 ```bash
-nuclei -t ./templates -u https://192.168.0.18:8443/ -severity critical,high,medium
+nuclei -t ./templates -l targets.txt -severity critical,high,medium -jsonl -o resultados.jsonl
 ```
 
-Windows:
+## Flujos Recomendados
 
-```powershell
-nuclei -t .\templates -u https://192.168.0.18:8443/ -severity critical,high,medium
+| Escenario | Comando |
+| --- | --- |
+| Triage rapido | `nuclei -t ./templates -u https://objetivo -severity critical,high` |
+| Auditoria completa | `nuclei -t ./templates -u https://objetivo` |
+| Inventario tecnologico | `nuclei -t ./templates/technologies -u https://objetivo` |
+| Superficie Java | `nuclei -t ./templates/misconfiguration/java-apps -t ./templates/vulnerabilities/spring -u https://objetivo` |
+| Apache/Tomcat/WildFly | `nuclei -t ./templates/misconfiguration/apache -t ./templates/misconfiguration/tomcat -t ./templates/misconfiguration/wildfly -u https://objetivo` |
+| Ficheros sensibles | `nuclei -t ./templates/exposures/sensitive-paths -u https://objetivo` |
+
+## Estructura del Repositorio
+
+```text
+scan-nuclei/
++-- templates/
+|   +-- cves/                 # CVEs concretos y checks potenciales
+|   +-- default-logins/       # Credenciales por defecto
+|   +-- exposures/            # Ficheros, APIs, logs, dumps y artefactos expuestos
+|   +-- misconfiguration/     # Consolas, endpoints, hardening y configuraciones inseguras
+|   +-- technologies/         # Fingerprinting y version disclosure
+|   +-- vulnerabilities/      # Riesgos sin CVE unica o genericos de framework
++-- COVERAGE-MATRIX.md        # Matriz de cobertura por carpeta y prioridad
++-- README.md
 ```
 
-Guardar resultados en fichero:
+## Como Interpretar Resultados
 
-Linux:
+| Severidad | Lectura recomendada |
+| --- | --- |
+| `critical` / `high` | Revisar primero. Normalmente implican secretos, administracion expuesta, acceso no autenticado o superficie explotable. |
+| `medium` | Superficie util para ataque, fuga operativa o mala configuracion que conviene cerrar. |
+| `low` | Hardening y postura defensiva. |
+| `info` | Fingerprinting y contexto tecnologico. No es vulnerabilidad por si solo. |
 
-```bash
-nuclei -t ./templates -u https://192.168.0.18:8443/ -o resultados.txt
-```
+Los templates con sufijo `-potential` indican una condicion compatible con una vulnerabilidad o configuracion peligrosa, pero deben validarse manualmente antes de reportarse como confirmados.
 
-Windows:
+## Buenas Practicas
 
-```powershell
-nuclei -t .\templates -u https://192.168.0.18:8443/ -o resultados.txt
-```
+- Ejecuta primero `nuclei -validate -t ./templates` despues de actualizar el repositorio.
+- Prioriza hallazgos `critical`, `high`, `default-login`, `*-management-unauth`, `heapdump`, `env`, `jmx`, `keystore`, `server.xml`, `standalone.xml` y logs sensibles.
+- Agrupa resultados por tecnologia: los fingerprints ayudan a decidir que familias revisar primero.
+- Usa `-jsonl` cuando quieras integrar resultados con SIEM, pipelines o herramientas propias.
+- Valida manualmente los `*-potential`; estan pensados para ser no intrusivos y evitar explotacion activa.
+- Ejecuta solo contra sistemas propios o con autorizacion explicita.
 
-Guardar resultados en JSONL para procesarlos despues:
+## Mantenimiento
 
-Linux:
-
-```bash
-nuclei -t ./templates -u https://192.168.0.18:8443/ -jsonl -o resultados.jsonl
-```
-
-Windows:
-
-```powershell
-nuclei -t .\templates -u https://192.168.0.18:8443/ -jsonl -o resultados.jsonl
-```
-
-Actualizar Nuclei cuando quieras tener la ultima version del motor:
-
-Linux y Windows:
+Actualizar el motor:
 
 ```bash
 nuclei -update
 ```
 
-## Criterio rapido de lectura
+Actualizar este repositorio:
 
-- `critical` / `high`: revisar y corregir primero; normalmente implican exposicion sensible, acceso no autenticado o riesgo explotable.
-- `medium`: superficie util para ataque o fuga operativa que conviene cerrar.
-- `low`: hardening o postura defensiva.
-- `info`: fingerprinting; sirve para priorizar, no es por si solo una vulnerabilidad.
+```bash
+git pull
+nuclei -validate -t ./templates
+```
 
-Los templates con sufijo `-potential` indican una condicion compatible con una vulnerabilidad o mala configuracion, pero requieren validacion manual antes de reportarlos como confirmados.
+Comprobar numero de plantillas:
+
+```bash
+find templates -name '*.yaml' | wc -l
+```
+
+## Licencia
+
+Este proyecto se distribuye bajo licencia MIT. Consulta [LICENSE](LICENSE).

@@ -1,0 +1,50 @@
+<svg width="1280" height="520" viewBox="0 0 1280 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">scan-nuclei coverage overview</title>
+  <desc id="desc">Professional overview of scan-nuclei template coverage for Java, Apache, Tomcat, WildFly, DevOps, APIs, and observability.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.55" stop-color="#123047"/>
+      <stop offset="1" stop-color="#0F3F3A"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="160" y1="120" x2="1120" y2="430" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="0.5" stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#020617" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="1280" height="520" rx="32" fill="url(#bg)"/>
+  <path d="M102 413C210 288 309 346 423 229C539 110 648 86 790 149C914 204 992 153 1174 88" stroke="url(#accent)" stroke-width="8" stroke-linecap="round" opacity="0.78"/>
+  <path d="M84 414H1196" stroke="#E2E8F0" stroke-width="2" opacity="0.14"/>
+  <g filter="url(#shadow)">
+    <rect x="80" y="74" width="1120" height="372" rx="24" fill="#0B1220" fill-opacity="0.72" stroke="#E2E8F0" stroke-opacity="0.16"/>
+  </g>
+  <text x="120" y="142" fill="#F8FAFC" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="0">scan-nuclei</text>
+  <text x="120" y="186" fill="#BAE6FD" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="0">Curated Nuclei templates for enterprise HTTP security assessment</text>
+  <text x="120" y="226" fill="#CBD5E1" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" letter-spacing="0">Focused on Java, Apache HTTPD, Tomcat, WildFly/JBoss, Spring, APIs, DevOps, observability, and exposed infrastructure.</text>
+  <g font-family="Inter, Segoe UI, Arial, sans-serif">
+    <rect x="120" y="272" width="160" height="96" rx="14" fill="#111827" stroke="#38BDF8" stroke-opacity="0.55"/>
+    <text x="148" y="314" fill="#F8FAFC" font-size="34" font-weight="800">393</text>
+    <text x="148" y="342" fill="#93C5FD" font-size="16" font-weight="700">templates</text>
+    <rect x="304" y="272" width="160" height="96" rx="14" fill="#111827" stroke="#22C55E" stroke-opacity="0.55"/>
+    <text x="332" y="314" fill="#F8FAFC" font-size="34" font-weight="800">184</text>
+    <text x="332" y="342" fill="#86EFAC" font-size="16" font-weight="700">misconfig</text>
+    <rect x="488" y="272" width="160" height="96" rx="14" fill="#111827" stroke="#F59E0B" stroke-opacity="0.55"/>
+    <text x="516" y="314" fill="#F8FAFC" font-size="34" font-weight="800">121</text>
+    <text x="516" y="342" fill="#FCD34D" font-size="16" font-weight="700">exposures</text>
+    <rect x="672" y="272" width="160" height="96" rx="14" fill="#111827" stroke="#A78BFA" stroke-opacity="0.55"/>
+    <text x="700" y="314" fill="#F8FAFC" font-size="34" font-weight="800">29</text>
+    <text x="700" y="342" fill="#C4B5FD" font-size="16" font-weight="700">fingerprints</text>
+  </g>
+  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">
+    <rect x="878" y="266" width="242" height="36" rx="18" fill="#0F766E" fill-opacity="0.55"/>
+    <text x="900" y="290" fill="#CCFBF1">Java / Spring / Jakarta</text>
+    <rect x="878" y="314" width="242" height="36" rx="18" fill="#0369A1" fill-opacity="0.55"/>
+    <text x="900" y="338" fill="#E0F2FE">Apache / Tomcat / WildFly</text>
+    <rect x="878" y="362" width="242" height="36" rx="18" fill="#92400E" fill-opacity="0.55"/>
+    <text x="900" y="386" fill="#FEF3C7">DevOps / APIs / Observability</text>
+  </g>
+</svg>

@@ -1,29 +1,50 @@
 # Templates
 
-Arbol de plantillas para ejecutar directamente con Nuclei:
+Arbol de plantillas listo para ejecutar directamente con Nuclei:
 
 ```bash
-nuclei -t ./templates -u https://192.168.0.18:8443/
+nuclei -t ./templates -u https://objetivo
 ```
 
-## Carpetas
+Actualmente contiene 393 plantillas organizadas por tipo de hallazgo y tecnologia.
 
-- `cves/`: CVEs concretos.
-- `vulnerabilities/`: fallos sin CVE unico.
-- `misconfiguration/`: configuraciones inseguras.
-- `exposures/`: endpoints, ficheros o artefactos sensibles expuestos.
-- `technologies/`: fingerprinting y version disclosure.
-- `default-logins/`: credenciales por defecto.
+## Carpetas Principales
 
-Subfamilias destacadas:
+| Carpeta | Plantillas | Proposito |
+| --- | ---: | --- |
+| `cves/` | 21 | CVEs concretos y checks no intrusivos de exposicion potencial |
+| `default-logins/` | 2 | Credenciales por defecto |
+| `exposures/` | 121 | Ficheros, endpoints, dumps, logs, APIs y artefactos sensibles expuestos |
+| `misconfiguration/` | 184 | Consolas, administracion expuesta, hardening, proxies y configuracion insegura |
+| `technologies/` | 29 | Fingerprinting y version disclosure |
+| `vulnerabilities/` | 36 | Riesgos sin CVE unica o genericos de frameworks |
 
-- `misconfiguration/devops/`: GitLab, Nexus, Artifactory, SonarQube, Argo CD y Harbor.
-- `misconfiguration/iam/`: Keycloak y superficies de identidad.
+## Subfamilias Destacadas
 
-La matriz completa de cobertura vive en `../COVERAGE-MATRIX.md`.
+| Ruta | Enfoque |
+| --- | --- |
+| `misconfiguration/apache/` | Apache HTTPD, proxying, WebDAV, ModSecurity, logs, status/info y hardening |
+| `misconfiguration/tomcat/` | Tomcat Manager, Host Manager, JMXProxy, diagnostico, sesiones y WebDAV |
+| `misconfiguration/wildfly/` | WildFly/JBoss management, datasources, Elytron, remoting, Infinispan, Undertow y dominio |
+| `misconfiguration/java-apps/` | Spring, Dubbo, Camunda, Flowable, Vaadin, XXL-JOB, Apollo, Druid, Nacos, Solr, Spark, Flink y mas |
+| `exposures/sensitive-paths/` | Configs Java/Spring/Tomcat/WildFly, keystores, logs, WAR/JAR, `WEB-INF`, JMX y artefactos runtime |
+| `exposures/apis/` | GraphQL introspection y UI |
+| `exposures/debug-probes/` | Heapdump, threaddump y logfile |
+
+La matriz completa de cobertura vive en [`../COVERAGE-MATRIX.md`](../COVERAGE-MATRIX.md).
 
 ## Nomenclatura
 
-- `*-exposed`: evidencia confirmada de exposicion.
-- `*-potential`: indicio que requiere validacion manual.
+- `*-exposed`: evidencia observable de exposicion.
+- `*-unauth`: acceso sin autenticacion efectiva.
+- `*-potential`: indicio compatible con riesgo o CVE; requiere validacion manual.
 - `*-fingerprint`: contexto tecnologico para priorizar hallazgos.
+- `*-default-credentials`: prueba de credenciales por defecto o debiles conocidas.
+
+## Validacion
+
+```bash
+nuclei -validate -t ./templates
+```
+
+Si la salida incluye `All templates validated successfully`, el arbol esta listo para uso.
