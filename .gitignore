@@ -15,8 +15,12 @@ nuclei
 *.nuclei
 nuclei-output*
 *.ndjson
+*.jsonl
+report.html
+nuclei-report.html
 scan-*.log
 nuclei-*.log
+targets.txt
 
 # Local env
 .env

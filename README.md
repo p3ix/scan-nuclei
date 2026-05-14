@@ -126,6 +126,40 @@ Escanear una lista de hosts:
 nuclei -t ./templates -l targets.txt -severity critical,high,medium -jsonl -o resultados.jsonl
 ```
 
+## Informes HTML
+
+Para listas de objetivos, la salida normal de Nuclei mezcla findings de todos los hosts. Este repositorio incluye un generador de informes que lee JSONL, agrupa resultados por target y severidad, enriquece cada finding con la descripcion de su plantilla y muestra evidencia concreta como rutas expuestas, valores extraidos o cabeceras ausentes.
+
+Flujo recomendado en dos pasos:
+
+```bash
+nuclei -t ./templates -l targets.txt -jsonl -o resultados.jsonl
+python3 scripts/nuclei-html-report.py --input resultados.jsonl --output report.html
+```
+
+Si prefieres que Nuclei no pinte todos los resultados JSON por pantalla, deja que el script lance el escaneo y silencie `stdout`:
+
+```bash
+python3 scripts/nuclei-html-report.py --targets targets.txt --templates ./templates --output report.html --keep-jsonl resultados.jsonl
+```
+
+Importante: `-o resultados.jsonl` sin `-jsonl` no genera JSONL, solo guarda la salida de consola con formato humano. El generador intenta leer ambos formatos, pero JSONL conserva mas metadatos y produce informes mas ricos.
+
+Con filtro de severidad:
+
+```bash
+python3 scripts/nuclei-html-report.py --targets targets.txt --templates ./templates --severity critical,high,medium --output report.html
+```
+
+El informe HTML incluye:
+
+- Resumen ejecutivo con total de findings, targets afectados y hallazgos accionables.
+- Agrupacion por target, severidad y plantilla.
+- Nombre legible, severidad, tags y descripcion de cada template.
+- URL y ruta afectada.
+- Extractores de Nuclei, por ejemplo `exposed_path`, `tomcat_version`, `missing_headers` o `missing_count`.
+- Recomendacion practica segun tipo de hallazgo.
+
 ## Flujos Recomendados
 
 | Escenario | Comando |
