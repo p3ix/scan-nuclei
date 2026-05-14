@@ -1,0 +1,57 @@
+id: apollo-config-portal-exposed
+
+info:
+  name: Apollo Config Portal Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apollo configuration portal and API surfaces. Apollo often
+    stores application configuration, namespaces, release history, environment
+    metadata, and sometimes sensitive operational values.
+  tags:
+    - misconfig
+    - java
+    - apollo
+    - config
+    - portal
+    - admin
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/signin"
+      - "{{BaseURL}}/apollo/"
+      - "{{BaseURL}}/apollo/signin"
+      - "{{BaseURL}}/apps"
+      - "{{BaseURL}}/openapi/v1/apps"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Apollo\\s+Config"
+          - "(?i)apollo-portal"
+          - "(?i)apollo-configservice"
+          - "(?i)ctripcorp\\/apollo"
+          - '(?i)"appId"\\s*:'
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)apollo"
+          - "(?i)namespace"
+          - "(?i)cluster"
+          - "(?i)config"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

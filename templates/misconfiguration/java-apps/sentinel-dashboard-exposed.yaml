@@ -1,0 +1,52 @@
+id: sentinel-dashboard-exposed
+
+info:
+  name: Sentinel Dashboard Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Alibaba Sentinel dashboards. A reachable dashboard can
+    disclose service names, cluster health, flow-control rules, degradation
+    policies, and runtime telemetry for Java microservices.
+  tags:
+    - misconfig
+    - java
+    - sentinel
+    - alibaba
+    - dashboard
+    - microservices
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+      - "{{BaseURL}}/sentinel/"
+      - "{{BaseURL}}/sentinel-dashboard/"
+      - "{{BaseURL}}/dashboard"
+      - "{{BaseURL}}/version"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Sentinel\\s+Dashboard"
+          - "(?i)sentinel-dashboard"
+          - "(?i)com\\.alibaba\\.csp\\.sentinel"
+          - "(?i)Flow\\s+Control"
+          - "(?i)Degrade\\s+Rule"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

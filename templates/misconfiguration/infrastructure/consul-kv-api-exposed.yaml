@@ -1,0 +1,53 @@
+id: consul-kv-api-exposed
+
+info:
+  name: Consul KV API Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Consul KV APIs. Public KV access can reveal service
+    configuration, feature flags, credentials, deployment metadata, and
+    application secrets stored under common prefixes.
+  tags:
+    - misconfig
+    - infrastructure
+    - consul
+    - kv
+    - secrets
+    - api
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/v1/kv/?keys"
+      - "{{BaseURL}}/v1/kv/config/?keys"
+      - "{{BaseURL}}/v1/kv/services/?keys"
+      - "{{BaseURL}}/v1/kv/application/?keys"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)\\["[^"]+/.+"\\]'
+          - '(?i)"errors"\\s*:'
+          - "(?i)Consul"
+          - "(?i)permission\\s+denied"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)config"
+          - "(?i)service"
+          - "(?i)application"
+          - "(?i)consul"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

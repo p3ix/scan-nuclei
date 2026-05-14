@@ -1,0 +1,54 @@
+id: artifactory-api-repositories-exposed
+
+info:
+  name: Artifactory Repository API Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Artifactory repository APIs. Exposed metadata can
+    reveal repository keys, package types, storage URLs, permissions posture,
+    and supply-chain organization.
+  tags:
+    - misconfig
+    - devops
+    - artifactory
+    - repository
+    - api
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/artifactory/api/repositories"
+      - "{{BaseURL}}/api/repositories"
+      - "{{BaseURL}}/artifactory/api/system/version"
+      - "{{BaseURL}}/ui/api/v1/ui"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"key"\\s*:\\s*"[^"]+"'
+          - '(?i)"packageType"\\s*:'
+          - '(?i)"repoType"\\s*:'
+          - '(?i)"artifactory"\\s*:'
+          - "(?i)JFrog\\s+Artifactory"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)artifactory"
+          - "(?i)repository"
+          - "(?i)jfrog"
+          - "(?i)package"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

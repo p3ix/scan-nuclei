@@ -1,0 +1,55 @@
+id: knife4j-api-docs-exposed
+
+info:
+  name: Knife4j API Documentation Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Knife4j/Swagger API documentation commonly used in Java
+    services. These pages can reveal controllers, request schemas, auth flows,
+    internal endpoints, and environment-specific API groups.
+  tags:
+    - exposure
+    - java
+    - knife4j
+    - swagger
+    - openapi
+    - docs
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/doc.html"
+      - "{{BaseURL}}/knife4j/doc.html"
+      - "{{BaseURL}}/swagger-resources"
+      - "{{BaseURL}}/v2/api-docs"
+      - "{{BaseURL}}/v3/api-docs"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Knife4j"
+          - "(?i)knife4j"
+          - "(?i)SwaggerBootstrapUi"
+          - '(?i)"swagger"\\s*:\\s*"2\\.0"'
+          - '(?i)"openapi"\\s*:\\s*"3\\.'
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)api-docs"
+          - "(?i)swagger-resources"
+          - "(?i)group"
+          - "(?i)paths"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

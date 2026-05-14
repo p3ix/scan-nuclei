@@ -1,0 +1,51 @@
+id: hystrix-dashboard-exposed
+
+info:
+  name: Hystrix Dashboard Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Netflix Hystrix dashboards and streams. These legacy Java
+    microservice endpoints can disclose service names, circuit health, error
+    rates, latency distributions, and internal command keys.
+  tags:
+    - misconfig
+    - java
+    - hystrix
+    - netflix
+    - dashboard
+    - microservices
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/hystrix"
+      - "{{BaseURL}}/hystrix/"
+      - "{{BaseURL}}/hystrix.stream"
+      - "{{BaseURL}}/actuator/hystrix.stream"
+      - "{{BaseURL}}/turbine.stream"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Hystrix\\s+Dashboard"
+          - "(?i)hystrix\\.stream"
+          - "(?i)Turbine"
+          - "(?im)^data:\\s*\\{.*\"type\"\\s*:\\s*\"Hystrix"
+          - "(?i)com\\.netflix\\.hystrix"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

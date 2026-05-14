@@ -1,0 +1,53 @@
+id: jenkins-computer-api-exposed
+
+info:
+  name: Jenkins Computer API Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Jenkins computer/node API responses. Node metadata can leak
+    agent names, executors, labels, remoting status, architecture hints, and
+    build infrastructure topology.
+  tags:
+    - misconfig
+    - cicd
+    - jenkins
+    - nodes
+    - api
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/computer/api/json"
+      - "{{BaseURL}}/jenkins/computer/api/json"
+      - "{{BaseURL}}/computer/(built-in)/api/json"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"computer"\\s*:\\s*\\['
+          - '(?i)"numExecutors"\\s*:'
+          - '(?i)"assignedLabels"\\s*:'
+          - "(?i)X-Jenkins:"
+          - "(?i)Jenkins"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)offline"
+          - "(?i)temporarilyOffline"
+          - "(?i)executor"
+          - "(?i)jenkins"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

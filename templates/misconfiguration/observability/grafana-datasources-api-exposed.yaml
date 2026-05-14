@@ -1,0 +1,53 @@
+id: grafana-datasources-api-exposed
+
+info:
+  name: Grafana Datasources API Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects Grafana datasource API exposure. Even when secrets are redacted,
+    datasource metadata can disclose internal service URLs, database types,
+    organization IDs, plugin IDs, and monitoring topology.
+  tags:
+    - misconfig
+    - observability
+    - grafana
+    - datasources
+    - api
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/datasources"
+      - "{{BaseURL}}/grafana/api/datasources"
+      - "{{BaseURL}}/api/datasources/name/prometheus"
+      - "{{BaseURL}}/grafana/api/datasources/name/prometheus"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"type"\\s*:\\s*"(prometheus|elasticsearch|mysql|postgres|influxdb|loki)"'
+          - '(?i)"access"\\s*:\\s*"(proxy|direct)"'
+          - '(?i)"database"\\s*:'
+          - "(?i)Grafana"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)datasource"
+          - "(?i)grafana"
+          - "(?i)prometheus"
+          - "(?i)url"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

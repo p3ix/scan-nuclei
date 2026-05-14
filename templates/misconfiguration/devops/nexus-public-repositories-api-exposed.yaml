@@ -1,0 +1,54 @@
+id: nexus-public-repositories-api-exposed
+
+info:
+  name: Nexus Public Repositories API Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects publicly reachable Nexus repository listing APIs. Repository
+    metadata can reveal artifact formats, hosted/proxy group topology, internal
+    names, blob stores, and package supply-chain structure.
+  tags:
+    - misconfig
+    - devops
+    - nexus
+    - repository
+    - api
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/service/rest/v1/repositories"
+      - "{{BaseURL}}/nexus/service/rest/v1/repositories"
+      - "{{BaseURL}}/repository/maven-public/"
+      - "{{BaseURL}}/nexus/repository/maven-public/"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"format"\\s*:\\s*"(maven2|npm|docker|raw|pypi|nuget)"'
+          - '(?i)"type"\\s*:\\s*"(hosted|proxy|group)"'
+          - "(?i)Nexus\\s+Repository"
+          - "(?i)nexus-coreui"
+          - "(?i)Index\\s+of\\s+repository"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)nexus"
+          - "(?i)repository"
+          - "(?i)maven"
+          - "(?i)artifact"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

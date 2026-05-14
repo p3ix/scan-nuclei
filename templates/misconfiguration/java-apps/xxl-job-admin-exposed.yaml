@@ -1,0 +1,52 @@
+id: xxl-job-admin-exposed
+
+info:
+  name: XXL-JOB Admin Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed XXL-JOB admin consoles. Public job scheduling consoles can
+    reveal executor groups, job handlers, logs, trigger history, and can become
+    execution surfaces if credentials are weak or missing.
+  tags:
+    - misconfig
+    - java
+    - xxl-job
+    - scheduler
+    - admin
+    - console
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/xxl-job-admin/"
+      - "{{BaseURL}}/xxl-job-admin/toLogin"
+      - "{{BaseURL}}/xxl-job-admin/jobinfo"
+      - "{{BaseURL}}/job-admin/"
+      - "{{BaseURL}}/job-admin/toLogin"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)XXL-JOB"
+          - "(?i)Distributed\\s+Task\\s+Scheduling"
+          - "(?i)xxl-job-admin"
+          - "(?i)任务调度中心"
+          - "(?i)JobGroup"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

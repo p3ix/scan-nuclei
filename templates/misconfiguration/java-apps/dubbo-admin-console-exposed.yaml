@@ -1,0 +1,53 @@
+id: dubbo-admin-console-exposed
+
+info:
+  name: Apache Dubbo Admin Console Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Apache Dubbo Admin consoles and service metadata endpoints.
+    Dubbo Admin can disclose providers, consumers, registries, service names,
+    methods, routing rules, and governance configuration.
+  tags:
+    - misconfig
+    - java
+    - apache
+    - dubbo
+    - admin
+    - registry
+    - console
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/dubbo-admin/"
+      - "{{BaseURL}}/dubbo-admin"
+      - "{{BaseURL}}/dubbo-admin/api/dev/versions"
+      - "{{BaseURL}}/api/dev/versions"
+      - "{{BaseURL}}/api/services"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Dubbo\\s+Admin"
+          - "(?i)Apache\\s+Dubbo"
+          - "(?i)dubbo-admin"
+          - '(?i)"dubbo"\\s*:'
+          - "(?i)org\\.apache\\.dubbo"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

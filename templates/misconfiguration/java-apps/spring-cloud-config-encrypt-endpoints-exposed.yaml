@@ -1,0 +1,52 @@
+id: spring-cloud-config-encrypt-endpoints-exposed
+
+info:
+  name: Spring Cloud Config Encrypt Endpoints Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Spring Cloud Config encryption/decryption endpoint surface
+    using safe GET probes. These endpoints are normally POST-only; observable
+    method responses still indicate sensitive cryptographic service exposure.
+  tags:
+    - misconfig
+    - java
+    - spring
+    - spring-cloud-config
+    - encrypt
+    - crypto
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/encrypt"
+      - "{{BaseURL}}/decrypt"
+      - "{{BaseURL}}/config/encrypt"
+      - "{{BaseURL}}/config/decrypt"
+
+    redirects: false
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403 || status_code == 405"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)Request\\s+method\\s+'GET'\\s+not\\s+supported"
+          - "(?i)Method\\s+Not\\s+Allowed"
+          - "(?i)Spring\\s+Cloud\\s+Config"
+          - "(?i)Encryptor"
+          - "(?i)Cannot\\s+decrypt"
+      - type: dsl
+        dsl:
+          - '!contains(to_lower(body), "<title>404")'
+          - '!contains(to_lower(body), "not found")'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

@@ -1,0 +1,50 @@
+id: jenkins-queue-api-exposed
+
+info:
+  name: Jenkins Queue API Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Jenkins queue API responses. Queue metadata can disclose job
+    names, build causes, labels, node constraints, user names, and CI activity.
+  tags:
+    - misconfig
+    - cicd
+    - jenkins
+    - api
+    - exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/queue/api/json"
+      - "{{BaseURL}}/jenkins/queue/api/json"
+      - "{{BaseURL}}/view/All/queue/api/json"
+
+    matchers-condition: and
+    matchers:
+      - type: dsl
+        dsl:
+          - "status_code == 200 || status_code == 401 || status_code == 403"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - '(?i)"items"\\s*:\\s*\\['
+          - '(?i)"discoverableItems"\\s*:\\s*\\['
+          - "(?i)X-Jenkins:"
+          - "(?i)Jenkins"
+      - type: regex
+        part: all
+        condition: or
+        regex:
+          - "(?i)jenkins"
+          - "(?i)queue"
+          - "(?i)blocked"
+          - "(?i)buildable"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
