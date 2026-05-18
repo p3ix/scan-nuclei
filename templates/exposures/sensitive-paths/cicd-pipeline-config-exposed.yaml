@@ -1,0 +1,68 @@
+id: cicd-pipeline-config-exposed
+
+info:
+  name: CI/CD Pipeline Configuration Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed CI/CD pipeline configuration files. These may reveal build
+    steps, deployment commands, registry URLs, branch rules, environment names,
+    secret variable names, and internal infrastructure references.
+  tags:
+    - exposure
+    - cicd
+    - devops
+    - pipeline
+    - config
+    - supply-chain
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.gitlab-ci.yml"
+      - "{{BaseURL}}/.github/workflows/ci.yml"
+      - "{{BaseURL}}/.github/workflows/build.yml"
+      - "{{BaseURL}}/.github/workflows/deploy.yml"
+      - "{{BaseURL}}/.github/workflows/release.yml"
+      - "{{BaseURL}}/Jenkinsfile"
+      - "{{BaseURL}}/jenkinsfile"
+      - "{{BaseURL}}/azure-pipelines.yml"
+      - "{{BaseURL}}/bitbucket-pipelines.yml"
+      - "{{BaseURL}}/.circleci/config.yml"
+      - "{{BaseURL}}/.drone.yml"
+      - "{{BaseURL}}/.travis.yml"
+      - "{{BaseURL}}/cloudbuild.yaml"
+      - "{{BaseURL}}/skaffold.yaml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^name\\s*:\\s*.+\\n\\s*on\\s*:"
+          - "(?im)^stages\\s*:"
+          - "(?im)^jobs\\s*:"
+          - "(?im)^pipeline\\s*\\{"
+          - "(?im)^trigger\\s*:"
+          - "(?im)^steps\\s*:"
+          - "(?im)^kind\\s*:\\s*pipeline\\s*$"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(mvn|gradle|docker|kubectl|helm|deploy|registry|artifact|sonar|nexus|artifactory)"
+          - "(?i)(secrets\\.|secret|token|password|credential|AWS_|GCP_|AZURE_|KUBE_)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/plain|application/x-yaml|text/yaml|application/yaml|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

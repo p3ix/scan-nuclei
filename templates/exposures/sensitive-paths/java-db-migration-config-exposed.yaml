@@ -1,0 +1,69 @@
+id: java-db-migration-config-exposed
+
+info:
+  name: Java Database Migration Configuration Exposed
+  author: scan-nuclei
+  severity: high
+  description: |
+    Detects exposed Flyway and Liquibase configuration or changelog files. These
+    may reveal database URLs, schemas, usernames, credentials, migration paths,
+    and internal data model details.
+  tags:
+    - exposure
+    - java
+    - database
+    - migration
+    - flyway
+    - liquibase
+    - sensitive
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/flyway.conf"
+      - "{{BaseURL}}/conf/flyway.conf"
+      - "{{BaseURL}}/config/flyway.conf"
+      - "{{BaseURL}}/WEB-INF/classes/flyway.conf"
+      - "{{BaseURL}}/db/migration/flyway.conf"
+      - "{{BaseURL}}/liquibase.properties"
+      - "{{BaseURL}}/liquibase.yml"
+      - "{{BaseURL}}/liquibase.yaml"
+      - "{{BaseURL}}/liquibase.xml"
+      - "{{BaseURL}}/changelog.xml"
+      - "{{BaseURL}}/db/changelog/db.changelog-master.xml"
+      - "{{BaseURL}}/db/changelog/db.changelog-master.yaml"
+      - "{{BaseURL}}/db/changelog/db.changelog-master.yml"
+      - "{{BaseURL}}/WEB-INF/classes/db/changelog/db.changelog-master.xml"
+      - "{{BaseURL}}/WEB-INF/classes/db/changelog/db.changelog-master.yaml"
+      - "{{BaseURL}}/WEB-INF/classes/db/changelog/db.changelog-master.yml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^flyway\\.(url|user|password|locations|schemas|table)\\s*="
+          - "(?im)^(url|username|password|changeLogFile|classpath)\\s*[:=]"
+          - "(?im)^liquibase\\.command\\.(url|username|password|changeLogFile)\\s*="
+          - "(?is)<databaseChangeLog\\b"
+          - "(?im)^databaseChangeLog\\s*:"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(jdbc:|databaseChangeLog|changeSet|flyway|liquibase|schema|migration)"
+          - "(?i)(password|passwd|username|credential|secret|token)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(application/xml|text/xml|text/plain|application/x-yaml|text/yaml|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path

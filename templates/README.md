@@ -6,7 +6,7 @@ Arbol de plantillas listo para ejecutar directamente con Nuclei:
 nuclei -t ./templates -u https://objetivo
 ```
 
-Actualmente contiene 393 plantillas organizadas por tipo de hallazgo y tecnologia.
+Actualmente contiene 398 plantillas organizadas por tipo de hallazgo y tecnologia.
 
 ## Carpetas Principales
 
@@ -14,7 +14,7 @@ Actualmente contiene 393 plantillas organizadas por tipo de hallazgo y tecnologi
 | --- | ---: | --- |
 | `cves/` | 21 | CVEs concretos y checks no intrusivos de exposicion potencial |
 | `default-logins/` | 2 | Credenciales por defecto |
-| `exposures/` | 121 | Ficheros, endpoints, dumps, logs, APIs y artefactos sensibles expuestos |
+| `exposures/` | 126 | Ficheros, endpoints, dumps, logs, APIs y artefactos sensibles expuestos |
 | `misconfiguration/` | 184 | Consolas, administracion expuesta, hardening, proxies y configuracion insegura |
 | `technologies/` | 29 | Fingerprinting y version disclosure |
 | `vulnerabilities/` | 36 | Riesgos sin CVE unica o genericos de frameworks |

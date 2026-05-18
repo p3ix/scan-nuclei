@@ -1,0 +1,72 @@
+id: deployment-manifests-exposed
+
+info:
+  name: Deployment Manifests Exposed
+  author: scan-nuclei
+  severity: medium
+  description: |
+    Detects exposed Docker, Docker Compose, Kubernetes, and Helm manifests. These
+    files can disclose images, service names, environment variables, ports,
+    internal hostnames, secrets references, and deployment topology.
+  tags:
+    - exposure
+    - deployment
+    - docker
+    - kubernetes
+    - helm
+    - config
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/Dockerfile"
+      - "{{BaseURL}}/docker-compose.yml"
+      - "{{BaseURL}}/docker-compose.yaml"
+      - "{{BaseURL}}/compose.yml"
+      - "{{BaseURL}}/compose.yaml"
+      - "{{BaseURL}}/kubernetes.yml"
+      - "{{BaseURL}}/kubernetes.yaml"
+      - "{{BaseURL}}/k8s.yml"
+      - "{{BaseURL}}/k8s.yaml"
+      - "{{BaseURL}}/deployment.yml"
+      - "{{BaseURL}}/deployment.yaml"
+      - "{{BaseURL}}/service.yml"
+      - "{{BaseURL}}/service.yaml"
+      - "{{BaseURL}}/ingress.yml"
+      - "{{BaseURL}}/ingress.yaml"
+      - "{{BaseURL}}/values.yml"
+      - "{{BaseURL}}/values.yaml"
+      - "{{BaseURL}}/helm/values.yaml"
+      - "{{BaseURL}}/charts/values.yaml"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?im)^FROM\\s+[a-z0-9./:_-]+"
+          - "(?im)^services\\s*:"
+          - "(?im)^apiVersion\\s*:\\s*(apps/|batch/|networking\\.k8s\\.io/|v1)"
+          - "(?im)^kind\\s*:\\s*(Deployment|Service|Ingress|Secret|ConfigMap|StatefulSet|DaemonSet|Job|CronJob)"
+          - "(?im)^\\s*image\\s*:\\s*[a-z0-9./:_-]+"
+      - type: regex
+        part: body
+        condition: or
+        regex:
+          - "(?i)(container_name|ports:|environment:|env:|volumes:|restart:|depends_on)"
+          - "(?i)(secretKeyRef|configMapKeyRef|imagePullSecrets|serviceAccountName|nodeSelector)"
+          - "(?i)(SPRING_|JAVA_OPTS|JDBC_|DB_|REDIS_|KAFKA_)"
+      - type: regex
+        part: header
+        regex:
+          - "(?i)content-type:\\s*(text/plain|application/x-yaml|text/yaml|application/yaml|application/octet-stream)"
+
+    extractors:
+      - type: dsl
+        dsl:
+          - path
+        name: exposed_path
